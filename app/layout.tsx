@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description:
     "MOCO - Smart Electric Luggage, vali điện thông minh cho hành trình hiện đại.",
   icons: {
-    icon: "/logo.jpg",
+    icon: "/assets/logo.jpg",
   },
 };
 

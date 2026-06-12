@@ -88,7 +88,7 @@ export default function Home() {
     <>
       <header className="site-header">
         <a className="brand" href="#home" aria-label="MOCO home">
-          <Image src="/logo.jpg" alt="MOCO logo" width={34} height={34} style={{ borderRadius: '8px', objectFit: 'cover' }} />
+          <Image src="/assets/logo.jpg" alt="MOCO logo" width={34} height={34} style={{ borderRadius: '8px', objectFit: 'cover' }} />
           <span>MOCO</span>
         </a>
         <nav className="nav" aria-label="Điều hướng chính">
