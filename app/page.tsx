@@ -101,6 +101,26 @@ export default function Home() {
             </div>
           </div>
         </section>
+        <section className="section new-arrival" id="new-arrival">
+          <div className="new-arrival-content">
+            <span className="badge-outline">NEW ARRIVAL</span>
+            <h2 className="new-arrival-title">
+              Vali điện cho<br />hành trình hiện đại
+            </h2>
+            <div className="new-arrival-text">
+              <p className="highlight-text">
+                MOCO là vali điện thông minh thế hệ mới, được thiết kế để đồng hành cùng những người yêu thích sự tiện lợi, công nghệ và trải nghiệm di chuyển hiện đại.
+              </p>
+              <p>
+                Không chỉ là một chiếc vali, MOCO kết hợp giữa hành lý, phương tiện di chuyển cá nhân và công nghệ thông minh trong một sản phẩm duy nhất. Từ sân bay, nhà ga đến các khu du lịch hay đô thị hiện đại, MOCO giúp mỗi hành trình trở nên nhẹ nhàng, linh hoạt và thú vị hơn.
+              </p>
+              <p>
+                Được tích hợp khả năng di chuyển bằng điện, theo dõi vị trí, kết nối ứng dụng thông minh và nhiều tính năng hỗ trợ hiện đại, MOCO mang đến một chuẩn mực mới cho trải nghiệm Smart Travel trong kỷ nguyên số.
+              </p>
+            </div>
+          </div>
+        </section>
+
         <div className="feature-strip-container">
           <div className="feature-strip" aria-label="Điểm nổi bật">
             {data.highlights.map((item) => (

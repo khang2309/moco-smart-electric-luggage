@@ -20,9 +20,13 @@ html {
 body {
   margin: 0;
   color: var(--ink);
-  font-family: "Be Vietnam Pro", "Inter", "Segoe UI", Arial, sans-serif;
+  font-family: var(--font-quicksand), "Quicksand", sans-serif;
   background:
-    radial-gradient(circle at 22% 8%, rgba(84, 217, 255, 0.24), transparent 28rem),
+    radial-gradient(
+      circle at 22% 8%,
+      rgba(84, 217, 255, 0.24),
+      transparent 28rem
+    ),
     linear-gradient(145deg, #f9fbff 0%, #eef5ff 48%, #f8fbff 100%);
 }
 
@@ -203,7 +207,11 @@ a {
   border: 1px solid var(--line);
   border-radius: 8px;
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(238, 246, 255, 0.86)),
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.94),
+      rgba(238, 246, 255, 0.86)
+    ),
     linear-gradient(90deg, transparent, rgba(84, 217, 255, 0.12));
   box-shadow: var(--shadow);
 }
@@ -211,7 +219,7 @@ a {
 .hero {
   width: 100%;
   min-height: calc(100vh - 120px);
-  background-image: url('/assets/banner.jpg');
+  background-image: url("/assets/banner.png");
   background-size: cover;
   background-position: center;
   display: flex;
@@ -281,6 +289,73 @@ a {
   transform: translateY(-2px);
   transition: all 0.3s ease;
 }
+
+.new-arrival {
+  padding: 80px 64px;
+  background: white url("/assets/introVali.png") no-repeat center right / cover;
+  border-radius: 24px;
+  box-shadow: 0 24px 70px rgba(22, 62, 130, 0.08);
+  display: flex;
+  align-items: center;
+  min-height: 600px;
+}
+
+.new-arrival-content {
+  max-width: 55%;
+}
+
+.badge-outline {
+  display: inline-flex;
+  padding: 6px 16px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 24px;
+}
+
+.new-arrival-title {
+  font-size: clamp(28px, 3.5vw, 38px);
+  font-weight: 800;
+  line-height: 1.2;
+  margin: 0 0 24px 0;
+  color: #111;
+  letter-spacing: -0.5px;
+}
+
+.new-arrival-text p {
+  color: #555;
+  line-height: 1.7;
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.new-arrival-text p:last-child {
+  margin-bottom: 0;
+}
+
+.new-arrival-text .highlight-text {
+  position: relative;
+  padding-left: 20px;
+  font-weight: 600;
+  color: #222;
+}
+
+.new-arrival-text .highlight-text::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 4px;
+  bottom: 4px;
+  width: 3px;
+  background-color: var(--line);
+  border-radius: 2px;
+}
+
 
 .feature-strip-container {
   width: min(1180px, calc(100% - 32px));
@@ -542,6 +617,19 @@ footer {
   .contact,
   .preorder {
     grid-template-columns: 1fr;
+  }
+
+  .new-arrival {
+    padding: 40px 24px;
+    background-position: 80% center;
+  }
+
+  .new-arrival-content {
+    max-width: 100%;
+    background: rgba(255, 255, 255, 0.85);
+    padding: 24px;
+    border-radius: 16px;
+    backdrop-filter: blur(4px);
   }
 
   .feature-strip,
