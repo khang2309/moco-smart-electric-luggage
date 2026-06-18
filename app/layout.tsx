@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
+import { Quicksand } from "next/font/google";
 import "./globals.css";
+
+const quicksand = Quicksand({ subsets: ["latin", "vietnamese"], variable: "--font-quicksand" });
 import { Providers } from "./providers";
+import Header from "../components/Header";
 
 export const metadata: Metadata = {
   title: "MOCO - Smart Electric Luggage",
@@ -18,8 +22,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="vi">
-      <body>
-        <Providers>{children}</Providers>
+      <body className={quicksand.variable}>
+        <Providers>
+          <Header />
+          {children}
+        </Providers>
       </body>
     </html>
   );

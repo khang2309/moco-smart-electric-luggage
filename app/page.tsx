@@ -4,14 +4,7 @@ import Image from "next/image";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { FormEvent, useState } from "react";
 
-const navItems = [
-  ["About Us", "#about"],
-  ["Product", "#product"],
-  ["Features", "#features"],
-  ["Use Cases", "#use-cases"],
-  ["FAQ", "#faq"],
-  ["Contact", "#contact"],
-] as const;
+
 
 const content = {
   highlights: ["Di chuyển bằng điện", "GPS Tracking", "Khóa thông minh", "Pin sạc bền bỉ"],
@@ -86,56 +79,35 @@ export default function Home() {
 
   return (
     <>
-      <header className="site-header">
-        <a className="brand" href="#home" aria-label="MOCO home">
-          <Image src="/assets/logo.jpg" alt="MOCO logo" width={34} height={34} style={{ borderRadius: '8px', objectFit: 'cover' }} />
-          <span>MOCO</span>
-        </a>
-        <nav className="nav" aria-label="Điều hướng chính">
-          {navItems.map(([label, href]) => (
-            <a key={href} href={href}>
-              {label}
-            </a>
-          ))}
-        </nav>
-        <a className="nav-cta" href="#preorder">
-          Pre-order
-        </a>
-      </header>
+
 
       <main>
-        <section className="hero section" id="home">
-          <div className="hero-copy">
-            <p className="eyebrow">Smart Travel. Smarter Movement.</p>
-            <h2 className="hero-title">MOCO Smart Electric Luggage</h2>
-            <p>
-              MOCO là giải pháp vali điện thông minh giúp việc mang hành lý trở nên nhẹ nhàng,
-              nhanh chóng và tiện lợi hơn trong mọi hành trình hiện đại.
+        <section className="hero" id="home">
+          <div className="hero-content">
+            <h1 className="hero-title-main">MOCO</h1>
+            <h2 className="hero-subtitle">SMART ELECTRIC LUGGAGE</h2>
+            <div className="hero-divider"></div>
+            <p className="hero-description">
+              Vali điện thông minh cho những chuyến đi hiện đại<br/>
+              và trải nghiệm di chuyển tiện lợi.
             </p>
             <div className="hero-actions">
-              <a className="button primary" href="#product">
+              <a className="button primary glow" href="#product">
                 Khám phá sản phẩm
               </a>
-              <a className="button secondary" href="#features">
-                Xem tính năng
+              <a className="button white glow-light" href="#preorder">
+                Đăng ký quan tâm
               </a>
             </div>
           </div>
-          <div className="hero-visual" aria-label="MOCO website mockup">
-            <Image
-              src="/assets/moco-ui-reference.png"
-              alt="Giao diện tham chiếu MOCO"
-              width={2200}
-              height={1334}
-              priority
-            />
-          </div>
+        </section>
+        <div className="feature-strip-container">
           <div className="feature-strip" aria-label="Điểm nổi bật">
             {data.highlights.map((item) => (
               <span key={item}>{item}</span>
             ))}
           </div>
-        </section>
+        </div>
 
         <section className="section split" id="about">
           <div>
