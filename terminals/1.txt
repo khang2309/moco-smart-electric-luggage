@@ -1,0 +1,7 @@
+---
+pid: 0
+cwd: "c:\Users\Asus\Desktop\daihoc\EXE1"
+command: "cd \"c:\\Users\\Asus\\Desktop\\daihoc\\EXE1\" && npm run dev"
+started_at: 2026-06-19T12:45:45.207Z
+running_for_ms: 0        
+---

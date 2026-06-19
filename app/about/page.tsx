@@ -1,0 +1,70 @@
+"use client";
+
+import { useLanguage } from "../providers";
+
+const aboutCopy = {
+  vi: {
+    title: "ABOUT US",
+    brand: "MOCO",
+    subtitle: "Vali điện thông minh cho những chuyến đi hiện đại và trải nghiệm di chuyển tiện lợi",
+    storyTitle: "OUR STORY",
+    story:
+      "MOCO ra đời từ một câu hỏi đơn giản: tại sao việc mang hành lý lại luôn nặng nề và bất tiện? Chúng tôi nhận thấy việc di chuyển tại sân bay, nhà ga hay trong các chuyến đi xa luôn tốn nhiều sức lực, đặc biệt với hành lý cồng kềnh. Từ đó, MOCO được tạo ra với mục tiêu biến hành lý thành một phương tiện di chuyển thông minh.",
+    visionTitle: "OUR VISION",
+    vision: "Trở thành một trong những giải pháp dẫn đầu trong lĩnh vực hành lý thông minh và di chuyển cá nhân.",
+    missionTitle: "OUR MISSION",
+    mission: "Mang đến trải nghiệm di chuyển hiện đại, tiện lợi và thông minh hơn cho mọi người.",
+    teamTitle: "OUR TEAM",
+    team: "Nhóm sinh viên FPT Cần Thơ với định hướng phát triển sản phẩm công nghệ ứng dụng thực tiễn.",
+  },
+  en: {
+    title: "ABOUT US",
+    brand: "MOCO",
+    subtitle: "Smart electric luggage for modern journeys and convenient mobility experiences",
+    storyTitle: "OUR STORY",
+    story:
+      "MOCO began with a simple question: why does carrying luggage always feel heavy and inconvenient? We saw that moving through airports, stations, and long trips often consumes too much energy, especially with bulky luggage. MOCO was created to turn luggage into a smart personal mobility solution.",
+    visionTitle: "OUR VISION",
+    vision: "Become a leading solution in smart luggage and personal mobility.",
+    missionTitle: "OUR MISSION",
+    mission: "Deliver a modern, convenient, and smarter travel experience for everyone.",
+    teamTitle: "OUR TEAM",
+    team: "A group of FPT Can Tho students focused on practical technology products.",
+  },
+} as const;
+
+export default function AboutPage() {
+  const { language } = useLanguage();
+  const copy = aboutCopy[language];
+
+  return (
+    <main className="about-page">
+      <section className="about-hero-page">
+        <div>
+          <h1>{copy.title}</h1>
+          <strong>{copy.brand}</strong>
+          <p>{copy.subtitle}</p>
+        </div>
+      </section>
+      <section className="about-team-photo" aria-label={language === "vi" ? "Đội ngũ MOCO" : "MOCO team"} />
+      <section className="about-page-content">
+        <article>
+          <h2>{copy.storyTitle}</h2>
+          <p>{copy.story}</p>
+        </article>
+        <article>
+          <h2>{copy.visionTitle}</h2>
+          <p>{copy.vision}</p>
+        </article>
+        <article>
+          <h2>{copy.missionTitle}</h2>
+          <p>{copy.mission}</p>
+        </article>
+        <article>
+          <h2>{copy.teamTitle}</h2>
+          <p>{copy.team}</p>
+        </article>
+      </section>
+    </main>
+  );
+}
