@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { FormEvent, useState } from "react";
 
@@ -117,6 +116,41 @@ export default function Home() {
               <p>
                 Được tích hợp khả năng di chuyển bằng điện, theo dõi vị trí, kết nối ứng dụng thông minh và nhiều tính năng hỗ trợ hiện đại, MOCO mang đến một chuẩn mực mới cho trải nghiệm Smart Travel trong kỷ nguyên số.
               </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="home-showcase" aria-labelledby="home-showcase-title">
+          <div className="home-showcase-panel">
+            <div className="home-showcase-copy">
+              <p className="home-showcase-kicker">Smart Travel. Smarter Movement.</p>
+              <h2 id="home-showcase-title">Vì sao chọn MOCO?</h2>
+              <p>
+                Công nghệ thông minh - trải nghiệm di chuyển tự do và an tâm hơn
+                trong mọi hành trình hiện đại.
+              </p>
+              <div className="home-benefit-list">
+                <article>
+                  <span className="benefit-icon" aria-hidden="true">◌</span>
+                  <p>Di chuyển dễ dàng với hệ thống lái điện thông minh</p>
+                </article>
+                <article>
+                  <span className="benefit-icon" aria-hidden="true">⌁</span>
+                  <p>Kết nối ứng dụng theo thời gian thực</p>
+                </article>
+                <article>
+                  <span className="benefit-icon" aria-hidden="true">◇</span>
+                  <p>Theo dõi và bảo vệ hành lý mọi lúc mọi nơi</p>
+                </article>
+                <article>
+                  <span className="benefit-icon" aria-hidden="true">□</span>
+                  <p>Thiết kế hiện đại, tối ưu cho nhu cầu di chuyển hằng ngày</p>
+                </article>
+                <article>
+                  <span className="benefit-icon" aria-hidden="true">✣</span>
+                  <p>Kết hợp hài hòa giữa công nghệ, tiện ích và phong cách sống</p>
+                </article>
+              </div>
             </div>
           </div>
         </section>
