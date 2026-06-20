@@ -402,28 +402,24 @@ export default function Header() {
                 </svg>
                 <span>{currentCopy.account}</span>
               </button>
-              {isAccountOpen && (
-                <div className="account-dropdown">
-                  {isLoggedIn ? (
-                    <>
-                      <button className="auth-button" type="button" onClick={handleLogout}>{currentCopy.logout}</button>
-                      <hr className="account-dropdown-divider" />
-                    </>
-                  ) : (
-                    <>
-                      <a className="auth-button" href="/login" onClick={() => setIsAccountOpen(false)}>{currentCopy.login}</a>
-                      <hr className="account-dropdown-divider" />
-                    </>
-                  )}
-                  <a href="/about" onClick={() => setIsAccountOpen(false)}>{currentCopy.aboutUs}</a>
-                  <a href="/#features" onClick={() => handleNavClick("/#features")}>{currentCopy.experience}</a>
-                  <a href="/register-product" onClick={() => setIsAccountOpen(false)}>{currentCopy.registerProduct}</a>
-                  <a href="/account" onClick={() => setIsAccountOpen(false)}>{currentCopy.profile}</a>
-                  <a href="/#product" onClick={() => handleNavClick("/#product")}>{currentCopy.favorites}</a>
-                  <a href="/#contact" onClick={() => handleNavClick("/#contact")}>{currentCopy.coupons}</a>
-                </div>
-              )}
             </div>
+          </div>
+        </div>
+        {isAccountOpen && (
+          <div className="account-dropdown">
+            <a href="/about" onClick={() => setIsAccountOpen(false)}>{currentCopy.aboutUs}</a>
+            <a href="/#features" onClick={() => handleNavClick("/#features")}>{currentCopy.experience}</a>
+            <a href="/register-product" onClick={() => setIsAccountOpen(false)}>{currentCopy.registerProduct}</a>
+            <a href="/account" onClick={() => setIsAccountOpen(false)}>{currentCopy.profile}</a>
+            <a href="/#product" onClick={() => handleNavClick("/#product")}>{currentCopy.favorites}</a>
+            <a href="/#contact" onClick={() => handleNavClick("/#contact")}>{currentCopy.coupons}</a>
+            {isLoggedIn ? (
+              <button type="button" onClick={handleLogout}>{currentCopy.logout}</button>
+            ) : (
+              <a href="/login" onClick={() => setIsAccountOpen(false)}>{currentCopy.login}</a>
+            )}
+          </div>
+        )}
           </div>
         </div>
       </header>

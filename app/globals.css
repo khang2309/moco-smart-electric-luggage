@@ -188,8 +188,7 @@ a {
   flex: 1 1 520px;
   max-width: 100%;
   min-width: 0;
-  overflow: visible;
-  flex-wrap: wrap;
+  overflow-x: auto;
   scrollbar-width: none;
 }
 
@@ -340,19 +339,13 @@ a {
     gap: 6px;
   }
 
-  .nav {
+  .nav,
+  .header-actions {
     width: 100%;
     min-width: 0;
     overflow-x: auto;
     justify-content: flex-start;
     scrollbar-width: none;
-  }
-  
-  .header-actions {
-    width: 100%;
-    overflow: visible;
-    flex-wrap: wrap;
-    justify-content: flex-start;
   }
 
   .nav::-webkit-scrollbar,
@@ -2767,7 +2760,7 @@ textarea {
   .header-main-nav {
     margin-left: 0;
     width: 100%;
-    overflow: visible;
+    overflow-x: auto;
     padding-bottom: 2px;
     justify-content: flex-start;
     gap: 14px;
@@ -4295,8 +4288,8 @@ textarea {
 
 .account-dropdown {
   position: absolute;
-  top: calc(100% + 10px);
-  right: 0;
+  top: calc(100% + 4px);
+  right: clamp(24px, 3.2vw, 48px);
   z-index: 140;
   width: 220px;
   display: grid;
@@ -4837,8 +4830,13 @@ textarea {
 }
 
 @media (max-width: 920px) {
+  .header-actions {
+    overflow-x: auto;
+    overflow-y: visible;
+  }
+
   .account-dropdown {
-    right: 0;
+    right: 12px;
     width: 228px;
   }
 
@@ -5147,102 +5145,4 @@ textarea {
   }
 }
 
-.site-header .account-menu {
-  position: relative;
-  z-index: 300;
-  overflow: visible;
-}
-
-.site-header .account-dropdown {
-  position: absolute;
-  top: calc(100% + 12px);
-  right: 0;
-  z-index: 400;
-  width: 280px;
-  display: grid;
-  gap: 2px;
-  padding: 16px 18px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  color: #ffffff;
-  background: rgba(10, 10, 10, 0.96);
-  backdrop-filter: blur(12px);
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
-  pointer-events: auto;
-}
-
-.site-header .account-dropdown a,
-.site-header .account-dropdown button {
-  min-height: 42px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border: 0;
-  border-radius: 8px;
-  padding: 0 12px;
-  color: #f0f0f0;
-  background: transparent;
-  font: inherit;
-  font-size: 15px;
-  font-weight: 500;
-  text-align: left;
-  text-decoration: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.site-header .account-dropdown a::after,
-.site-header .account-dropdown button::after {
-  content: "›";
-  font-size: 22px;
-  line-height: 1;
-  opacity: 0.5;
-  transform: translateX(0);
-  transition: transform 0.2s ease, opacity 0.2s ease;
-}
-
-.site-header .account-dropdown a:hover::after,
-.site-header .account-dropdown button:hover::after {
-  opacity: 1;
-  transform: translateX(4px);
-}
-
-.site-header .account-dropdown a:hover,
-.site-header .account-dropdown button:hover {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.site-header .account-dropdown .auth-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 48px;
-  margin-bottom: 6px;
-  padding: 0 20px;
-  border-radius: 999px;
-  color: #050505;
-  background: #ffffff;
-  font-size: 15px;
-  font-weight: 700;
-  text-align: center;
-  transition: transform 0.2s ease, background 0.2s ease;
-}
-
-.site-header .account-dropdown .auth-button::after {
-  content: none;
-}
-
-.site-header .account-dropdown .auth-button:hover {
-  color: #000000;
-  background: #f0f0f0;
-  transform: scale(1.02);
-}
-
-.site-header .account-dropdown-divider {
-  height: 1px;
-  margin: 6px 0 14px 0;
-  border: 0;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-}
 
