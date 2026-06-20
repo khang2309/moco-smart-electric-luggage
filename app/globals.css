@@ -188,7 +188,7 @@ a {
   flex: 1 1 520px;
   max-width: 100%;
   min-width: 0;
-  overflow-x: auto;
+  overflow: visible;
   scrollbar-width: none;
 }
 
@@ -339,8 +339,7 @@ a {
     gap: 6px;
   }
 
-  .nav,
-  .header-actions {
+  .nav {
     width: 100%;
     min-width: 0;
     overflow-x: auto;
@@ -348,8 +347,12 @@ a {
     scrollbar-width: none;
   }
 
-  .nav::-webkit-scrollbar,
-  .header-actions::-webkit-scrollbar {
+  .header-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .nav::-webkit-scrollbar {
     display: none;
   }
 
@@ -2760,7 +2763,7 @@ textarea {
   .header-main-nav {
     margin-left: 0;
     width: 100%;
-    overflow-x: auto;
+    overflow: visible;
     padding-bottom: 2px;
     justify-content: flex-start;
     gap: 14px;
@@ -4830,11 +4833,6 @@ textarea {
 }
 
 @media (max-width: 920px) {
-  .header-actions {
-    overflow-x: auto;
-    overflow-y: visible;
-  }
-
   .account-dropdown {
     right: 0;
     width: 228px;
