@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Image from "next/image";
@@ -835,6 +835,7 @@ export default function Home() {
                   <button
                     className="product-3d-card"
                     type="button"
+                    style={{ position: "absolute" }}
                     aria-label={product.name}
                     aria-current={isActive}
                     onClick={() => {
@@ -883,7 +884,7 @@ export default function Home() {
         </section>
 
         <section className="section product home-product-showcase home-product-legacy" aria-hidden="true">
-          <div className="home-product-visual">
+          <div className="home-product-visual" style={{ position: "relative" }}>
             <Image
               src="/assets/product-carousel.png"
               alt="MOCO Smart Electric Luggage"
@@ -921,10 +922,10 @@ export default function Home() {
             <h2>{text.headings.features}</h2>
           </div>
           <div className="features-showcase">
-            <div className="feature-visual feature-visual-large">
+            <div className="feature-visual feature-visual-large" style={{ position: "relative" }}>
               <Image src="/assets/moco-ui-reference.png" alt="" fill sizes="(max-width: 900px) 100vw, 36vw" />
             </div>
-            <div className="feature-visual feature-visual-stack">
+            <div className="feature-visual feature-visual-stack" style={{ position: "relative" }}>
               <Image src="/assets/product-carousel.png" alt="" fill sizes="(max-width: 900px) 100vw, 28vw" />
             </div>
             <div className="feature-example">

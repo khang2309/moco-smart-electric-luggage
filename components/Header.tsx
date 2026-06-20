@@ -50,9 +50,9 @@ const copy = {
     registerProduct: "\u0110\u0103ng k\u00fd s\u1ea3n ph\u1ea9m",
     profile: "Qu\u1ea3n l\u00fd h\u1ed3 s\u01a1",
     favorites: "Y\u00eau th\u00edch c\u1ee7a t\u00f4i",
-    coupons: "M\u00e3 gi\u1ea3m gi\u00e1 c\u1ee7a t\u00f4i",
-    login: "\u0110\u0103ng nh\u1eadp",
-    logout: "\u0110\u0103ng xu\u1ea5t",
+    coupons: "Mã giảm giá của tôi",
+    login: "Đăng ký / Đăng nhập",
+    logout: "Đăng xuất",
     rewards: "My MOCO Rewards",
     cart: "Gi\u1ecf h\u00e0ng",
     searchTitle: "T\u00ecm Ki\u1ebfm",
@@ -84,7 +84,7 @@ const copy = {
     profile: "Profile management",
     favorites: "My favorites",
     coupons: "My coupons",
-    login: "Login",
+    login: "Register / Login",
     logout: "Logout",
     rewards: "My MOCO Rewards",
     cart: "Cart",
@@ -306,7 +306,7 @@ export default function Header() {
             alt="MOCO logo"
             width={60}
             height={40}
-            style={{ objectFit: "contain" }}
+            style={{ objectFit: "contain", width: "auto", height: "auto" }}
           />
         </a>
         <div className="header-main-nav">
@@ -404,17 +404,23 @@ export default function Header() {
               </button>
               {isAccountOpen && (
                 <div className="account-dropdown">
+                  {isLoggedIn ? (
+                    <>
+                      <button className="auth-button" type="button" onClick={handleLogout}>{currentCopy.logout}</button>
+                      <hr className="account-dropdown-divider" />
+                    </>
+                  ) : (
+                    <>
+                      <a className="auth-button" href="/login" onClick={() => setIsAccountOpen(false)}>{currentCopy.login}</a>
+                      <hr className="account-dropdown-divider" />
+                    </>
+                  )}
                   <a href="/about" onClick={() => setIsAccountOpen(false)}>{currentCopy.aboutUs}</a>
                   <a href="/#features" onClick={() => handleNavClick("/#features")}>{currentCopy.experience}</a>
                   <a href="/register-product" onClick={() => setIsAccountOpen(false)}>{currentCopy.registerProduct}</a>
                   <a href="/account" onClick={() => setIsAccountOpen(false)}>{currentCopy.profile}</a>
                   <a href="/#product" onClick={() => handleNavClick("/#product")}>{currentCopy.favorites}</a>
                   <a href="/#contact" onClick={() => handleNavClick("/#contact")}>{currentCopy.coupons}</a>
-                  {isLoggedIn ? (
-                    <button type="button" onClick={handleLogout}>{currentCopy.logout}</button>
-                  ) : (
-                    <a href="/login" onClick={() => setIsAccountOpen(false)}>{currentCopy.login}</a>
-                  )}
                 </div>
               )}
             </div>
@@ -482,13 +488,23 @@ export default function Header() {
           <aside className="cart-drawer" onClick={(event) => event.stopPropagation()}>
             <div className="cart-drawer-header">
               <h2 id="cart-drawer-title">Cart ({cartCount})</h2>
-              <button type="button" aria-label="Close cart" onClick={() => setIsCartOpen(false)}>
-                x
+              <button className="cart-close-btn" type="button" aria-label="Close cart" onClick={() => setIsCartOpen(false)}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
               </button>
             </div>
 
             {cartItems.length === 0 ? (
               <div className="cart-empty-state">
+                <div className="cart-empty-icon">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="9" cy="21" r="1"></circle>
+                    <circle cx="20" cy="21" r="1"></circle>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                  </svg>
+                </div>
                 <p>Your cart is empty</p>
                 <button
                   type="button"

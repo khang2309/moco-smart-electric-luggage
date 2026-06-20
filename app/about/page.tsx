@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useLanguage } from "../providers";
 
 const aboutCopy = {
@@ -46,7 +47,15 @@ export default function AboutPage() {
           <p>{copy.subtitle}</p>
         </div>
       </section>
-      <section className="about-team-photo" aria-label={language === "vi" ? "Đội ngũ MOCO" : "MOCO team"} />
+      <section className="about-team-photo-wrapper">
+        <Image
+          src="/assets/about-team.png"
+          alt={language === "vi" ? "Đội ngũ MOCO" : "MOCO team"}
+          width={5120}
+          height={1506}
+          className="about-team-photo-img"
+        />
+      </section>
       <section className="about-page-content">
         <article>
           <h2>{copy.storyTitle}</h2>
