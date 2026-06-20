@@ -189,6 +189,7 @@ a {
   max-width: 100%;
   min-width: 0;
   overflow: visible;
+  flex-wrap: wrap;
   scrollbar-width: none;
 }
 
@@ -346,13 +347,16 @@ a {
     justify-content: flex-start;
     scrollbar-width: none;
   }
-
+  
   .header-actions {
     width: 100%;
+    overflow: visible;
+    flex-wrap: wrap;
     justify-content: flex-start;
   }
 
-  .nav::-webkit-scrollbar {
+  .nav::-webkit-scrollbar,
+  .header-actions::-webkit-scrollbar {
     display: none;
   }
 
