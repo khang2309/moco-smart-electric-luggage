@@ -326,6 +326,91 @@ a {
   animation: moco-metal-border 5.5s linear infinite;
 }
 
+.account-menu {
+  position: relative;
+}
+
+.account-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 12px;
+  width: 260px;
+  background: #111111;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 50;
+  border: 1px solid #2a2a2a;
+}
+
+.account-dropdown-header {
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.account-dropdown-header .auth-btn {
+  background: #ffffff;
+  color: #000000;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 24px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+  transition: transform 0.2s, background 0.2s;
+  display: inline-block;
+}
+
+.account-dropdown-header .auth-btn:hover {
+  transform: translateY(-2px);
+  background: #f0f0f0;
+}
+
+.account-dropdown-divider {
+  height: 1px;
+  background: #333333;
+  width: 100%;
+}
+
+.account-dropdown-links {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0;
+}
+
+.account-dropdown-links a {
+  padding: 12px 20px;
+  color: #e0e0e0;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.2s, color 0.2s;
+}
+
+.account-dropdown-links a:hover {
+  background: #1a1a1a;
+  color: #ffffff;
+}
+
+.account-dropdown-links a .arrow {
+  color: #888;
+  font-size: 16px;
+  transition: transform 0.2s;
+}
+
+.account-dropdown-links a:hover .arrow {
+  transform: translateX(4px);
+  color: #fff;
+}
+
 @media (max-width: 1280px) {
   .site-header {
     row-gap: 6px;
@@ -4623,43 +4708,99 @@ textarea {
 }
 
 .account-dropdown {
-  top: calc(100% + 12px);
+  top: calc(100% + 24px);
   right: 0;
   z-index: 120;
-  width: 248px;
+  width: 260px;
   gap: 0;
-  padding: 14px 16px;
-  border: 0;
-  border-radius: 0;
+  padding: 0;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
   color: #ffffff;
   background: #050505;
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.24);
   pointer-events: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-.account-dropdown a,
-.account-dropdown button {
-  min-height: 28px;
+.account-dropdown-header {
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.account-dropdown .auth-btn {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: none;
+  border-radius: 999px !important;
+  padding: 10px 24px !important;
+  font-weight: 700;
+  font-size: 14px !important;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+  transition: transform 0.2s, background 0.2s;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center !important;
+  min-height: 40px !important;
+}
+
+.account-dropdown .auth-btn::after {
+  content: none !important;
+}
+
+.account-dropdown .auth-btn:hover {
+  transform: translateY(-2px);
+  background: #f0f0f0 !important;
+  color: #000000 !important;
+}
+
+.account-dropdown-divider {
+  height: 1px;
+  background: #333333;
+  width: 100%;
+}
+
+.account-dropdown-links {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0;
+}
+
+.account-dropdown-links a {
+  min-height: 38px;
+  display: flex;
   justify-content: space-between;
+  align-items: center;
   border-radius: 0;
-  padding: 0;
+  padding: 10px 20px;
   color: #ffffff;
   background: transparent;
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 500;
+  text-decoration: none;
 }
 
-.account-dropdown a::after,
-.account-dropdown button::after {
+.account-dropdown-links a::after {
   content: ">";
-  font-size: 28px;
+  font-size: 20px;
   line-height: 1;
+  color: #888;
+  transition: transform 0.2s, color 0.2s;
 }
 
-.account-dropdown a:hover,
-.account-dropdown button:hover {
-  color: #d7f7ff;
-  background: transparent;
+.account-dropdown-links a:hover {
+  background: #1a1a1a;
+  color: #ffffff;
+}
+
+.account-dropdown-links a:hover::after {
+  color: #ffffff;
+  transform: translateX(4px);
 }
 
 .product-carousel-stage .product-card-shell {
@@ -5142,6 +5283,18 @@ textarea {
 
   .registered-arrow {
     display: none !important;
+  }
+}
+
+@media (max-width: 1280px) {
+  .account-dropdown {
+    position: fixed;
+    top: 110px;
+    right: 16px;
+    left: auto;
+    width: 260px;
+    margin-top: 0;
+    z-index: 1000;
   }
 }
 

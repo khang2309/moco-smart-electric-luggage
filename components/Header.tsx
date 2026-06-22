@@ -114,8 +114,24 @@ export default function Header() {
   const { language, setLanguage } = useLanguage();
   const pathname = usePathname();
   const searchInputRef = useRef<HTMLInputElement | null>(null);
+  const accountMenuRef = useRef<HTMLDivElement>(null);
   const isClickScrolling = useRef(false);
   const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        isAccountOpen &&
+        accountMenuRef.current &&
+        !accountMenuRef.current.contains(event.target as Node)
+      ) {
+        setIsAccountOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isAccountOpen]);
 
   useEffect(() => {
     document.body.classList.toggle("search-open", isSearchOpen);
@@ -385,7 +401,7 @@ export default function Header() {
               <span aria-hidden="true">/</span>
               <span className={language === "en" ? "active" : ""}>EN</span>
             </button>
-            <div className="account-menu">
+            <div className="account-menu" ref={accountMenuRef}>
               <button
                 className={`action-item action-account${isAccountOpen ? " active" : ""}`}
                 type="button"
@@ -402,24 +418,42 @@ export default function Header() {
                 </svg>
                 <span>{currentCopy.account}</span>
               </button>
+              
+              {isAccountOpen && (
+                <div className="account-dropdown">
+                  <div className="account-dropdown-header">
+                    {isLoggedIn ? (
+                      <button type="button" className="auth-btn" onClick={handleLogout}>{currentCopy.logout}</button>
+                    ) : (
+                      <a href="/login" className="auth-btn" onClick={() => setIsAccountOpen(false)}>{currentCopy.login}</a>
+                    )}
+                  </div>
+                  <div className="account-dropdown-divider"></div>
+                  <div className="account-dropdown-links">
+                    <a href="/about" onClick={() => setIsAccountOpen(false)}>
+                      <span>{currentCopy.aboutUs}</span>
+                    </a>
+                    <a href="/#features" onClick={() => handleNavClick("/#features")}>
+                      <span>{currentCopy.experience}</span>
+                    </a>
+                    <a href="/register-product" onClick={() => setIsAccountOpen(false)}>
+                      <span>{currentCopy.registerProduct}</span>
+                    </a>
+                    <a href="/account" onClick={() => setIsAccountOpen(false)}>
+                      <span>{currentCopy.profile}</span>
+                    </a>
+                    <a href="/#product" onClick={() => handleNavClick("/#product")}>
+                      <span>{currentCopy.favorites}</span>
+                    </a>
+                    <a href="/#contact" onClick={() => handleNavClick("/#contact")}>
+                      <span>{currentCopy.coupons}</span>
+                    </a>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
-        {isAccountOpen && (
-          <div className="account-dropdown">
-            <a href="/about" onClick={() => setIsAccountOpen(false)}>{currentCopy.aboutUs}</a>
-            <a href="/#features" onClick={() => handleNavClick("/#features")}>{currentCopy.experience}</a>
-            <a href="/register-product" onClick={() => setIsAccountOpen(false)}>{currentCopy.registerProduct}</a>
-            <a href="/account" onClick={() => setIsAccountOpen(false)}>{currentCopy.profile}</a>
-            <a href="/#product" onClick={() => handleNavClick("/#product")}>{currentCopy.favorites}</a>
-            <a href="/#contact" onClick={() => handleNavClick("/#contact")}>{currentCopy.coupons}</a>
-            {isLoggedIn ? (
-              <button type="button" onClick={handleLogout}>{currentCopy.logout}</button>
-            ) : (
-              <a href="/login" onClick={() => setIsAccountOpen(false)}>{currentCopy.login}</a>
-            )}
-          </div>
-        )}
       </header>
       {isSearchOpen && (
         <div
