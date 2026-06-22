@@ -110,7 +110,7 @@ export default function ProductDetailPage() {
   const [showCartFlyer, setShowCartFlyer] = useState(false);
   const [favoriteProducts, setFavoriteProducts] = useState<string[]>([]);
 
-  const product = products.find((item) => item.slug === params.slug) ?? products[0];
+  const product = products.find((item) => item.slug === params?.slug) ?? products[0];
   const details = product[language];
 
   const copy = useMemo(

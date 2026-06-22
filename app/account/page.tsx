@@ -21,7 +21,7 @@ export default function AccountPage() {
 
   useEffect(() => {
     // If user clicked the link in the real email
-    if (searchParams.get("reset") === "true") {
+    if (searchParams?.get("reset") === "true") {
       setShowPasswordForm(true);
     }
   }, [searchParams]);
