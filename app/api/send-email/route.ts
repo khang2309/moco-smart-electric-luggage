@@ -48,6 +48,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, message: 'Đã gửi email xác nhận!' });
   } catch (error) {
     console.error('Error sending email:', error);
-    return NextResponse.json({ success: false, error: 'Không thể gửi email' }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
   }
 }

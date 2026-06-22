@@ -107,18 +107,23 @@ export default function AccountPage() {
             <div className="account-card-title">
               <h2>{language === "vi" ? "Hồ sơ cá nhân" : "Personal profile"}</h2>
               {!isEditing ? (
-                <button type="button" aria-label="Edit profile" onClick={() => setIsEditing(true)}>
+                <button type="button" aria-label="Edit profile" onClick={() => setIsEditing(true)} className="p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-500 hover:text-black">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <path d="m18 2 4 4-14 14H4v-4Z"></path>
                   </svg>
                 </button>
               ) : (
-                <div className="flex gap-2">
-                  <button type="button" className="text-sm px-3 py-1 rounded bg-black text-white" onClick={handleSaveProfile}>
-                    {language === "vi" ? "Lưu" : "Save"}
+                <div className="flex gap-1">
+                  <button type="button" aria-label="Cancel editing" onClick={() => setIsEditing(false)} className="p-2 rounded-full hover:bg-red-50 transition-colors text-red-500 hover:text-red-600" title={language === "vi" ? "Hủy" : "Cancel"}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
                   </button>
-                  <button type="button" className="text-sm px-3 py-1 rounded border border-gray-300" onClick={() => setIsEditing(false)}>
-                    {language === "vi" ? "Hủy" : "Cancel"}
+                  <button type="button" aria-label="Save profile" onClick={handleSaveProfile} className="p-2 rounded-full hover:bg-green-50 transition-colors text-green-600 hover:text-green-700" title={language === "vi" ? "Lưu" : "Save"}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
                   </button>
                 </div>
               )}
@@ -131,22 +136,22 @@ export default function AccountPage() {
             )}
             
             {isEditing ? (
-              <div className="flex flex-col gap-4 mt-6">
+              <div className="flex flex-col gap-5 mt-6">
                 <label className="flex flex-col gap-1 text-sm">
                   <span className="text-gray-500">{language === "vi" ? "Họ và tên" : "Full name"}</span>
-                  <input type="text" className="border border-gray-200 rounded p-2 text-[15px]" value={editForm.name} onChange={(e) => setEditForm({...editForm, name: e.target.value})} />
+                  <input type="text" className="border border-gray-200 rounded-lg p-3 text-[15px] focus:ring-2 focus:ring-black/5 focus:border-black transition-all outline-none" value={editForm.name} onChange={(e) => setEditForm({...editForm, name: e.target.value})} />
                 </label>
                 <label className="flex flex-col gap-1 text-sm opacity-60">
                   <span className="text-gray-500">Email ({language === "vi" ? "Không thể thay đổi" : "Cannot be changed"})</span>
-                  <input type="email" className="border border-gray-200 rounded p-2 text-[15px]" value={userInfo?.email || ""} disabled />
+                  <input type="email" className="border border-gray-200 rounded-lg p-3 text-[15px] bg-gray-50 cursor-not-allowed" value={userInfo?.email || ""} disabled />
                 </label>
                 <label className="flex flex-col gap-1 text-sm">
                   <span className="text-gray-500">{language === "vi" ? "Số điện thoại" : "Phone"}</span>
-                  <input type="tel" className="border border-gray-200 rounded p-2 text-[15px]" value={editForm.phone} onChange={(e) => setEditForm({...editForm, phone: e.target.value})} />
+                  <input type="tel" className="border border-gray-200 rounded-lg p-3 text-[15px] focus:ring-2 focus:ring-black/5 focus:border-black transition-all outline-none" value={editForm.phone} onChange={(e) => setEditForm({...editForm, phone: e.target.value})} />
                 </label>
                 <label className="flex flex-col gap-1 text-sm">
                   <span className="text-gray-500">{language === "vi" ? "Tỉnh/Thành phố" : "City"}</span>
-                  <input type="text" className="border border-gray-200 rounded p-2 text-[15px]" value={editForm.city} onChange={(e) => setEditForm({...editForm, city: e.target.value})} />
+                  <input type="text" className="border border-gray-200 rounded-lg p-3 text-[15px] focus:ring-2 focus:ring-black/5 focus:border-black transition-all outline-none" value={editForm.city} onChange={(e) => setEditForm({...editForm, city: e.target.value})} />
                 </label>
               </div>
             ) : (
