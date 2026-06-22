@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useLanguage } from "../app/providers";
 
@@ -109,10 +110,12 @@ export default function Header() {
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [isCartPulsing, setIsCartPulsing] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userInfo, setUserInfo] = useState<{name: string, email: string} | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const { language, setLanguage } = useLanguage();
   const pathname = usePathname();
+  const router = useRouter();
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const accountMenuRef = useRef<HTMLDivElement>(null);
   const isClickScrolling = useRef(false);
@@ -168,10 +171,23 @@ export default function Header() {
       }
     };
 
-    setIsLoggedIn(window.localStorage.getItem("moco-auth") === "true");
+    const loadAuth = () => {
+      const isAuth = window.localStorage.getItem("moco-auth") === "true";
+      setIsLoggedIn(isAuth);
+      if (isAuth) {
+        try {
+          const user = JSON.parse(window.localStorage.getItem("moco-user") || "{}");
+          if (user.name) setUserInfo(user);
+        } catch (e) {}
+      } else {
+        setUserInfo(null);
+      }
+    };
+
+    loadAuth();
     loadCart();
 
-    const handleAuthUpdate = () => setIsLoggedIn(window.localStorage.getItem("moco-auth") === "true");
+    const handleAuthUpdate = () => loadAuth();
 
     window.addEventListener("storage", loadCart);
     window.addEventListener("moco-cart-updated", loadCart);
@@ -257,7 +273,9 @@ export default function Header() {
 
   const handleLogout = () => {
     window.localStorage.removeItem("moco-auth");
+    window.localStorage.removeItem("moco-user");
     setIsLoggedIn(false);
+    setUserInfo(null);
     setIsAccountOpen(false);
     window.dispatchEvent(new Event("moco-auth-updated"));
   };
@@ -290,7 +308,7 @@ export default function Header() {
     setIsSearchOpen(false);
     window.setTimeout(() => {
       if (pathname !== "/") {
-        window.location.href = `/${target}`;
+        router.push(`/${target}`);
         return;
       }
 
@@ -328,7 +346,7 @@ export default function Header() {
         <div className="header-main-nav">
           <nav className="nav" aria-label={language === "vi" ? "\u0110i\u1ec1u h\u01b0\u1edbng ch\u00ednh" : "Main navigation"}>
             {translatedNavItems.map(([label, href]) => (
-              <a
+              <Link
                 key={href}
                 href={href}
                 className={
@@ -339,11 +357,11 @@ export default function Header() {
                 onClick={() => handleNavClick(href)}
               >
                 {label}
-              </a>
+              </Link>
             ))}
           </nav>
           <div className="header-actions">
-            <a
+            <Link
               href="/#support"
               className={`action-item action-support${activeSection === "#support" ? " active" : ""}`}
               onClick={() => handleNavClick("/#support")}
@@ -353,7 +371,7 @@ export default function Header() {
                 <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
               </svg>
               <span>{currentCopy.support}</span>
-            </a>
+            </Link>
             <button
               className="action-item action-search"
               type="button"
@@ -416,38 +434,46 @@ export default function Header() {
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                   <circle cx="12" cy="7" r="4"></circle>
                 </svg>
-                <span>{currentCopy.account}</span>
+                <span>{isLoggedIn && userInfo?.name ? userInfo.name : currentCopy.account}</span>
               </button>
               
               {isAccountOpen && (
                 <div className="account-dropdown">
-                  <div className="account-dropdown-header">
+                  <div className="account-dropdown-header flex-col items-center">
                     {isLoggedIn ? (
-                      <button type="button" className="auth-btn" onClick={handleLogout}>{currentCopy.logout}</button>
+                      <div className="w-full flex flex-col items-center">
+                        {userInfo && (
+                          <div className="mb-4 text-center w-full overflow-hidden">
+                            <div className="font-bold text-white text-[15px] truncate px-2">{userInfo.name}</div>
+                            <div className="text-gray-400 text-[13px] truncate px-2 mt-0.5">{userInfo.email}</div>
+                          </div>
+                        )}
+                        <button type="button" className="auth-btn" onClick={handleLogout}>{currentCopy.logout}</button>
+                      </div>
                     ) : (
-                      <a href="/login" className="auth-btn" onClick={() => setIsAccountOpen(false)}>{currentCopy.login}</a>
+                      <Link href="/login" className="auth-btn" onClick={() => setIsAccountOpen(false)}>{currentCopy.login}</Link>
                     )}
                   </div>
                   <div className="account-dropdown-divider"></div>
                   <div className="account-dropdown-links">
-                    <a href="/about" onClick={() => setIsAccountOpen(false)}>
+                    <Link href="/about" onClick={() => setIsAccountOpen(false)}>
                       <span>{currentCopy.aboutUs}</span>
-                    </a>
-                    <a href="/#features" onClick={() => handleNavClick("/#features")}>
+                    </Link>
+                    <Link href="/#features" onClick={() => handleNavClick("/#features")}>
                       <span>{currentCopy.experience}</span>
-                    </a>
-                    <a href="/register-product" onClick={() => setIsAccountOpen(false)}>
+                    </Link>
+                    <Link href="/register-product" onClick={() => setIsAccountOpen(false)}>
                       <span>{currentCopy.registerProduct}</span>
-                    </a>
-                    <a href="/account" onClick={() => setIsAccountOpen(false)}>
+                    </Link>
+                    <Link href="/account" onClick={() => setIsAccountOpen(false)}>
                       <span>{currentCopy.profile}</span>
-                    </a>
-                    <a href="/#product" onClick={() => handleNavClick("/#product")}>
+                    </Link>
+                    <Link href="/#product" onClick={() => handleNavClick("/#product")}>
                       <span>{currentCopy.favorites}</span>
-                    </a>
-                    <a href="/#contact" onClick={() => handleNavClick("/#contact")}>
+                    </Link>
+                    <Link href="/#contact" onClick={() => handleNavClick("/#contact")}>
                       <span>{currentCopy.coupons}</span>
-                    </a>
+                    </Link>
                   </div>
                 </div>
               )}
@@ -500,9 +526,9 @@ export default function Header() {
 
                   return (
                     <li key={link}>
-                      <a href={href} onClick={() => setIsSearchOpen(false)}>
+                      <Link href={href} onClick={() => setIsSearchOpen(false)}>
                         {link}
-                      </a>
+                      </Link>
                     </li>
                   );
                 })}

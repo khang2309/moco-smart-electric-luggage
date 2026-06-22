@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { useLanguage } from "../providers";
 
@@ -44,7 +45,7 @@ export default function ForgotPasswordPage() {
             </p>
           ) : null}
           <p>
-            <a href="/login">{language === "vi" ? "Quay lại đăng nhập" : "Back to login"}</a>
+            <Link href="/login">{language === "vi" ? "Quay lại đăng nhập" : "Back to login"}</Link>
           </p>
         </form>
       </section>

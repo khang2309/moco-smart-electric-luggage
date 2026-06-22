@@ -1,17 +1,25 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import { useLanguage } from "../providers";
 
 export default function LoginPage() {
   const { language } = useLanguage();
+  const router = useRouter();
 
   const handleLogin = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const email = formData.get("email") as string;
+    const name = email ? email.split('@')[0] : "User";
+    
     window.localStorage.setItem("moco-auth", "true");
+    window.localStorage.setItem("moco-user", JSON.stringify({ email, name }));
     window.dispatchEvent(new Event("moco-auth-updated"));
-    window.location.href = "/#home";
+    router.push("/#home");
   };
 
   return (
@@ -29,15 +37,15 @@ export default function LoginPage() {
           <h1>{language === "vi" ? "Đăng nhập MOCO Account" : "Login to MOCO Account"}</h1>
           <p>
             {language === "vi" ? "Bạn chưa có tài khoản MOCO?" : "Do not have a MOCO account?"}{" "}
-            <a href="/signup">{language === "vi" ? "Tạo tài khoản MOCO mới" : "Create a new MOCO account"}</a>
+            <Link href="/signup">{language === "vi" ? "Tạo tài khoản MOCO mới" : "Create a new MOCO account"}</Link>
           </p>
           <label>
             <span>{language === "vi" ? "Địa chỉ email đăng nhập *" : "Login email address *"}</span>
-            <input type="email" required />
+            <input type="email" name="email" required />
           </label>
-          <a className="login-forgot" href="/forgot-password">
+          <Link className="login-forgot" href="/forgot-password">
             {language === "vi" ? "Bạn quên mật khẩu?" : "Forgot password?"}
-          </a>
+          </Link>
           <label>
             <span>{language === "vi" ? "Mật khẩu *" : "Password *"}</span>
             <input type="password" required />
