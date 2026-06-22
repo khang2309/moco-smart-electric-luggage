@@ -2,11 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLanguage } from "../providers";
 
-export default function AccountPage() {
+function AccountContent() {
   const { language } = useLanguage();
   const [userInfo, setUserInfo] = useState<{name: string, email: string, phone?: string, city?: string} | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -273,5 +273,13 @@ export default function AccountPage() {
       )}
 
     </main>
+  );
+}
+
+export default function AccountPage() {
+  return (
+    <Suspense fallback={<div className="p-10 flex justify-center"><div className="w-8 h-8 border-4 border-black border-t-transparent rounded-full animate-spin"></div></div>}>
+      <AccountContent />
+    </Suspense>
   );
 }
