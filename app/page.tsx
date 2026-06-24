@@ -989,7 +989,7 @@ export default function Home() {
             <aside className="support-side">
               <h3>{text.support.quickInfo}</h3>
               <p>{text.support.supportTime}</p>
-              <p>{language === "vi" ? "Đường dây nóng" : "Hotline"}: 1900 6868</p>
+              <p>{language === "vi" ? "Đường dây nóng" : "Hotline"}: XXXX XXXX</p>
               <p>{language === "vi" ? "Email hỗ trợ" : "Support email"}: mocoluggage@gmail.com</p>
               <div className="direct-support">
                 <strong>{text.support.directTitle}</strong>
