@@ -32,7 +32,7 @@ export default function LoginPage() {
           sizes="100vw"
           priority
         />
-        <div className="login-brand">MOCO</div>
+        
         <form className="login-card" onSubmit={handleLogin}>
           <h1>{language === "vi" ? "Đăng nhập MOCO Account" : "Login to MOCO Account"}</h1>
           <p>

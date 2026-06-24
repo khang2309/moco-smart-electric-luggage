@@ -16,7 +16,7 @@ const aboutCopy = {
     missionTitle: "OUR MISSION",
     mission: "Mang đến trải nghiệm di chuyển hiện đại, tiện lợi và thông minh hơn cho mọi người.",
     teamTitle: "OUR TEAM",
-    team: "Nhóm sinh viên FPT Cần Thơ với định hướng phát triển sản phẩm công nghệ ứng dụng thực tiễn.",
+    team: "Nhóm sinh viên trường đại học FPT campus Cần Thơ với định hướng phát triển sản phẩm công nghệ ứng dụng thực tiễn.",
   },
   en: {
     title: "ABOUT US",
@@ -30,7 +30,7 @@ const aboutCopy = {
     missionTitle: "OUR MISSION",
     mission: "Deliver a modern, convenient, and smarter travel experience for everyone.",
     teamTitle: "OUR TEAM",
-    team: "A group of FPT Can Tho students focused on practical technology products.",
+    team: "We are a team of students from FPT University, Can Tho Campus, dedicated to developing innovative technology solutions with practical real-world applications.",
   },
 } as const;
 
