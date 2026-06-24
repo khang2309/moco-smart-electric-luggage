@@ -8,28 +8,24 @@ import { useLanguage } from "../providers";
 const products = [
   {
     slug: "moco-go",
-    option: "option 1",
     name: "MOCO Go",
     vi: "Phiên bản tiêu chuẩn với hệ thống lái điện tích hợp, hỗ trợ người dùng di chuyển thuận tiện tại sân bay, nhà ga, khu du lịch và các không gian rộng lớn.",
     en: "The standard edition with integrated electric driving for airports, stations, travel areas, and large spaces.",
   },
   {
     slug: "moco-plus",
-    option: "option 2",
     name: "MOCO Plus",
     vi: "Phiên bản vali điện có thể lái được, tích hợp hệ thống định vị GPS và chế độ tự động đi theo người dùng qua Bluetooth và ứng dụng điện thoại.",
     en: "A rideable electric luggage version with GPS positioning and automatic follow mode through Bluetooth and the mobile app.",
   },
   {
     slug: "moco-pro",
-    option: "option 3",
     name: "MOCO Pro",
     vi: "Phiên bản vali điện có thể lái được, tích hợp GPS, chế độ tự động đi theo người dùng qua Bluetooth và ứng dụng điện thoại, đồng thời trang bị cảm biến tránh vật cản thông minh.",
     en: "A rideable electric luggage version with GPS, app connection, automatic follow mode, and intelligent obstacle avoidance sensors.",
   },
   {
     slug: "moco-max",
-    option: "option 4",
     name: "MOCO Max",
     vi: "Phiên bản cao cấp nhất, tích hợp GPS, chế độ tự động đi theo người dùng qua Bluetooth và ứng dụng điện thoại, cùng hệ thống cảm biến tránh vật cản thông minh toàn diện.",
     en: "The most advanced edition with GPS, Bluetooth app follow mode, and a complete intelligent obstacle avoidance system.",
@@ -132,8 +128,6 @@ export default function ProductPage() {
           <span />
         </button>
 
-        <div className="product-option-label">{activeProduct.option}</div>
-
         <div className="product-wheel" aria-live="polite">
           {products.map((product, index) => {
             const offset = getLoopOffset(index, activeIndex);
@@ -172,10 +166,10 @@ export default function ProductPage() {
         </div>
 
         <div className="product-carousel-copy">
-          <p>{activeProduct[language]}</p>
           <Link href={`/product/${activeProduct.slug}`} className="product-stage-title">
             {activeProduct.name}
           </Link>
+          <p>{activeProduct[language]}</p>
           <span>{t.hint}</span>
         </div>
       </section>

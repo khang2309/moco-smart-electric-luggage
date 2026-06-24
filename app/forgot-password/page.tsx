@@ -24,7 +24,7 @@ export default function ForgotPasswordPage() {
           sizes="100vw"
           priority
         />
-        <div className="login-brand">MOCO</div>
+       
         <form className="login-card auth-card forgot-card" onSubmit={handleReset}>
           <h1>{language === "vi" ? "Đặt lại mật khẩu" : "Reset password"}</h1>
           <p>

@@ -48,7 +48,7 @@ const pageCopy = {
       ],
     },
     why: {
-      kicker: "Smart Travel. Smarter Movement.",
+      kicker: "",
       title: "Vì sao chọn MOCO?",
       description:
         "Công nghệ thông minh - trải nghiệm di chuyển tự do và an tâm hơn trong mọi hành trình hiện đại.",
@@ -68,7 +68,7 @@ const pageCopy = {
       description:
         "Dù bạn là ai, MOCO luôn là người bạn đồng hành đáng tin cậy trên mọi hành trình.",
       items: [
-        ["travel", "Người thường xuyên\ndi du lịch và khám phá"],
+        ["travel", "Người thường xuyên\nđi du lịch và khám phá"],
         ["business", "Người đi công tác\nvà di chuyển nhiều"],
         ["student", "Sinh viên và\nngười trẻ năng động"],
         ["tech", "Người yêu thích công nghệ\nvà lifestyle hiện đại"],
@@ -192,7 +192,7 @@ const pageCopy = {
       preorder: "Đăng ký quan tâm MOCO",
     },
     support: {
-      kicker: "Hỗ trợ MOCO",
+      
       title: "Trung tâm hỗ trợ MOCO",
       description: "Tìm hướng dẫn, bảo hành và hỗ trợ cho vali điện của bạn.",
       searchPlaceholder: "Tìm theo model, số serial hoặc từ khóa...",
@@ -308,7 +308,7 @@ const pageCopy = {
       ],
     },
     why: {
-      kicker: "Smart Travel. Smarter Movement.",
+      kicker: "",
       title: "Why choose MOCO?",
       description:
         "Smart technology for freer, calmer, and more confident movement on every modern journey.",
@@ -569,7 +569,7 @@ const fixedViCopy = {
     ],
   },
   why: {
-    kicker: "Smart Travel. Smarter Movement.",
+    kicker: "",
     title: "Vì sao chọn MOCO?",
     description:
       "Công nghệ thông minh - trải nghiệm di chuyển tự do và an tâm hơn trong mọi hành trình hiện đại.",
@@ -687,7 +687,7 @@ const fixedViCopy = {
   },
   support: {
     ...pageCopy.vi.support,
-    kicker: "Hỗ trợ MOCO",
+    kicker: "Hỗ trợ",
     title: "Trung tâm hỗ trợ MOCO",
     description: "Tìm hướng dẫn, bảo hành và hỗ trợ cho vali điện của bạn.",
     searchPlaceholder: "Tìm theo model, số serial hoặc từ khóa...",
@@ -998,7 +998,7 @@ export default function Home() {
         >
           <div className="home-showcase-panel">
             <div className="home-showcase-copy">
-              <p className="home-showcase-kicker">{text.why.kicker}</p>
+              {text.why.kicker ? <p className="home-showcase-kicker">{text.why.kicker}</p> : null}
               <h2 id="home-showcase-title">{text.why.title}</h2>
               <p>{text.why.description}</p>
               <div className="home-benefit-list">
@@ -1160,9 +1160,10 @@ export default function Home() {
             >
               {activeHomeProduct.name}
             </Link>
+            <p>{activeHomeProduct.description}</p>
             <span>
               {language === "vi"
-                ? "B\u1ea5m v\u00e0o t\u00ean s\u1ea3n ph\u1ea9m \u0111\u1ec3 xem th\u00f4ng tin v\u00e0 mua h\u00e0ng"
+                ? "Bấm vào tên sản phẩm để xem thông tin và mua hàng"
                 : "Click the product name to view details and purchase"}
             </span>
           </div>
@@ -1317,13 +1318,8 @@ export default function Home() {
             <aside className="support-side">
               <h3>{text.support.quickInfo}</h3>
               <p>{text.support.supportTime}</p>
-              <p>
-                {language === "vi" ? "Đường dây nóng" : "Hotline"}: 1900 6868
-              </p>
-              <p>
-                {language === "vi" ? "Email hỗ trợ" : "Support email"}:
-                support@moco.vn
-              </p>
+              <p>{language === "vi" ? "Đường dây nóng" : "Hotline"}: 1900 6868</p>
+              <p>{language === "vi" ? "Email hỗ trợ" : "Support email"}: mocoluggage@gmail.com</p>
               <div className="direct-support">
                 <strong>{text.support.directTitle}</strong>
                 <span>{text.support.directText}</span>
@@ -1380,7 +1376,6 @@ export default function Home() {
         >
           <div className="contact-shell">
             <div className="contact-intro">
-              <p className="support-kicker">{text.headings.contactEyebrow}</p>
               <h2 id="contact-title">{text.contact.title}</h2>
               <p>{text.contact.description}</p>
             </div>
@@ -1482,3 +1477,4 @@ export default function Home() {
     </>
   );
 }
+

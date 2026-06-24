@@ -33,7 +33,7 @@ export default function SignupPage() {
           sizes="100vw"
           priority
         />
-        <div className="login-brand">MOCO</div>
+        
         <form className="login-card auth-card" onSubmit={handleSignup}>
           <h1>{language === "vi" ? "Tạo tài khoản MOCO" : "Create MOCO Account"}</h1>
           <p>
