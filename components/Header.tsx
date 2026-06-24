@@ -51,11 +51,11 @@ const copy = {
     registerProduct: "\u0110\u0103ng k\u00fd s\u1ea3n ph\u1ea9m",
     profile: "Qu\u1ea3n l\u00fd h\u1ed3 s\u01a1",
     favorites: "Y\u00eau th\u00edch c\u1ee7a t\u00f4i",
-    coupons: "Mã giảm giá của tôi",
+    coupons: "Ưu đãi MOCO của tôi",
     login: "Đăng ký / Đăng nhập",
     logout: "Đăng xuất",
-    rewards: "My MOCO Rewards",
-    cart: "Gi\u1ecf h\u00e0ng",
+    rewards: "Ưu đãi MOCO của tôi",
+    cart: "Giỏ hàng",
     searchTitle: "T\u00ecm Ki\u1ebfm",
     searchSubmit: "T\u00ecm",
     closeSearch: "\u0110\u00f3ng t\u00ecm ki\u1ebfm",
@@ -84,10 +84,10 @@ const copy = {
     registerProduct: "Register product",
     profile: "Profile management",
     favorites: "My favorites",
-    coupons: "My coupons",
+    coupons: "my MOCO rewards",
     login: "Register / Login",
     logout: "Logout",
-    rewards: "My MOCO Rewards",
+    rewards: "my MOCO rewards",
     cart: "Cart",
     searchTitle: "Search",
     searchSubmit: "Go",
@@ -110,7 +110,10 @@ export default function Header() {
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [isCartPulsing, setIsCartPulsing] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userInfo, setUserInfo] = useState<{name: string, email: string} | null>(null);
+  const [userInfo, setUserInfo] = useState<{
+    name: string;
+    email: string;
+  } | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const { language, setLanguage } = useLanguage();
@@ -176,7 +179,9 @@ export default function Header() {
       setIsLoggedIn(isAuth);
       if (isAuth) {
         try {
-          const user = JSON.parse(window.localStorage.getItem("moco-user") || "{}");
+          const user = JSON.parse(
+            window.localStorage.getItem("moco-user") || "{}",
+          );
           if (user.name) setUserInfo(user);
         } catch (e) {}
       } else {
@@ -219,7 +224,10 @@ export default function Header() {
         }
       }
 
-      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 50) {
+      if (
+        window.innerHeight + window.scrollY >=
+        document.body.offsetHeight - 50
+      ) {
         current = "#contact";
       }
 
@@ -261,7 +269,11 @@ export default function Header() {
 
   const updateCartQuantity = (slug: string, delta: number) => {
     const updatedItems = cartItems
-      .map((item) => (item.slug === slug ? { ...item, quantity: Math.max(0, item.quantity + delta) } : item))
+      .map((item) =>
+        item.slug === slug
+          ? { ...item, quantity: Math.max(0, item.quantity + delta) }
+          : item,
+      )
       .filter((item) => item.quantity > 0);
 
     persistCart(updatedItems);
@@ -286,7 +298,10 @@ export default function Header() {
     const normalizedQuery = searchQuery.trim().toLowerCase();
     let target = "#support";
 
-    if (normalizedQuery.includes("li\u00ean h\u1ec7") || normalizedQuery.includes("contact")) {
+    if (
+      normalizedQuery.includes("li\u00ean h\u1ec7") ||
+      normalizedQuery.includes("contact")
+    ) {
       target = "#contact";
     } else if (
       normalizedQuery.includes("pin") ||
@@ -301,7 +316,10 @@ export default function Header() {
       normalizedQuery.includes("vali")
     ) {
       target = "#product";
-    } else if (normalizedQuery.includes("faq") || normalizedQuery.includes("c\u00e2u h\u1ecfi")) {
+    } else if (
+      normalizedQuery.includes("faq") ||
+      normalizedQuery.includes("c\u00e2u h\u1ecfi")
+    ) {
       target = "#faq";
     }
 
@@ -318,7 +336,10 @@ export default function Header() {
 
   const currentCopy = copy[language];
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  const cartTotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const cartTotal = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  );
   const currency = new Intl.NumberFormat("vi-VN").format;
   const translatedNavItems = [
     [currentCopy.nav.home, "/#home"],
@@ -344,13 +365,20 @@ export default function Header() {
           />
         </a>
         <div className="header-main-nav">
-          <nav className="nav" aria-label={language === "vi" ? "\u0110i\u1ec1u h\u01b0\u1edbng ch\u00ednh" : "Main navigation"}>
+          <nav
+            className="nav"
+            aria-label={
+              language === "vi"
+                ? "\u0110i\u1ec1u h\u01b0\u1edbng ch\u00ednh"
+                : "Main navigation"
+            }
+          >
             {translatedNavItems.map(([label, href]) => (
               <Link
                 key={href}
                 href={href}
                 className={
-                  (pathname === "/" && activeSection === href.replace("/", ""))
+                  pathname === "/" && activeSection === href.replace("/", "")
                     ? "active"
                     : ""
                 }
@@ -361,12 +389,23 @@ export default function Header() {
             ))}
           </nav>
           <div className="header-actions">
+            <div className="divider"></div>
             <Link
               href="/#support"
               className={`action-item action-support${activeSection === "#support" ? " active" : ""}`}
               onClick={() => handleNavClick("/#support")}
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
                 <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
                 <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
               </svg>
@@ -384,7 +423,17 @@ export default function Header() {
                 setIsSearchOpen((open) => !open);
               }}
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
                 <circle cx="11" cy="11" r="8"></circle>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
@@ -401,7 +450,17 @@ export default function Header() {
                 setIsCartOpen(true);
               }}
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
                 <circle cx="9" cy="21" r="1"></circle>
                 <circle cx="20" cy="21" r="1"></circle>
                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
@@ -412,8 +471,14 @@ export default function Header() {
             <button
               className="lang-switch"
               type="button"
-              aria-label={language === "vi" ? "Chuy\u1ec3n sang ti\u1ebfng Anh" : "Switch to Vietnamese"}
-              onClick={() => setLanguage((current) => (current === "vi" ? "en" : "vi"))}
+              aria-label={
+                language === "vi"
+                  ? "Chuy\u1ec3n sang ti\u1ebfng Anh"
+                  : "Switch to Vietnamese"
+              }
+              onClick={() =>
+                setLanguage((current) => (current === "vi" ? "en" : "vi"))
+              }
             >
               <span className={language === "vi" ? "active" : ""}>VI</span>
               <span aria-hidden="true">/</span>
@@ -430,13 +495,27 @@ export default function Header() {
                   setIsCartOpen(false);
                 }}
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                   <circle cx="12" cy="7" r="4"></circle>
                 </svg>
-                <span>{isLoggedIn && userInfo?.name ? userInfo.name : currentCopy.account}</span>
+                <span>
+                  {isLoggedIn && userInfo?.name
+                    ? userInfo.name
+                    : currentCopy.account}
+                </span>
               </button>
-              
+
               {isAccountOpen && (
                 <div className="account-dropdown">
                   <div className="account-dropdown-header flex-col items-center">
@@ -444,14 +523,30 @@ export default function Header() {
                       <div className="w-full flex flex-col items-center">
                         {userInfo && (
                           <div className="mb-4 text-center w-full overflow-hidden">
-                            <div className="font-bold text-white text-[15px] truncate px-2">{userInfo.name}</div>
-                            <div className="text-gray-400 text-[13px] truncate px-2 mt-0.5">{userInfo.email}</div>
+                            <div className="font-bold text-white text-[15px] truncate px-2">
+                              {userInfo.name}
+                            </div>
+                            <div className="text-gray-400 text-[13px] truncate px-2 mt-0.5">
+                              {userInfo.email}
+                            </div>
                           </div>
                         )}
-                        <button type="button" className="auth-btn" onClick={handleLogout}>{currentCopy.logout}</button>
+                        <button
+                          type="button"
+                          className="auth-btn"
+                          onClick={handleLogout}
+                        >
+                          {currentCopy.logout}
+                        </button>
                       </div>
                     ) : (
-                      <Link href="/login" className="auth-btn" onClick={() => setIsAccountOpen(false)}>{currentCopy.login}</Link>
+                      <Link
+                        href="/login"
+                        className="auth-btn"
+                        onClick={() => setIsAccountOpen(false)}
+                      >
+                        {currentCopy.login}
+                      </Link>
                     )}
                   </div>
                   <div className="account-dropdown-divider"></div>
@@ -459,19 +554,34 @@ export default function Header() {
                     <Link href="/about" onClick={() => setIsAccountOpen(false)}>
                       <span>{currentCopy.aboutUs}</span>
                     </Link>
-                    <Link href="/#features" onClick={() => handleNavClick("/#features")}>
+                    <Link
+                      href="/#features"
+                      onClick={() => handleNavClick("/#features")}
+                    >
                       <span>{currentCopy.experience}</span>
                     </Link>
-                    <Link href="/register-product" onClick={() => setIsAccountOpen(false)}>
+                    <Link
+                      href="/register-product"
+                      onClick={() => setIsAccountOpen(false)}
+                    >
                       <span>{currentCopy.registerProduct}</span>
                     </Link>
-                    <Link href="/account" onClick={() => setIsAccountOpen(false)}>
+                    <Link
+                      href="/account"
+                      onClick={() => setIsAccountOpen(false)}
+                    >
                       <span>{currentCopy.profile}</span>
                     </Link>
-                    <Link href="/#product" onClick={() => handleNavClick("/#product")}>
+                    <Link
+                      href="/#product"
+                      onClick={() => handleNavClick("/#product")}
+                    >
                       <span>{currentCopy.favorites}</span>
                     </Link>
-                    <Link href="/#contact" onClick={() => handleNavClick("/#contact")}>
+                    <Link
+                      href="/#contact"
+                      onClick={() => handleNavClick("/#contact")}
+                    >
                       <span>{currentCopy.coupons}</span>
                     </Link>
                   </div>
@@ -494,8 +604,22 @@ export default function Header() {
             id="site-search-panel"
             onClick={(event) => event.stopPropagation()}
           >
-            <form className="search-entry-bar shadow-inner" role="search" onSubmit={handleSearchSubmit}>
-              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <form
+              className="search-entry-bar shadow-inner"
+              role="search"
+              onSubmit={handleSearchSubmit}
+            >
+              <svg
+                width="34"
+                height="34"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
                 <circle cx="11" cy="11" r="8"></circle>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
@@ -522,7 +646,12 @@ export default function Header() {
               <h3>{currentCopy.quickLinksTitle}</h3>
               <ul>
                 {currentCopy.quickLinks.map((link, index) => {
-                  const href = index === 1 ? "#features" : index === 3 ? "#contact" : "#support";
+                  const href =
+                    index === 1
+                      ? "#features"
+                      : index === 3
+                        ? "#contact"
+                        : "#support";
 
                   return (
                     <li key={link}>
@@ -538,12 +667,35 @@ export default function Header() {
         </div>
       )}
       {isCartOpen && (
-        <div className="cart-overlay" role="dialog" aria-modal="true" aria-labelledby="cart-drawer-title" onClick={() => setIsCartOpen(false)}>
-          <aside className="cart-drawer" onClick={(event) => event.stopPropagation()}>
+        <div
+          className="cart-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="cart-drawer-title"
+          onClick={() => setIsCartOpen(false)}
+        >
+          <aside
+            className="cart-drawer"
+            onClick={(event) => event.stopPropagation()}
+          >
             <div className="cart-drawer-header">
               <h2 id="cart-drawer-title">Cart ({cartCount})</h2>
-              <button className="cart-close-btn" type="button" aria-label="Close cart" onClick={() => setIsCartOpen(false)}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <button
+                className="cart-close-btn"
+                type="button"
+                aria-label="Close cart"
+                onClick={() => setIsCartOpen(false)}
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <line x1="18" y1="6" x2="6" y2="18"></line>
                   <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
@@ -553,7 +705,16 @@ export default function Header() {
             {cartItems.length === 0 ? (
               <div className="cart-empty-state">
                 <div className="cart-empty-icon">
-                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    width="40"
+                    height="40"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <circle cx="9" cy="21" r="1"></circle>
                     <circle cx="20" cy="21" r="1"></circle>
                     <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
@@ -581,11 +742,17 @@ export default function Header() {
                         <strong>{item.name}</strong>
                         <p>{item.subtitle}</p>
                         <div className="cart-quantity">
-                          <button type="button" onClick={() => updateCartQuantity(item.slug, -1)}>
+                          <button
+                            type="button"
+                            onClick={() => updateCartQuantity(item.slug, -1)}
+                          >
                             -
                           </button>
                           <span>{item.quantity}</span>
-                          <button type="button" onClick={() => updateCartQuantity(item.slug, 1)}>
+                          <button
+                            type="button"
+                            onClick={() => updateCartQuantity(item.slug, 1)}
+                          >
                             +
                           </button>
                         </div>
@@ -593,8 +760,22 @@ export default function Header() {
                       <div className="cart-item-side">
                         <strong>{currency(item.price)} VND</strong>
                         <span>{currency(item.oldPrice)} VND</span>
-                        <button type="button" aria-label={`Remove ${item.name}`} onClick={() => removeCartItem(item.slug)}>
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <button
+                          type="button"
+                          aria-label={`Remove ${item.name}`}
+                          onClick={() => removeCartItem(item.slug)}
+                        >
+                          <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            aria-hidden="true"
+                          >
                             <path d="M3 6h18"></path>
                             <path d="M8 6V4h8v2"></path>
                             <path d="m19 6-1 14H6L5 6"></path>

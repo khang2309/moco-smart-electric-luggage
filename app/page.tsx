@@ -29,7 +29,12 @@ const pageCopy = {
   vi: {
     hero: {
       subtitle: "SMART ELECTRIC LUGGAGE",
-      description: "Vali điện thông minh cho những chuyến đi hiện đại và trải nghiệm di chuyển tiện lợi.",
+      description: (
+        <>
+          Vali điện thông minh cho những chuyến đi hiện đại<br />
+          và trải nghiệm di chuyển tiện lợi.
+        </>
+      ),
       primary: "Khám phá sản phẩm",
       secondary: "Đăng ký quan tâm",
     },
@@ -45,79 +50,134 @@ const pageCopy = {
     why: {
       kicker: "Smart Travel. Smarter Movement.",
       title: "Vì sao chọn MOCO?",
-      description: "Công nghệ thông minh - trải nghiệm di chuyển tự do và an tâm hơn trong mọi hành trình hiện đại.",
+      description:
+        "Công nghệ thông minh - trải nghiệm di chuyển tự do và an tâm hơn trong mọi hành trình hiện đại.",
       benefits: [
         ["mobility", "Di chuyển dễ dàng với hệ thống lái điện thông minh"],
         ["app", "Kết nối ứng dụng theo thời gian thực"],
         ["security", "Theo dõi và bảo vệ hành lý mọi lúc mọi nơi"],
         ["design", "Thiết kế hiện đại, tối ưu cho nhu cầu di chuyển hằng ngày"],
-        ["lifestyle", "Kết hợp hài hòa giữa công nghệ, tiện ích và phong cách sống"],
+        [
+          "lifestyle",
+          "Kết hợp hài hòa giữa công nghệ, tiện ích và phong cách sống",
+        ],
       ] as [IconName, string][],
     },
     audience: {
       title: "MOCO dành cho ai?",
-      description: "Dù bạn là ai, MOCO luôn là người bạn đồng hành đáng tin cậy trên mọi hành trình.",
+      description:
+        "Dù bạn là ai, MOCO luôn là người bạn đồng hành đáng tin cậy trên mọi hành trình.",
       items: [
         ["travel", "Người thường xuyên\ndi du lịch và khám phá"],
         ["business", "Người đi công tác\nvà di chuyển nhiều"],
         ["student", "Sinh viên và\nngười trẻ năng động"],
         ["tech", "Người yêu thích công nghệ\nvà lifestyle hiện đại"],
-        ["global", "Những ai tìm kiếm giải pháp\nSmart Travel thông minh\nvà khác biệt"],
+        [
+          "global",
+          "Những ai tìm kiếm giải pháp\nSmart Travel thông minh\nvà khác biệt",
+        ],
       ] as [IconName, string][],
     },
     content: {
-      highlights: ["Di chuyển bằng điện", "GPS Tracking", "Khóa thông minh", "Pin sạc bền bỉ"],
+      highlights: [
+        "Di chuyển bằng điện",
+        "GPS Tracking",
+        "Khóa thông minh",
+        "Pin sạc bền bỉ",
+      ],
       products: [
         {
           name: "MOCO Go",
-          description: "Phiên bản tiêu chuẩn với hệ thống lái điện tích hợp cho sân bay, nhà ga và khu du lịch.",
+          description:
+            "Phiên bản tiêu chuẩn với hệ thống lái điện tích hợp cho sân bay, nhà ga và khu du lịch.",
         },
         {
           name: "MOCO Plus",
-          description: "Tích hợp GPS, Bluetooth và chế độ tự động đi theo người dùng qua ứng dụng.",
+          description:
+            "Tích hợp GPS, Bluetooth và chế độ tự động đi theo người dùng qua ứng dụng.",
         },
         {
           name: "MOCO Pro",
-          description: "Bổ sung cảm biến tránh vật cản thông minh, an toàn hơn trong môi trường đông người.",
+          description:
+            "Bổ sung cảm biến tránh vật cản thông minh, an toàn hơn trong môi trường đông người.",
         },
         {
           name: "MOCO Max",
-          description: "Phiên bản cao cấp nhất với GPS, Bluetooth, app và cảm biến toàn diện.",
+          description:
+            "Phiên bản cao cấp nhất với GPS, Bluetooth, app và cảm biến toàn diện.",
         },
       ],
       features: [
-        ["Smart Mobility System", "Cho phép vali tự di chuyển, hỗ trợ người dùng trong quá trình di chuyển."],
-        ["Battery & Charging", "Pin tích hợp có thể sạc lại và hỗ trợ năng lượng cho thiết bị cá nhân."],
-        ["GPS Tracking", "Hỗ trợ định vị hành lý, giảm nguy cơ thất lạc trong chuyến đi."],
-        ["Smart Security", "Hệ thống khóa an toàn bảo vệ hành lý trong mọi tình huống."],
+        [
+          "Smart Mobility System",
+          "Cho phép vali tự di chuyển, hỗ trợ người dùng trong quá trình di chuyển.",
+        ],
+        [
+          "Battery & Charging",
+          "Pin tích hợp có thể sạc lại và hỗ trợ năng lượng cho thiết bị cá nhân.",
+        ],
+        [
+          "GPS Tracking",
+          "Hỗ trợ định vị hành lý, giảm nguy cơ thất lạc trong chuyến đi.",
+        ],
+        [
+          "Smart Security",
+          "Hệ thống khóa an toàn bảo vệ hành lý trong mọi tình huống.",
+        ],
       ],
       cases: [
         ["Sân bay", "Di chuyển nhanh hơn mà không cần kéo hành lý nặng."],
         ["Du lịch", "Thoải mái hơn trong các chuyến đi dài và lịch trình dày."],
         ["Công tác", "Tiết kiệm thời gian khi di chuyển giữa nhiều địa điểm."],
-        ["Sinh viên", "Hỗ trợ di chuyển hành lý trong ký túc xá và môi trường học tập."],
+        [
+          "Sinh viên",
+          "Hỗ trợ di chuyển hành lý trong ký túc xá và môi trường học tập.",
+        ],
       ],
       faqs: [
-        ["MOCO có nặng không?", "MOCO được thiết kế tối ưu trọng lượng để đảm bảo tính tiện dụng."],
-        ["Có được mang lên máy bay không?", "Tùy theo quy định từng hãng hàng không, MOCO có thể được mang như hành lý cabin."],
-        ["Pin sử dụng được bao lâu?", "Thời gian sử dụng phụ thuộc vào mức độ vận hành, phù hợp cho các chuyến di chuyển ngắn trong ngày."],
-        ["Cách điều khiển như thế nào?", "Thiết kế đơn giản, dễ dùng với nút điều khiển cơ bản hoặc tùy chọn kết nối ứng dụng."],
+        [
+          "MOCO có nặng không?",
+          "MOCO được thiết kế tối ưu trọng lượng để đảm bảo tính tiện dụng.",
+        ],
+        [
+          "Có được mang lên máy bay không?",
+          "Tùy theo quy định từng hãng hàng không, MOCO có thể được mang như hành lý cabin.",
+        ],
+        [
+          "Pin sử dụng được bao lâu?",
+          "Thời gian sử dụng phụ thuộc vào mức độ vận hành, phù hợp cho các chuyến di chuyển ngắn trong ngày.",
+        ],
+        [
+          "Cách điều khiển như thế nào?",
+          "Thiết kế đơn giản, dễ dùng với nút điều khiển cơ bản hoặc tùy chọn kết nối ứng dụng.",
+        ],
       ],
     },
     about: {
       eyebrow: "About us",
       title: "Câu chuyện của MOCO",
-      story: "MOCO ra đời từ một câu hỏi đơn giản: tại sao việc mang hành lý lại luôn nặng nề và bất tiện? Từ đó, nhóm sinh viên FPT Cần Thơ tạo nên một giải pháp biến hành lý thành phương tiện di chuyển thông minh.",
+      story:
+        "MOCO ra đời từ một câu hỏi đơn giản: tại sao việc mang hành lý lại luôn nặng nề và bất tiện? Từ đó, nhóm sinh viên FPT Cần Thơ tạo nên một giải pháp biến hành lý thành phương tiện di chuyển thông minh.",
       cards: [
-        ["Sứ mệnh", "Mang đến trải nghiệm di chuyển hiện đại, tiện lợi và thông minh hơn."],
-        ["Tầm nhìn", "Trở thành giải pháp dẫn đầu về hành lý thông minh và di chuyển cá nhân."],
-        ["Đội ngũ", "Nhóm sinh viên FPT Cần Thơ phát triển sản phẩm công nghệ ứng dụng thực tiễn."],
+        [
+          "Sứ mệnh",
+          "Mang đến trải nghiệm di chuyển hiện đại, tiện lợi và thông minh hơn.",
+        ],
+        [
+          "Tầm nhìn",
+          "Trở thành giải pháp dẫn đầu về hành lý thông minh và di chuyển cá nhân.",
+        ],
+        [
+          "Đội ngũ",
+          "Nhóm sinh viên FPT Cần Thơ phát triển sản phẩm công nghệ ứng dụng thực tiễn.",
+        ],
       ],
     },
     product: {
       eyebrow: "Sản phẩm",
       title: "MOCO Smart Electric Luggage",
-      description: "Vali điện thông minh tích hợp khả năng di chuyển, sạc và định vị, phù hợp cho du lịch, công tác và cuộc sống năng động.",
+      description:
+        "Vali điện thông minh tích hợp khả năng di chuyển, sạc và định vị, phù hợp cho du lịch, công tác và cuộc sống năng động.",
       badge: "Lựa chọn tốt nhất",
     },
     headings: {
@@ -147,17 +207,34 @@ const pageCopy = {
       needHelp: "Bạn cần hỗ trợ gì?",
       cards: [
         ["order", "Đăng ký sản phẩm", "Kích hoạt bảo hành cho vali MOCO."],
-        ["repair", "Bảo hành & sửa chữa", "Kiểm tra tình trạng và gửi yêu cầu hỗ trợ."],
-        ["manual", "Hướng dẫn sử dụng", "Xem cách vận hành, sạc pin và an toàn khi dùng."],
-        ["app", "Thiết lập MOCO App", "Kết nối GPS, theo dõi pin và quản lý thiết bị."],
-        ["flight", "Chính sách pin & hàng không", "Thông tin mang vali điện lên máy bay."],
+        [
+          "repair",
+          "Bảo hành & sửa chữa",
+          "Kiểm tra tình trạng và gửi yêu cầu hỗ trợ.",
+        ],
+        [
+          "manual",
+          "Hướng dẫn sử dụng",
+          "Xem cách vận hành, sạc pin và an toàn khi dùng.",
+        ],
+        [
+          "app",
+          "Thiết lập MOCO App",
+          "Kết nối GPS, theo dõi pin và quản lý thiết bị.",
+        ],
+        [
+          "flight",
+          "Chính sách pin & hàng không",
+          "Thông tin mang vali điện lên máy bay.",
+        ],
         ["faq", "Câu hỏi thường gặp", "Giải đáp các thắc mắc phổ biến."],
       ] as [IconName, string, string][],
       tip: "Mẹo: Hãy chuẩn bị số serial hoặc tên model để được hỗ trợ nhanh hơn.",
       quickInfo: "Thông tin nhanh",
       supportTime: "Thời gian hỗ trợ: 8:00 - 21:00",
       directTitle: "Cần hỗ trợ trực tiếp?",
-      directText: "Đội ngũ MOCO sẵn sàng hỗ trợ bạn về bảo hành, app và kỹ thuật.",
+      directText:
+        "Đội ngũ MOCO sẵn sàng hỗ trợ bạn về bảo hành, app và kỹ thuật.",
       contactNow: "Liên hệ ngay",
       chat: "Chat với MOCO",
       topics: [
@@ -168,7 +245,8 @@ const pageCopy = {
     },
     contact: {
       title: "Liên hệ MOCO",
-      description: "Để lại thông tin, đội ngũ MOCO sẽ phản hồi về sản phẩm, bảo hành hoặc hợp tác trong thời gian sớm nhất.",
+      description:
+        "Để lại thông tin, đội ngũ MOCO sẽ phản hồi về sản phẩm, bảo hành hoặc hợp tác trong thời gian sớm nhất.",
       name: "Họ và tên *",
       email: "Email *",
       phone: "Số điện thoại *",
@@ -182,23 +260,27 @@ const pageCopy = {
       pending: "Đang gửi...",
     },
     preorder: {
-      description: "MOCO đang trong giai đoạn phát triển. Đăng ký để nhận cập nhật về phiên bản đầu tiên, tiến trình sản phẩm và cơ hội trải nghiệm sớm.",
+      description:
+        "MOCO đang trong giai đoạn phát triển. Đăng ký để nhận cập nhật về phiên bản đầu tiên, tiến trình sản phẩm và cơ hội trải nghiệm sớm.",
       namePlaceholder: "Họ và tên",
       button: "Đăng ký quan tâm ngay",
       pending: "Đang đăng ký...",
     },
     footer: {
       title: "VỀ CHÚNG TÔI",
-      subtitle: "Vali điện thông minh cho những chuyến đi hiện đại và trải nghiệm di chuyển tiện lợi.",
+      subtitle:
+        "Vali điện thông minh cho những chuyến đi hiện đại và trải nghiệm di chuyển tiện lợi.",
       storyTitle: "CÂU CHUYỆN",
       story: [
         "MOCO ra đời từ một câu hỏi đơn giản: tại sao việc mang hành lý lại luôn nặng nề và bất tiện?",
         "Chúng tôi nhận thấy việc di chuyển tại sân bay, nhà ga hay trong các chuyến đi xa luôn tốn nhiều sức lực, đặc biệt với hành lý cồng kềnh. Từ đó, MOCO được tạo ra với mục tiêu biến hành lý thành một phương tiện di chuyển thông minh.",
       ],
       visionTitle: "TẦM NHÌN",
-      vision: "Trở thành một trong những giải pháp dẫn đầu trong lĩnh vực hành lý thông minh và di chuyển cá nhân.",
+      vision:
+        "Trở thành một trong những giải pháp dẫn đầu trong lĩnh vực hành lý thông minh và di chuyển cá nhân.",
       missionTitle: "SỨ MỆNH",
-      mission: "Mang đến trải nghiệm di chuyển hiện đại, tiện lợi và thông minh hơn cho mọi người.",
+      mission:
+        "Mang đến trải nghiệm di chuyển hiện đại, tiện lợi và thông minh hơn cho mọi người.",
       teamTitle: "ĐỘI NGŨ",
       team: "Nhóm sinh viên FPT Cần Thơ với định hướng phát triển sản phẩm công nghệ ứng dụng thực tiễn.",
     },
@@ -207,7 +289,12 @@ const pageCopy = {
   en: {
     hero: {
       subtitle: "SMART ELECTRIC LUGGAGE",
-      description: "Smart electric luggage for modern trips and a more convenient travel experience.",
+      description: (
+        <>
+          Smart electric luggage for modern trips<br />
+          and a more convenient travel experience.
+        </>
+      ),
       primary: "Explore product",
       secondary: "Register interest",
     },
@@ -223,7 +310,8 @@ const pageCopy = {
     why: {
       kicker: "Smart Travel. Smarter Movement.",
       title: "Why choose MOCO?",
-      description: "Smart technology for freer, calmer, and more confident movement on every modern journey.",
+      description:
+        "Smart technology for freer, calmer, and more confident movement on every modern journey.",
       benefits: [
         ["mobility", "Move easily with an intelligent electric driving system"],
         ["app", "Connect to the app in real time"],
@@ -234,68 +322,119 @@ const pageCopy = {
     },
     audience: {
       title: "Who is MOCO for?",
-      description: "Whoever you are, MOCO is a reliable travel companion for every journey.",
+      description:
+        "Whoever you are, MOCO is a reliable travel companion for every journey.",
       items: [
         ["travel", "Frequent travelers\nand explorers"],
         ["business", "Business travelers\nwho move often"],
         ["student", "Students and\nyoung active users"],
         ["tech", "Technology lovers\nwith a modern lifestyle"],
-        ["global", "People looking for\na smarter and distinctive\nSmart Travel solution"],
+        [
+          "global",
+          "People looking for\na smarter and distinctive\nSmart Travel solution",
+        ],
       ] as [IconName, string][],
     },
     content: {
-      highlights: ["Electric mobility", "GPS Tracking", "Smart lock", "Durable rechargeable battery"],
+      highlights: [
+        "Electric mobility",
+        "GPS Tracking",
+        "Smart lock",
+        "Durable rechargeable battery",
+      ],
       products: [
         {
           name: "MOCO Go",
-          description: "The standard edition with integrated electric driving for airports, stations, and travel areas.",
+          description:
+            "The standard edition with integrated electric driving for airports, stations, and travel areas.",
         },
         {
           name: "MOCO Plus",
-          description: "Adds GPS, Bluetooth, and automatic follow mode through the mobile app.",
+          description:
+            "Adds GPS, Bluetooth, and automatic follow mode through the mobile app.",
         },
         {
           name: "MOCO Pro",
-          description: "Adds intelligent obstacle avoidance sensors for safer movement in crowded spaces.",
+          description:
+            "Adds intelligent obstacle avoidance sensors for safer movement in crowded spaces.",
         },
         {
           name: "MOCO Max",
-          description: "The premium edition with GPS, Bluetooth, app control, and complete sensing.",
+          description:
+            "The premium edition with GPS, Bluetooth, app control, and complete sensing.",
         },
       ],
       features: [
-        ["Smart Mobility System", "Allows the suitcase to move electrically and support users during travel."],
-        ["Battery & Charging", "Integrated rechargeable battery that can also support personal devices."],
-        ["GPS Tracking", "Helps locate luggage and reduce the risk of losing it during trips."],
-        ["Smart Security", "A secure lock system that protects your belongings in different situations."],
+        [
+          "Smart Mobility System",
+          "Allows the suitcase to move electrically and support users during travel.",
+        ],
+        [
+          "Battery & Charging",
+          "Integrated rechargeable battery that can also support personal devices.",
+        ],
+        [
+          "GPS Tracking",
+          "Helps locate luggage and reduce the risk of losing it during trips.",
+        ],
+        [
+          "Smart Security",
+          "A secure lock system that protects your belongings in different situations.",
+        ],
       ],
       cases: [
         ["Airport", "Move faster without pulling heavy luggage."],
         ["Travel", "Stay comfortable on long trips and packed schedules."],
         ["Business", "Save time while moving between multiple locations."],
-        ["Students", "Support luggage movement in dorms and learning environments."],
+        [
+          "Students",
+          "Support luggage movement in dorms and learning environments.",
+        ],
       ],
       faqs: [
-        ["Is MOCO heavy?", "MOCO is designed with optimized weight to remain practical and easy to use."],
-        ["Can I bring it on a plane?", "Depending on airline rules, MOCO can be treated like cabin luggage."],
-        ["How long does the battery last?", "Battery life depends on usage level and is suitable for short daily movements."],
-        ["How do I control it?", "MOCO is simple to use with basic controls and optional app connectivity."],
+        [
+          "Is MOCO heavy?",
+          "MOCO is designed with optimized weight to remain practical and easy to use.",
+        ],
+        [
+          "Can I bring it on a plane?",
+          "Depending on airline rules, MOCO can be treated like cabin luggage.",
+        ],
+        [
+          "How long does the battery last?",
+          "Battery life depends on usage level and is suitable for short daily movements.",
+        ],
+        [
+          "How do I control it?",
+          "MOCO is simple to use with basic controls and optional app connectivity.",
+        ],
       ],
     },
     about: {
       eyebrow: "About us",
       title: "The MOCO story",
-      story: "MOCO started from a simple question: why does carrying luggage always feel heavy and inconvenient? From there, a team of FPT Can Tho students built a solution that turns luggage into a smart mobility companion.",
+      story:
+        "MOCO started from a simple question: why does carrying luggage always feel heavy and inconvenient? From there, a team of FPT Can Tho students built a solution that turns luggage into a smart mobility companion.",
       cards: [
-        ["Mission", "Deliver a smarter, more convenient, and more modern travel experience."],
-        ["Vision", "Become a leading solution for smart luggage and personal mobility."],
-        ["Team", "A group of FPT Can Tho students building practical technology products."],
+        [
+          "Mission",
+          "Deliver a smarter, more convenient, and more modern travel experience.",
+        ],
+        [
+          "Vision",
+          "Become a leading solution for smart luggage and personal mobility.",
+        ],
+        [
+          "Team",
+          "A group of FPT Can Tho students building practical technology products.",
+        ],
       ],
     },
     product: {
       eyebrow: "Product",
       title: "MOCO Smart Electric Luggage",
-      description: "Smart electric luggage with mobility, charging, and tracking features for travel, business, and active living.",
+      description:
+        "Smart electric luggage with mobility, charging, and tracking features for travel, business, and active living.",
       badge: "Best choice",
     },
     headings: {
@@ -312,7 +451,8 @@ const pageCopy = {
     support: {
       kicker: "MOCO Support",
       title: "MOCO Support Center",
-      description: "Find guides, warranty information, and support for your electric luggage.",
+      description:
+        "Find guides, warranty information, and support for your electric luggage.",
       searchPlaceholder: "Search by model, serial number, or keyword...",
       searchButton: "Search",
       modelHelp: "Not sure where your model number is?",
@@ -324,18 +464,35 @@ const pageCopy = {
       ] as [IconName, string][],
       needHelp: "What do you need help with?",
       cards: [
-        ["order", "Product registration", "Activate warranty for your MOCO suitcase."],
-        ["repair", "Warranty & repair", "Check status and send a support request."],
+        [
+          "order",
+          "Product registration",
+          "Activate warranty for your MOCO suitcase.",
+        ],
+        [
+          "repair",
+          "Warranty & repair",
+          "Check status and send a support request.",
+        ],
         ["manual", "User guide", "Learn operation, charging, and safe usage."],
-        ["app", "Set up MOCO App", "Connect GPS, track battery, and manage the device."],
-        ["flight", "Battery & airline policy", "Information about bringing electric luggage on flights."],
+        [
+          "app",
+          "Set up MOCO App",
+          "Connect GPS, track battery, and manage the device.",
+        ],
+        [
+          "flight",
+          "Battery & airline policy",
+          "Information about bringing electric luggage on flights.",
+        ],
         ["faq", "FAQ", "Answers to common questions."],
       ] as [IconName, string, string][],
       tip: "Tip: Prepare your serial number or model name for faster support.",
       quickInfo: "Quick information",
       supportTime: "Support hours: 8:00 - 21:00",
       directTitle: "Need direct support?",
-      directText: "The MOCO team is ready to help with warranty, app, and technical questions.",
+      directText:
+        "The MOCO team is ready to help with warranty, app, and technical questions.",
       contactNow: "Contact now",
       chat: "Chat with MOCO",
       topics: [
@@ -346,7 +503,8 @@ const pageCopy = {
     },
     contact: {
       title: "Contact MOCO",
-      description: "Leave your information and the MOCO team will respond about products, warranty, or collaboration soon.",
+      description:
+        "Leave your information and the MOCO team will respond about products, warranty, or collaboration soon.",
       name: "Full name *",
       email: "Email *",
       phone: "Phone number *",
@@ -360,23 +518,27 @@ const pageCopy = {
       pending: "Sending...",
     },
     preorder: {
-      description: "MOCO is currently in development. Register to receive updates about the first version, product progress, and early experience opportunities.",
+      description:
+        "MOCO is currently in development. Register to receive updates about the first version, product progress, and early experience opportunities.",
       namePlaceholder: "Full name",
       button: "Register interest now",
       pending: "Registering...",
     },
     footer: {
       title: "ABOUT US",
-      subtitle: "Smart electric luggage for modern trips and a convenient mobility experience.",
+      subtitle:
+        "Smart electric luggage for modern trips and a convenient mobility experience.",
       storyTitle: "OUR STORY",
       story: [
         "MOCO was born from a simple question: why does carrying luggage always feel heavy and inconvenient?",
         "We saw that moving through airports, stations, and long trips often takes unnecessary effort, especially with bulky luggage. MOCO was created to turn luggage into a smart mobility solution.",
       ],
       visionTitle: "OUR VISION",
-      vision: "Become one of the leading solutions in smart luggage and personal mobility.",
+      vision:
+        "Become one of the leading solutions in smart luggage and personal mobility.",
       missionTitle: "OUR MISSION",
-      mission: "Deliver a modern, convenient, and smarter travel experience for everyone.",
+      mission:
+        "Deliver a modern, convenient, and smarter travel experience for everyone.",
       teamTitle: "OUR TEAM",
       team: "A team of FPT Can Tho students focused on practical technology products.",
     },
@@ -388,7 +550,12 @@ const fixedViCopy = {
   ...pageCopy.vi,
   hero: {
     subtitle: "SMART ELECTRIC LUGGAGE",
-    description: "Vali điện thông minh cho những chuyến đi hiện đại và trải nghiệm di chuyển tiện lợi.",
+    description: (
+      <>
+        Vali điện thông minh cho những chuyến đi hiện đại<br />
+        và trải nghiệm di chuyển tiện lợi.
+      </>
+    ),
     primary: "Khám phá sản phẩm",
     secondary: "Đăng ký quan tâm",
   },
@@ -404,63 +571,107 @@ const fixedViCopy = {
   why: {
     kicker: "Smart Travel. Smarter Movement.",
     title: "Vì sao chọn MOCO?",
-    description: "Công nghệ thông minh - trải nghiệm di chuyển tự do và an tâm hơn trong mọi hành trình hiện đại.",
+    description:
+      "Công nghệ thông minh - trải nghiệm di chuyển tự do và an tâm hơn trong mọi hành trình hiện đại.",
     benefits: [
       ["mobility", "Di chuyển dễ dàng với hệ thống lái điện thông minh"],
       ["app", "Kết nối ứng dụng theo thời gian thực"],
       ["security", "Theo dõi và bảo vệ hành lý mọi lúc mọi nơi"],
       ["design", "Thiết kế hiện đại, tối ưu cho nhu cầu di chuyển hằng ngày"],
-      ["lifestyle", "Kết hợp hài hòa giữa công nghệ, tiện ích và phong cách sống"],
+      [
+        "lifestyle",
+        "Kết hợp hài hòa giữa công nghệ, tiện ích và phong cách sống",
+      ],
     ] as [IconName, string][],
   },
   audience: {
     title: "MOCO dành cho ai?",
-    description: "Dù bạn là ai, MOCO luôn là người bạn đồng hành đáng tin cậy trên mọi hành trình.",
+    description:
+      "Dù bạn là ai, MOCO luôn là người bạn đồng hành đáng tin cậy trên mọi hành trình.",
     items: [
       ["travel", "Người thường xuyên\ndi du lịch và khám phá"],
       ["business", "Người đi công tác\nvà di chuyển nhiều"],
       ["student", "Sinh viên và\nngười trẻ năng động"],
       ["tech", "Người yêu thích công nghệ\nvà lifestyle hiện đại"],
-      ["global", "Những ai tìm kiếm giải pháp\nSmart Travel thông minh\nvà khác biệt"],
+      [
+        "global",
+        "Những ai tìm kiếm giải pháp\nSmart Travel thông minh\nvà khác biệt",
+      ],
     ] as [IconName, string][],
   },
   content: {
-    highlights: ["Di chuyển bằng điện", "GPS Tracking", "Khóa thông minh", "Pin sạc bền bỉ"],
+    highlights: [
+      "Di chuyển bằng điện",
+      "GPS Tracking",
+      "Khóa thông minh",
+      "Pin sạc bền bỉ",
+    ],
     products: [
       {
         name: "MOCO Go",
-        description: "Phiên bản tiêu chuẩn với hệ thống lái điện tích hợp cho sân bay, nhà ga và khu du lịch.",
+        description:
+          "Phiên bản tiêu chuẩn với hệ thống lái điện tích hợp cho sân bay, nhà ga và khu du lịch.",
       },
       {
         name: "MOCO Plus",
-        description: "Tích hợp GPS, Bluetooth và chế độ tự động đi theo người dùng qua ứng dụng.",
+        description:
+          "Tích hợp GPS, Bluetooth và chế độ tự động đi theo người dùng qua ứng dụng.",
       },
       {
         name: "MOCO Pro",
-        description: "Bổ sung cảm biến tránh vật cản thông minh, an toàn hơn trong môi trường đông người.",
+        description:
+          "Bổ sung cảm biến tránh vật cản thông minh, an toàn hơn trong môi trường đông người.",
       },
       {
         name: "MOCO Max",
-        description: "Phiên bản cao cấp nhất với GPS, Bluetooth, app và cảm biến toàn diện.",
+        description:
+          "Phiên bản cao cấp nhất với GPS, Bluetooth, app và cảm biến toàn diện.",
       },
     ],
     features: [
-      ["Hệ thống lái điện thông minh", "Vali hỗ trợ di chuyển chủ động, giảm sức kéo và phù hợp với sân bay, nhà ga, khu du lịch."],
-      ["Pin và sạc tiện lợi", "Pin tích hợp có thể sạc lại, hỗ trợ năng lượng cho thiết bị cá nhân trong hành trình."],
-      ["GPS Tracking", "Theo dõi vị trí hành lý, giảm rủi ro thất lạc trong các chuyến đi."],
-      ["Bảo mật thông minh", "Khóa an toàn giúp bảo vệ hành lý trong nhiều tình huống di chuyển."],
+      [
+        "Hệ thống lái điện thông minh",
+        "Vali hỗ trợ di chuyển chủ động, giảm sức kéo và phù hợp với sân bay, nhà ga, khu du lịch.",
+      ],
+      [
+        "Pin và sạc tiện lợi",
+        "Pin tích hợp có thể sạc lại, hỗ trợ năng lượng cho thiết bị cá nhân trong hành trình.",
+      ],
+      [
+        "GPS Tracking",
+        "Theo dõi vị trí hành lý, giảm rủi ro thất lạc trong các chuyến đi.",
+      ],
+      [
+        "Bảo mật thông minh",
+        "Khóa an toàn giúp bảo vệ hành lý trong nhiều tình huống di chuyển.",
+      ],
     ],
     cases: [
       ["Sân bay", "Di chuyển nhanh hơn mà không cần kéo hành lý nặng."],
       ["Du lịch", "Thoải mái hơn trong các chuyến đi dài và lịch trình dày."],
       ["Công tác", "Tiết kiệm thời gian khi di chuyển giữa nhiều địa điểm."],
-      ["Sinh viên", "Hỗ trợ di chuyển hành lý trong ký túc xá và môi trường học tập."],
+      [
+        "Sinh viên",
+        "Hỗ trợ di chuyển hành lý trong ký túc xá và môi trường học tập.",
+      ],
     ],
     faqs: [
-      ["MOCO có nặng không?", "MOCO được thiết kế tối ưu trọng lượng để đảm bảo tính tiện dụng."],
-      ["Có được mang lên máy bay không?", "Tùy theo quy định từng hãng hàng không, MOCO có thể được mang như hành lý cabin."],
-      ["Pin sử dụng được bao lâu?", "Thời gian sử dụng phụ thuộc vào mức độ vận hành, phù hợp cho các chuyến di chuyển ngắn trong ngày."],
-      ["Cách điều khiển như thế nào?", "Thiết kế đơn giản, dễ dùng với nút điều khiển cơ bản hoặc tùy chọn kết nối ứng dụng."],
+      [
+        "MOCO có nặng không?",
+        "MOCO được thiết kế tối ưu trọng lượng để đảm bảo tính tiện dụng.",
+      ],
+      [
+        "Có được mang lên máy bay không?",
+        "Tùy theo quy định từng hãng hàng không, MOCO có thể được mang như hành lý cabin.",
+      ],
+      [
+        "Pin sử dụng được bao lâu?",
+        "Thời gian sử dụng phụ thuộc vào mức độ vận hành, phù hợp cho các chuyến di chuyển ngắn trong ngày.",
+      ],
+      [
+        "Cách điều khiển như thế nào?",
+        "Thiết kế đơn giản, dễ dùng với nút điều khiển cơ bản hoặc tùy chọn kết nối ứng dụng.",
+      ],
     ],
   },
   headings: {
@@ -493,15 +704,32 @@ const fixedViCopy = {
     ] as [IconName, string][],
     cards: [
       ["order", "Đăng ký sản phẩm", "Kích hoạt bảo hành cho vali MOCO."],
-      ["repair", "Bảo hành & sửa chữa", "Kiểm tra tình trạng và gửi yêu cầu hỗ trợ."],
-      ["manual", "Hướng dẫn sử dụng", "Xem cách vận hành, sạc pin và an toàn khi dùng."],
-      ["app", "Thiết lập MOCO App", "Kết nối GPS, theo dõi pin và quản lý thiết bị."],
-      ["flight", "Chính sách pin & hàng không", "Thông tin mang vali điện lên máy bay."],
+      [
+        "repair",
+        "Bảo hành & sửa chữa",
+        "Kiểm tra tình trạng và gửi yêu cầu hỗ trợ.",
+      ],
+      [
+        "manual",
+        "Hướng dẫn sử dụng",
+        "Xem cách vận hành, sạc pin và an toàn khi dùng.",
+      ],
+      [
+        "app",
+        "Thiết lập MOCO App",
+        "Kết nối GPS, theo dõi pin và quản lý thiết bị.",
+      ],
+      [
+        "flight",
+        "Chính sách pin & hàng không",
+        "Thông tin mang vali điện lên máy bay.",
+      ],
       ["faq", "Câu hỏi thường gặp", "Giải đáp các thắc mắc phổ biến."],
     ] as [IconName, string, string][],
     tip: "Mẹo: Hãy chuẩn bị số serial hoặc tên model để được hỗ trợ nhanh hơn.",
     directTitle: "Cần hỗ trợ trực tiếp?",
-    directText: "Đội ngũ MOCO sẵn sàng hỗ trợ bạn về bảo hành, app và kỹ thuật.",
+    directText:
+      "Đội ngũ MOCO sẵn sàng hỗ trợ bạn về bảo hành, app và kỹ thuật.",
     contactNow: "Liên hệ ngay",
     chat: "Chat với MOCO",
     topics: [
@@ -512,7 +740,8 @@ const fixedViCopy = {
   },
   contact: {
     title: "Liên hệ MOCO",
-    description: "Để lại thông tin, đội ngũ MOCO sẽ phản hồi về sản phẩm, bảo hành hoặc hợp tác trong thời gian sớm nhất.",
+    description:
+      "Để lại thông tin, đội ngũ MOCO sẽ phản hồi về sản phẩm, bảo hành hoặc hợp tác trong thời gian sớm nhất.",
     name: "Họ và tên *",
     email: "Email *",
     phone: "Số điện thoại *",
@@ -526,14 +755,16 @@ const fixedViCopy = {
     pending: "Đang gửi...",
   },
   preorder: {
-    description: "MOCO đang trong giai đoạn phát triển. Đăng ký để nhận cập nhật về phiên bản đầu tiên, tiến trình sản phẩm và cơ hội trải nghiệm sớm.",
+    description:
+      "MOCO đang trong giai đoạn phát triển. Đăng ký để nhận cập nhật về phiên bản đầu tiên, tiến trình sản phẩm và cơ hội trải nghiệm sớm.",
     namePlaceholder: "Họ và tên",
     button: "Đăng ký quan tâm ngay",
     pending: "Đang đăng ký...",
   },
   footer: {
     ...pageCopy.vi.footer,
-    subtitle: "Vali điện thông minh cho những chuyến đi hiện đại và trải nghiệm di chuyển tiện lợi.",
+    subtitle:
+      "Vali điện thông minh cho những chuyến đi hiện đại và trải nghiệm di chuyển tiện lợi.",
   },
   formThanks: "Cảm ơn bạn. MOCO sẽ liên hệ lại sớm nhất.",
 };
@@ -670,8 +901,10 @@ export default function Home() {
   const [activeProductIndex, setActiveProductIndex] = useState(0);
   const [favoriteProducts, setFavoriteProducts] = useState<string[]>([]);
   const leadMutation = useMutation({ mutationFn: () => submitLead(language) });
-  const activeHomeProduct = data.products[activeProductIndex % data.products.length];
-  const getProductSlug = (name: string) => name.toLowerCase().replace(/\s+/g, "-");
+  const activeHomeProduct =
+    data.products[activeProductIndex % data.products.length];
+  const getProductSlug = (name: string) =>
+    name.toLowerCase().replace(/\s+/g, "-");
 
   const getHomeProductOffset = (index: number) => {
     const rawOffset = index - activeProductIndex;
@@ -708,7 +941,10 @@ export default function Home() {
         ? current.filter((item) => item !== slug)
         : [...current, slug];
 
-      window.localStorage.setItem("moco-favorites", JSON.stringify(nextFavorites));
+      window.localStorage.setItem(
+        "moco-favorites",
+        JSON.stringify(nextFavorites),
+      );
       return nextFavorites;
     });
   };
@@ -739,15 +975,16 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="section new-arrival" id="new-arrival">
+        <section className="new-arrival" id="new-arrival">
           <div className="new-arrival-content">
             <span className="badge-outline">{text.newArrival.badge}</span>
-            <h2 className="new-arrival-title">
-              {text.newArrival.title}
-            </h2>
+            <h2 className="new-arrival-title">{text.newArrival.title}</h2>
             <div className="new-arrival-text">
               {text.newArrival.paragraphs.map((paragraph, index) => (
-                <p className={index === 0 ? "highlight-text" : ""} key={paragraph}>
+                <p
+                  className={index === 0 ? "highlight-text" : ""}
+                  key={paragraph}
+                >
                   {paragraph}
                 </p>
               ))}
@@ -755,7 +992,10 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="home-showcase" aria-labelledby="home-showcase-title">
+        <section
+          className="home-showcase"
+          aria-labelledby="home-showcase-title"
+        >
           <div className="home-showcase-panel">
             <div className="home-showcase-copy">
               <p className="home-showcase-kicker">{text.why.kicker}</p>
@@ -775,7 +1015,10 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="home-audience" aria-labelledby="home-audience-title">
+        <section
+          className="home-audience"
+          aria-labelledby="home-audience-title"
+        >
           <div className="home-audience-heading">
             <h2 id="home-audience-title">{text.audience.title}</h2>
             <p>{text.audience.description}</p>
@@ -795,20 +1038,31 @@ export default function Home() {
         </section>
 
         <div className="feature-strip-container">
-          <div className="feature-strip" aria-label={language === "vi" ? "Điểm nổi bật" : "Highlights"}>
+          <div
+            className="feature-strip"
+            aria-label={language === "vi" ? "Điểm nổi bật" : "Highlights"}
+          >
             {data.highlights.map((item) => (
               <span key={item}>{item}</span>
             ))}
           </div>
         </div>
 
-        <section className="product-carousel-stage home-product-stage-copy" id="product" aria-label="MOCO product carousel">
+        <section
+          className="product-carousel-stage home-product-stage-copy"
+          id="product"
+          aria-label="MOCO product carousel"
+        >
           <div className="product-stage-vignette" aria-hidden="true" />
 
           <button
             className="product-arrow product-arrow-left"
             type="button"
-            aria-label={language === "vi" ? "S\u1ea3n ph\u1ea9m tr\u01b0\u1edbc" : "Previous product"}
+            aria-label={
+              language === "vi"
+                ? "S\u1ea3n ph\u1ea9m tr\u01b0\u1edbc"
+                : "Previous product"
+            }
             onClick={() => moveHomeProduct("previous")}
           >
             <span />
@@ -816,13 +1070,19 @@ export default function Home() {
           <button
             className="product-arrow product-arrow-right"
             type="button"
-            aria-label={language === "vi" ? "S\u1ea3n ph\u1ea9m ti\u1ebfp theo" : "Next product"}
+            aria-label={
+              language === "vi"
+                ? "S\u1ea3n ph\u1ea9m ti\u1ebfp theo"
+                : "Next product"
+            }
             onClick={() => moveHomeProduct("next")}
           >
             <span />
           </button>
 
-          <div className="product-option-label">option {activeProductIndex + 1}</div>
+          <div className="product-option-label">
+            option {activeProductIndex + 1}
+          </div>
 
           <div className="product-wheel" aria-live="polite">
             {data.products.map((product, index) => {
@@ -831,7 +1091,11 @@ export default function Home() {
               const productSlug = getProductSlug(product.name);
 
               return (
-                <div className="product-card-shell" data-position={offset} key={product.name}>
+                <div
+                  className="product-card-shell"
+                  data-position={offset}
+                  key={product.name}
+                >
                   <button
                     className="product-3d-card"
                     type="button"
@@ -858,10 +1122,28 @@ export default function Home() {
                   <button
                     className={`product-favorite-button${favoriteProducts.includes(productSlug) ? " active" : ""}`}
                     type="button"
-                    aria-label={language === "vi" ? "Th\u00eam v\u00e0o y\u00eau th\u00edch" : "Add to favorites"}
+                    aria-label={
+                      language === "vi"
+                        ? "Th\u00eam v\u00e0o y\u00eau th\u00edch"
+                        : "Add to favorites"
+                    }
                     onClick={() => toggleFavoriteProduct(productSlug)}
                   >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill={favoriteProducts.includes(productSlug) ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill={
+                        favoriteProducts.includes(productSlug)
+                          ? "currentColor"
+                          : "none"
+                      }
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
                       <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"></path>
                     </svg>
                   </button>
@@ -872,7 +1154,10 @@ export default function Home() {
 
           <div className="product-carousel-copy">
             <p>{activeHomeProduct.description}</p>
-            <Link href={`/product/${getProductSlug(activeHomeProduct.name)}`} className="product-stage-title">
+            <Link
+              href={`/product/${getProductSlug(activeHomeProduct.name)}`}
+              className="product-stage-title"
+            >
               {activeHomeProduct.name}
             </Link>
             <span>
@@ -883,7 +1168,10 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="section product home-product-showcase home-product-legacy" aria-hidden="true">
+        <section
+          className="section product home-product-showcase home-product-legacy"
+          aria-hidden="true"
+        >
           <div className="home-product-visual" style={{ position: "relative" }}>
             <Image
               src="/assets/product-carousel.png"
@@ -899,17 +1187,25 @@ export default function Home() {
               <p>{text.product.description}</p>
             </div>
             <Link className="home-product-link" href="/product">
-              {language === "vi" ? "Xem bộ sưu tập sản phẩm" : "View product collection"}
+              {language === "vi"
+                ? "Xem bộ sưu tập sản phẩm"
+                : "View product collection"}
             </Link>
             <div className="product-layout">
               {data.products.map((product) => {
-                const productSlug = product.name.toLowerCase().replace(/\s+/g, "-");
+                const productSlug = product.name
+                  .toLowerCase()
+                  .replace(/\s+/g, "-");
 
                 return (
-                <Link href={`/product/${productSlug}`} key={product.name} className="product-card">
-                  <h3>{product.name}</h3>
-                  <p>{product.description}</p>
-                </Link>
+                  <Link
+                    href={`/product/${productSlug}`}
+                    key={product.name}
+                    className="product-card"
+                  >
+                    <h3>{product.name}</h3>
+                    <p>{product.description}</p>
+                  </Link>
                 );
               })}
             </div>
@@ -922,18 +1218,36 @@ export default function Home() {
             <h2>{text.headings.features}</h2>
           </div>
           <div className="features-showcase">
-            <div className="feature-visual feature-visual-large" style={{ position: "relative" }}>
-              <Image src="/assets/moco-ui-reference.png" alt="" fill sizes="(max-width: 900px) 100vw, 36vw" />
+            <div
+              className="feature-visual feature-visual-large"
+              style={{ position: "relative" }}
+            >
+              <Image
+                src="/assets/moco-ui-reference.png"
+                alt=""
+                fill
+                sizes="(max-width: 900px) 100vw, 36vw"
+              />
             </div>
-            <div className="feature-visual feature-visual-stack" style={{ position: "relative" }}>
-              <Image src="/assets/product-carousel.png" alt="" fill sizes="(max-width: 900px) 100vw, 28vw" />
+            <div
+              className="feature-visual feature-visual-stack"
+              style={{ position: "relative" }}
+            >
+              <Image
+                src="/assets/product-carousel.png"
+                alt=""
+                fill
+                sizes="(max-width: 900px) 100vw, 28vw"
+              />
             </div>
             <div className="feature-example">
               <span>{language === "vi" ? "ví dụ" : "example"}</span>
               <div className="feature-mini-list">
                 {data.features.map(([title, description], index) => (
                   <article key={title}>
-                    <strong>{String(index + 1).padStart(2, "0")} / {title}</strong>
+                    <strong>
+                      {String(index + 1).padStart(2, "0")} / {title}
+                    </strong>
                     <p>{description}</p>
                   </article>
                 ))}
@@ -942,7 +1256,11 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="support-center" id="support" aria-labelledby="support-title">
+        <section
+          className="support-center"
+          id="support"
+          aria-labelledby="support-title"
+        >
           <div className="support-hero">
             <div className="support-copy">
               <p className="support-kicker">{text.support.kicker}</p>
@@ -950,7 +1268,10 @@ export default function Home() {
               <p>{text.support.description}</p>
               <form className="support-search" role="search">
                 <span aria-hidden="true">⌕</span>
-                <input type="search" placeholder={text.support.searchPlaceholder} />
+                <input
+                  type="search"
+                  placeholder={text.support.searchPlaceholder}
+                />
                 <button type="submit">{text.support.searchButton}</button>
               </form>
               <a className="support-model-link" href="#contact">
@@ -962,7 +1283,12 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="support-tabs" aria-label={language === "vi" ? "Lối tắt hỗ trợ" : "Support shortcuts"}>
+          <div
+            className="support-tabs"
+            aria-label={
+              language === "vi" ? "Lối tắt hỗ trợ" : "Support shortcuts"
+            }
+          >
             {text.support.tabs.map(([icon, label]) => (
               <a href="#features" key={label}>
                 <SimpleIcon type={icon} />
@@ -991,8 +1317,13 @@ export default function Home() {
             <aside className="support-side">
               <h3>{text.support.quickInfo}</h3>
               <p>{text.support.supportTime}</p>
-              <p>{language === "vi" ? "Đường dây nóng" : "Hotline"}: 1900 6868</p>
-              <p>{language === "vi" ? "Email hỗ trợ" : "Support email"}: support@moco.vn</p>
+              <p>
+                {language === "vi" ? "Đường dây nóng" : "Hotline"}: 1900 6868
+              </p>
+              <p>
+                {language === "vi" ? "Email hỗ trợ" : "Support email"}:
+                support@moco.vn
+              </p>
               <div className="direct-support">
                 <strong>{text.support.directTitle}</strong>
                 <span>{text.support.directText}</span>
@@ -1042,7 +1373,11 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="contact-page" id="contact" aria-labelledby="contact-title">
+        <section
+          className="contact-page"
+          id="contact"
+          aria-labelledby="contact-title"
+        >
           <div className="contact-shell">
             <div className="contact-intro">
               <p className="support-kicker">{text.headings.contactEyebrow}</p>
@@ -1072,7 +1407,9 @@ export default function Home() {
                 ))}
               </div>
               <button className="contact-submit" type="submit">
-                {leadMutation.isPending ? text.contact.pending : text.contact.submit}
+                {leadMutation.isPending
+                  ? text.contact.pending
+                  : text.contact.submit}
               </button>
               <p className="form-note" aria-live="polite">
                 {leadMutation.data}
@@ -1088,10 +1425,22 @@ export default function Home() {
             <p>{text.preorder.description}</p>
           </div>
           <form className="form compact" onSubmit={handleSubmit}>
-            <input type="text" name="name" placeholder={text.preorder.namePlaceholder} required />
-            <input type="email" name="email" placeholder={text.contact.email.replace(" *", "")} required />
+            <input
+              type="text"
+              name="name"
+              placeholder={text.preorder.namePlaceholder}
+              required
+            />
+            <input
+              type="email"
+              name="email"
+              placeholder={text.contact.email.replace(" *", "")}
+              required
+            />
             <button className="button primary" type="submit">
-              {leadMutation.isPending ? text.preorder.pending : text.preorder.button}
+              {leadMutation.isPending
+                ? text.preorder.pending
+                : text.preorder.button}
             </button>
             <p className="form-note" aria-live="polite">
               {leadMutation.data}
@@ -1109,19 +1458,20 @@ export default function Home() {
           <section>
             <h2>{language === "vi" ? "Kh\u00e1m ph\u00e1" : "Explore"}</h2>
             <a href="/about">About Us</a>
-            <a href="/#product">{language === "vi" ? "S\u1ea3n ph\u1ea9m" : "Products"}</a>
-            <a href="/#features">{language === "vi" ? "T\u00ednh n\u0103ng" : "Features"}</a>
-          </section>
-          <section>
-            <h2>{language === "vi" ? "H\u1ed7 tr\u1ee3" : "Support"}</h2>
-            <a href="/#support">Support Center</a>
-            <a href="/#contact">Contact</a>
-            <a href="/login">Account</a>
+            <a href="/#product">
+              {language === "vi" ? "S\u1ea3n ph\u1ea9m" : "Products"}
+            </a>
+            <a href="/#features">
+              {language === "vi" ? "T\u00ednh n\u0103ng" : "Features"}
+            </a>
           </section>
           <section>
             <h2>{language === "vi" ? "Li\u00ean h\u1ec7" : "Contact"}</h2>
             <p>mocoluggage@gmail.com</p>
             <p>Can Tho, Vietnam</p>
+            <a href="/#support">Support Center</a>
+            <a href="/#contact">Contact</a>
+            <a href="/login">Account</a>
           </section>
         </div>
         <div className="footer-bottom">
@@ -1132,4 +1482,3 @@ export default function Home() {
     </>
   );
 }
-

@@ -60,7 +60,8 @@ a {
   background: #ffffff;
   color: #333333;
   font-family: "Quicksand", "Segoe UI", Arial, sans-serif;
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 600;
   border-bottom: 1px solid #f0f0f0;
 }
 
@@ -82,7 +83,7 @@ a {
   display: flex;
   align-items: center;
   flex: 1;
-  justify-content: flex-start;
+  justify-content: space-between;
   flex-wrap: wrap;
   gap: 6px clamp(10px, 1.2vw, 18px);
   min-width: 0;
@@ -183,7 +184,7 @@ a {
 .header-actions {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: flex-end;
   gap: clamp(6px, 0.8vw, 14px);
   flex: 1 1 520px;
   max-width: 100%;
@@ -220,20 +221,11 @@ a {
     transform 0.24s ease;
 }
 
-.action-support {
-  inline-size: 102px;
-}
-
-.action-search {
-  inline-size: 112px;
-}
-
-.action-rewards {
-  inline-size: 174px;
-}
-
+.action-support,
+.action-search,
+.action-rewards,
 .action-cart {
-  inline-size: 104px;
+  padding: 0 16px;
 }
 
 .action-item span {
@@ -278,7 +270,6 @@ a {
   align-items: center;
   justify-content: center;
   gap: 5px;
-  inline-size: 78px;
   padding: 0 14px;
   border: 1.5px solid transparent;
   border-radius: 999px;
@@ -447,29 +438,13 @@ a {
     min-inline-size: 104px;
   }
 
-  .action-support {
-    inline-size: 98px;
-    min-inline-size: 98px;
-  }
-
-  .action-search {
-    inline-size: 106px;
-    min-inline-size: 106px;
-  }
-
-  .action-rewards {
-    inline-size: 168px;
-    min-inline-size: 168px;
-  }
-
-  .action-cart {
-    inline-size: 98px;
-    min-inline-size: 98px;
-  }
-
+  .action-support,
+  .action-search,
+  .action-rewards,
+  .action-cart,
   .lang-switch {
-    inline-size: 72px;
-    min-inline-size: 72px;
+    inline-size: auto;
+    min-inline-size: 0;
   }
 }
 
@@ -699,8 +674,8 @@ a {
   font-size: clamp(60px, 8vw, 120px);
   font-weight: 800;
   line-height: 1;
-  margin: 0 0 10px 0;
-  letter-spacing: -1px;
+  margin: 0 0 10px -5px;
+  letter-spacing: 0;
 }
 
 .hero-subtitle {
@@ -708,21 +683,24 @@ a {
   font-weight: 700;
   margin: 0 0 24px 0;
   letter-spacing: 1px;
+  display: inline-block;
+  border-bottom: 3px solid var(--cyan);
+  padding-bottom: 8px;
 }
 
 .hero-divider {
-  width: 60px;
-  height: 3px;
-  background-color: var(--cyan);
-  margin-bottom: 24px;
+  display: none;
 }
 
 .hero-description {
   font-size: 16px;
   line-height: 1.6;
   margin-bottom: 40px;
-  color: #333333;
-  font-weight: 500;
+  color: #111;
+  font-weight: 600;
+  text-shadow: 0px 0px 5px rgba(255, 255, 255, 0.8);
+  max-width: 460px;
+  text-wrap: pretty;
 }
 
 .hero-actions {
@@ -753,13 +731,26 @@ a {
 }
 
 .new-arrival {
-  padding: 80px 64px;
-  background: white url("/assets/introVali.png") no-repeat center right / cover;
-  border-radius: 24px;
-  box-shadow: 0 24px 70px rgba(22, 62, 130, 0.08);
+  padding: 80px 8%;
+  background: url("/assets/introVali.png") no-repeat center center / cover;
   display: flex;
   align-items: center;
   min-height: 600px;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+}
+
+@media (max-width: 1024px) {
+  .new-arrival {
+    background-position: bottom center;
+    background-size: 80% auto;
+    padding-bottom: 300px;
+    flex-direction: column;
+    text-align: center;
+  }
+  .new-arrival-content {
+    max-width: 100%;
+  }
 }
 
 .new-arrival-content {
@@ -793,7 +784,7 @@ a {
   line-height: 1.7;
   margin-bottom: 20px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .new-arrival-text p:last-child {
@@ -804,7 +795,7 @@ a {
   position: relative;
   padding-left: 20px;
   font-weight: 600;
-  color: #222;
+  color: #555;
 }
 
 .new-arrival-text .highlight-text::before {

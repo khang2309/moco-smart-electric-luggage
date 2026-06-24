@@ -6,7 +6,8 @@ import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   title: "MOCO - Smart Electric Luggage",
-  description: "MOCO - Smart Electric Luggage, vali điện thông minh cho hành trình hiện đại.",
+  description:
+    "MOCO - Smart Electric Luggage, vali điện thông minh cho hành trình hiện đại.",
   icons: {
     icon: "/assets/logo.jpg",
   },
