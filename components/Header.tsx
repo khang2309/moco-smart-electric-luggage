@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import { signOutUser } from "../app/auth-storage";
 import { useLanguage } from "../app/providers";
 
 type CartItem = {
@@ -20,14 +21,12 @@ type CartItem = {
 const navItems = [
   ["Home", "/#home"],
   ["Product", "/#product"],
-  ["Features", "/#features"],
   ["Contact", "/#contact"],
 ] as const;
 
 const trackedHeaderItems = [
   ["Home", "#home"],
   ["Product", "#product"],
-  ["Features", "#features"],
   ["Contact", "#contact"],
   ["Support", "#support"],
   ["Rewards", "#rewards"],
@@ -40,7 +39,6 @@ const copy = {
     nav: {
       home: "Trang ch\u1ee7",
       product: "S\u1ea3n ph\u1ea9m",
-      features: "T\u00ednh n\u0103ng",
       contact: "Li\u00ean h\u1ec7",
     },
     support: "H\u1ed7 tr\u1ee3",
@@ -73,7 +71,6 @@ const copy = {
     nav: {
       home: "Home",
       product: "Product",
-      features: "Features",
       contact: "Contact",
     },
     support: "Support",
@@ -116,6 +113,7 @@ export default function Header() {
   } | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [selectedCartSlugs, setSelectedCartSlugs] = useState<string[]>([]);
   const { language, setLanguage } = useLanguage();
   const pathname = usePathname();
   const router = useRouter();
@@ -166,11 +164,19 @@ export default function Header() {
     const loadCart = () => {
       try {
         const rawCart = window.localStorage.getItem("moco-cart");
-        setCartItems(rawCart ? JSON.parse(rawCart) : []);
+        const nextCart: CartItem[] = rawCart ? JSON.parse(rawCart) : [];
+        setCartItems(nextCart);
+        setSelectedCartSlugs((current) => {
+          const existingSlugs = nextCart.map((item) => item.slug);
+          const keptSelection = current.filter((slug) => existingSlugs.includes(slug));
+          const newlyAdded = existingSlugs.filter((slug) => !current.includes(slug));
+          return [...keptSelection, ...newlyAdded];
+        });
         setIsCartPulsing(true);
         window.setTimeout(() => setIsCartPulsing(false), 650);
       } catch {
         setCartItems([]);
+        setSelectedCartSlugs([]);
       }
     };
 
@@ -281,15 +287,38 @@ export default function Header() {
 
   const removeCartItem = (slug: string) => {
     persistCart(cartItems.filter((item) => item.slug !== slug));
+    setSelectedCartSlugs((current) => current.filter((item) => item !== slug));
+  };
+
+  const toggleCartItemSelection = (slug: string) => {
+    setSelectedCartSlugs((current) =>
+      current.includes(slug)
+        ? current.filter((item) => item !== slug)
+        : [...current, slug],
+    );
+  };
+
+  const toggleSelectAllCart = () => {
+    setSelectedCartSlugs((current) =>
+      current.length === cartItems.length ? [] : cartItems.map((item) => item.slug),
+    );
+  };
+
+  const handleCheckout = () => {
+    const selectedItems = cartItems.filter((item) => selectedCartSlugs.includes(item.slug));
+
+    if (selectedItems.length === 0) return;
+
+    window.localStorage.setItem("moco-checkout-items", JSON.stringify(selectedItems));
+    setIsCartOpen(false);
+    router.push("/checkout");
   };
 
   const handleLogout = () => {
-    window.localStorage.removeItem("moco-auth");
-    window.localStorage.removeItem("moco-user");
+    signOutUser();
     setIsLoggedIn(false);
     setUserInfo(null);
     setIsAccountOpen(false);
-    window.dispatchEvent(new Event("moco-auth-updated"));
   };
 
   const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -336,15 +365,17 @@ export default function Header() {
 
   const currentCopy = copy[language];
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  const cartTotal = cartItems.reduce(
+  const selectedCartItems = cartItems.filter((item) => selectedCartSlugs.includes(item.slug));
+  const selectedCartCount = selectedCartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const cartTotal = selectedCartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0,
   );
+  const isEveryCartItemSelected = cartItems.length > 0 && selectedCartSlugs.length === cartItems.length;
   const currency = new Intl.NumberFormat("vi-VN").format;
   const translatedNavItems = [
     [currentCopy.nav.home, "/#home"],
     [currentCopy.nav.product, "/#product"],
-    [currentCopy.nav.features, "/#features"],
     [currentCopy.nav.contact, "/#contact"],
   ] as const;
 
@@ -679,7 +710,9 @@ export default function Header() {
             onClick={(event) => event.stopPropagation()}
           >
             <div className="cart-drawer-header">
-              <h2 id="cart-drawer-title">Cart ({cartCount})</h2>
+              <h2 id="cart-drawer-title">
+                {language === "vi" ? "Giỏ hàng" : "Cart"} ({cartCount})
+              </h2>
               <button
                 className="cart-close-btn"
                 type="button"
@@ -733,9 +766,27 @@ export default function Header() {
               </div>
             ) : (
               <>
+                <label className="cart-select-all">
+                  <input
+                    type="checkbox"
+                    checked={isEveryCartItemSelected}
+                    onChange={toggleSelectAllCart}
+                  />
+                  <span>{language === "vi" ? "Chọn tất cả" : "Select all"}</span>
+                  <strong>
+                    {selectedCartCount} {language === "vi" ? "sản phẩm đã chọn" : "selected"}
+                  </strong>
+                </label>
                 <div className="cart-items">
                   {cartItems.map((item) => (
-                    <article className="cart-item" key={item.slug}>
+                    <article className={`cart-item${selectedCartSlugs.includes(item.slug) ? " selected" : ""}`} key={item.slug}>
+                      <label className="cart-item-check" aria-label={`Select ${item.name}`}>
+                        <input
+                          type="checkbox"
+                          checked={selectedCartSlugs.includes(item.slug)}
+                          onChange={() => toggleCartItemSelection(item.slug)}
+                        />
+                      </label>
                       <Image src={item.image} alt="" width={68} height={68} />
                       <div className="cart-item-main">
                         <span>{item.store}</span>
@@ -793,14 +844,28 @@ export default function Header() {
                 </button>
                 <div className="cart-footer">
                   <div>
-                    <span>Total</span>
+                    <span>{language === "vi" ? "Tổng tiền sản phẩm đã chọn" : "Selected total"}</span>
                     <strong>{currency(cartTotal)} VND</strong>
                   </div>
                   <div className="cart-actions">
-                    <button type="button">VIEW CART</button>
-                    <button type="button">CHECK OUT</button>
+                    <button type="button" onClick={toggleSelectAllCart}>
+                      {isEveryCartItemSelected
+                        ? language === "vi"
+                          ? "BỎ CHỌN"
+                          : "CLEAR"
+                        : language === "vi"
+                          ? "CHỌN TẤT CẢ"
+                          : "SELECT ALL"}
+                    </button>
+                    <button type="button" disabled={selectedCartItems.length === 0} onClick={handleCheckout}>
+                      {language === "vi" ? "THANH TOÁN" : "CHECK OUT"}
+                    </button>
                   </div>
-                  <p>Taxes and shipping calculated at checkout</p>
+                  <p>
+                    {language === "vi"
+                      ? "Bạn chỉ thanh toán các sản phẩm đã chọn. Phí vận chuyển và voucher sẽ được tính ở bước checkout."
+                      : "Only selected items will be checked out. Shipping and vouchers are calculated at checkout."}
+                  </p>
                 </div>
               </>
             )}

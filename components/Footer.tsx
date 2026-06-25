@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-
+import { FormEvent, useState } from "react";
 import { useLanguage } from "../app/providers";
 
 const footerCopy = {
@@ -38,6 +38,50 @@ const footerCopy = {
 export default function Footer() {
   const { language } = useLanguage();
   const copy = footerCopy[language];
+  const [newsletterState, setNewsletterState] = useState<{
+    pending: boolean;
+    message: string;
+    type: "success" | "error" | "";
+  }>({ pending: false, message: "", type: "" });
+
+  const handleNewsletterSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const email = formData.get("email") as string;
+
+    setNewsletterState({ pending: true, message: "", type: "" });
+
+    try {
+      const response = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, type: "newsletter" }),
+      });
+      const data = await response.json();
+
+      if (!data.success) throw new Error(data.error || "Unable to subscribe");
+
+      setNewsletterState({
+        pending: false,
+        message:
+          language === "vi"
+            ? "Đăng ký thành công. Email xác nhận đã được gửi đến bạn."
+            : "Subscribed successfully. A confirmation email has been sent.",
+        type: "success",
+      });
+      form.reset();
+    } catch {
+      setNewsletterState({
+        pending: false,
+        message:
+          language === "vi"
+            ? "Chưa thể gửi email xác nhận. Vui lòng thử lại."
+            : "Could not send confirmation email. Please try again.",
+        type: "error",
+      });
+    }
+  };
 
   return (
     <footer className="site-footer global-footer">
@@ -46,10 +90,28 @@ export default function Footer() {
           <img src="/assets/logo.jpg" alt="MOCO" />
           <p>{copy.brand}</p>
           <div className="footer-socials" aria-label="Social links">
-            <a href="#" aria-label="Facebook">f</a>
-            <a href="#" aria-label="Instagram">◎</a>
-            <a href="#" aria-label="TikTok">♪</a>
-            <a href="#" aria-label="YouTube">▶</a>
+            <a href="https://web.facebook.com/profile.php?id=61590722004834" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M14 8h2V5h-2c-2.2 0-4 1.8-4 4v2H8v3h2v7h3v-7h2.3l.7-3h-3V9c0-.6.4-1 1-1Z" />
+              </svg>
+            </a>
+            <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="5" />
+                <circle cx="12" cy="12" r="4" />
+                <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+              </svg>
+            </a>
+            <a href="https://www.tiktok.com/@mocosmartluggage?_r=1&_t=ZS-97TjyrxkE30" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M15 3c.4 2.7 2 4.4 5 4.8V11c-1.8 0-3.5-.5-5-1.5V16a5 5 0 1 1-5-5c.3 0 .7 0 1 .1v3.2a2 2 0 1 0 1 1.7V3h3Z" />
+              </svg>
+            </a>
+            <a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M22 8.2a3 3 0 0 0-2.1-2.1C18 5.6 12 5.6 12 5.6s-6 0-7.9.5A3 3 0 0 0 2 8.2 31 31 0 0 0 1.5 12a31 31 0 0 0 .5 3.8 3 3 0 0 0 2.1 2.1c1.9.5 7.9.5 7.9.5s6 0 7.9-.5a3 3 0 0 0 2.1-2.1 31 31 0 0 0 .5-3.8 31 31 0 0 0-.5-3.8ZM10 15.2V8.8l5.5 3.2L10 15.2Z" />
+              </svg>
+            </a>
           </div>
         </section>
 
@@ -83,10 +145,18 @@ export default function Footer() {
         <section className="global-footer-newsletter">
           <h2>{copy.newsletter}</h2>
           <p>{copy.newsletterText}</p>
-          <form>
-            <input type="email" placeholder={copy.placeholder} aria-label={copy.placeholder} />
-            <button type="submit" aria-label={copy.newsletter}>→</button>
+          <form onSubmit={handleNewsletterSubmit}>
+            <input type="email" name="email" placeholder={copy.placeholder} aria-label={copy.placeholder} required />
+            <button type="submit" aria-label={copy.newsletter} disabled={newsletterState.pending}>
+              {newsletterState.pending ? "..." : "→"}
+            </button>
           </form>
+          {newsletterState.message && (
+            <p className={`newsletter-note ${newsletterState.type}`} aria-live="polite">
+              <span aria-hidden="true">{newsletterState.type === "success" ? "✓" : "!"}</span>
+              {newsletterState.message}
+            </p>
+          )}
         </section>
       </div>
 

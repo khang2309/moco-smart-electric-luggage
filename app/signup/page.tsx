@@ -5,6 +5,7 @@ import Link from "next/link";
 import { FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "../providers";
+import { findUser, saveUser } from "../auth-storage";
 
 export default function SignupPage() {
   const { language } = useLanguage();
@@ -16,10 +17,20 @@ export default function SignupPage() {
     const name = formData.get("name") as string;
     const email = formData.get("email") as string;
     const phone = formData.get("phone") as string || "";
-    
-    window.localStorage.setItem("moco-auth", "true");
-    window.localStorage.setItem("moco-user", JSON.stringify({ name, email, phone }));
-    window.dispatchEvent(new Event("moco-auth-updated"));
+    const password = formData.get("password") as string;
+    const confirmPassword = formData.get("confirmPassword") as string;
+
+    if (password !== confirmPassword) {
+      alert(language === "vi" ? "Mật khẩu xác nhận không khớp." : "Passwords do not match.");
+      return;
+    }
+
+    if (findUser(email)) {
+      alert(language === "vi" ? "Email này đã có tài khoản. Vui lòng đăng nhập." : "This email already has an account. Please login.");
+      return;
+    }
+
+    saveUser({ name, email, phone, password });
     router.push("/account");
   };
 
@@ -54,11 +65,11 @@ export default function SignupPage() {
           </label>
           <label>
             <span>{language === "vi" ? "Mật khẩu *" : "Password *"}</span>
-            <input type="password" required />
+            <input type="password" name="password" required minLength={6} />
           </label>
           <label>
             <span>{language === "vi" ? "Nhập lại mật khẩu *" : "Confirm password *"}</span>
-            <input type="password" required />
+            <input type="password" name="confirmPassword" required minLength={6} />
           </label>
           <button type="submit">{language === "vi" ? "Tạo tài khoản" : "Create account"}</button>
         </form>

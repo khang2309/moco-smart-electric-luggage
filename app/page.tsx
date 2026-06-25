@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
@@ -88,21 +88,25 @@ const pageCopy = {
       products: [
         {
           name: "MOCO Go",
+          image: "/assets/product/mocoGO.png",
           description:
             "Phiên bản tiêu chuẩn với hệ thống lái điện tích hợp cho sân bay, nhà ga và khu du lịch.",
         },
         {
           name: "MOCO Plus",
+          image: "/assets/product/mocoPLUS.png",
           description:
             "Tích hợp GPS, Bluetooth và chế độ tự động đi theo người dùng qua ứng dụng.",
         },
         {
           name: "MOCO Pro",
+          image: "/assets/product/mocoPRO.png",
           description:
             "Bổ sung cảm biến tránh vật cản thông minh, an toàn hơn trong môi trường đông người.",
         },
         {
           name: "MOCO Max",
+          image: "/assets/product/mocoMAX.png",
           description:
             "Phiên bản cao cấp nhất với GPS, Bluetooth, app và cảm biến toàn diện.",
         },
@@ -192,7 +196,7 @@ const pageCopy = {
       preorder: "Đăng ký quan tâm MOCO",
     },
     support: {
-      
+
       title: "Trung tâm hỗ trợ MOCO",
       description: "Tìm hướng dẫn, bảo hành và hỗ trợ cho vali điện của bạn.",
       searchPlaceholder: "Tìm theo model, số serial hoặc từ khóa...",
@@ -321,7 +325,7 @@ const pageCopy = {
       ] as [IconName, string][],
     },
     audience: {
-      title: "Who is MOCO for?",
+      title: "Who Will Love MOCO?",
       description:
         "Whoever you are, MOCO is a reliable travel companion for every journey.",
       items: [
@@ -345,21 +349,25 @@ const pageCopy = {
       products: [
         {
           name: "MOCO Go",
+          image: "/assets/product/mocoGO.png",
           description:
             "The standard edition with integrated electric driving for airports, stations, and travel areas.",
         },
         {
           name: "MOCO Plus",
+          image: "/assets/product/mocoPLUS.png",
           description:
             "Adds GPS, Bluetooth, and automatic follow mode through the mobile app.",
         },
         {
           name: "MOCO Pro",
+          image: "/assets/product/mocoPRO.png",
           description:
             "Adds intelligent obstacle avoidance sensors for safer movement in crowded spaces.",
         },
         {
           name: "MOCO Max",
+          image: "/assets/product/mocoMAX.png",
           description:
             "The premium edition with GPS, Bluetooth, app control, and complete sensing.",
         },
@@ -585,9 +593,9 @@ const fixedViCopy = {
     ] as [IconName, string][],
   },
   audience: {
-    title: "MOCO dành cho ai?",
+    title: "Ai sẽ yêu thích MOCO?",
     description:
-      "Dù bạn là ai, MOCO luôn là người bạn đồng hành đáng tin cậy trên mọi hành trình.",
+      "MOCO luôn là người bạn đồng hành đáng tin cậy trên mọi hành trình.",
     items: [
       ["travel", "Người thường xuyên\ndi du lịch và khám phá"],
       ["business", "Người đi công tác\nvà di chuyển nhiều"],
@@ -609,21 +617,25 @@ const fixedViCopy = {
     products: [
       {
         name: "MOCO Go",
+        image: "/assets/product/mocoGO.png",
         description:
           "Phiên bản tiêu chuẩn với hệ thống lái điện tích hợp cho sân bay, nhà ga và khu du lịch.",
       },
       {
         name: "MOCO Plus",
+        image: "/assets/product/mocoPLUS.png",
         description:
           "Tích hợp GPS, Bluetooth và chế độ tự động đi theo người dùng qua ứng dụng.",
       },
       {
         name: "MOCO Pro",
+        image: "/assets/product/mocoPRO.png",
         description:
           "Bổ sung cảm biến tránh vật cản thông minh, an toàn hơn trong môi trường đông người.",
       },
       {
         name: "MOCO Max",
+        image: "/assets/product/mocoMAX.png",
         description:
           "Phiên bản cao cấp nhất với GPS, Bluetooth, app và cảm biến toàn diện.",
       },
@@ -778,11 +790,6 @@ async function getMocoContent(language: Language) {
   return localizedCopy[language].content;
 }
 
-async function submitLead(language: Language) {
-  await new Promise((resolve) => setTimeout(resolve, 500));
-  return localizedCopy[language].formThanks;
-}
-
 function SimpleIcon({ type }: { type: IconName }) {
   const commonProps = {
     width: 24,
@@ -900,7 +907,11 @@ export default function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [activeProductIndex, setActiveProductIndex] = useState(0);
   const [favoriteProducts, setFavoriteProducts] = useState<string[]>([]);
-  const leadMutation = useMutation({ mutationFn: () => submitLead(language) });
+  const [leadState, setLeadState] = useState<{
+    pending: boolean;
+    message: string;
+    type: "success" | "error" | "";
+  }>({ pending: false, message: "", type: "" });
   const activeHomeProduct =
     data.products[activeProductIndex % data.products.length];
   const getProductSlug = (name: string) =>
@@ -949,10 +960,51 @@ export default function Home() {
     });
   };
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    leadMutation.mutate();
-    event.currentTarget.reset();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const email = formData.get("email") as string;
+    const name = (formData.get("name") as string) || "";
+    const isPreorderForm = form.closest("#preorder") !== null;
+
+    setLeadState({ pending: true, message: "", type: "" });
+
+    try {
+      const response = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          name,
+          type: isPreorderForm ? "interest" : "contact",
+        }),
+      });
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error || "Unable to submit");
+      }
+
+      setLeadState({
+        pending: false,
+        message:
+          language === "vi"
+            ? "Đăng ký thành công. MOCO đã gửi email xác nhận đến hộp thư của bạn."
+            : "Registration successful. MOCO has sent a confirmation email to your inbox.",
+        type: "success",
+      });
+      form.reset();
+    } catch (error) {
+      setLeadState({
+        pending: false,
+        message:
+          language === "vi"
+            ? "Chưa thể gửi email xác nhận. Vui lòng thử lại sau."
+            : "Could not send confirmation email. Please try again later.",
+        type: "error",
+      });
+    }
   }
 
   return (
@@ -1112,11 +1164,12 @@ export default function Home() {
                     }}
                   >
                     <Image
-                      src="/assets/product-carousel.png"
-                      alt=""
+                      src={product.image}
+                      alt={product.name}
                       fill
                       sizes="(max-width: 560px) 76vw, 38vw"
                       priority={isActive}
+                      style={{ objectFit: "contain" }}
                     />
                   </button>
                   <button
@@ -1153,19 +1206,12 @@ export default function Home() {
           </div>
 
           <div className="product-carousel-copy">
-            <p>{activeHomeProduct.description}</p>
             <Link
               href={`/product/${getProductSlug(activeHomeProduct.name)}`}
               className="product-stage-title"
             >
-              {activeHomeProduct.name}
+              {activeHomeProduct.name.toUpperCase()}
             </Link>
-            <p>{activeHomeProduct.description}</p>
-            <span>
-              {language === "vi"
-                ? "Bấm vào tên sản phẩm để xem thông tin và mua hàng"
-                : "Click the product name to view details and purchase"}
-            </span>
           </div>
         </section>
 
@@ -1402,13 +1448,16 @@ export default function Home() {
                 ))}
               </div>
               <button className="contact-submit" type="submit">
-                {leadMutation.isPending
+                {leadState.pending
                   ? text.contact.pending
                   : text.contact.submit}
               </button>
-              <p className="form-note" aria-live="polite">
-                {leadMutation.data}
-              </p>
+              {leadState.message && (
+                <p className={`form-note ${leadState.type}`} aria-live="polite">
+                  <span aria-hidden="true">{leadState.type === "success" ? "✓" : "!"}</span>
+                  {leadState.message}
+                </p>
+              )}
             </form>
           </div>
         </section>
@@ -1433,13 +1482,16 @@ export default function Home() {
               required
             />
             <button className="button primary" type="submit">
-              {leadMutation.isPending
+              {leadState.pending
                 ? text.preorder.pending
                 : text.preorder.button}
             </button>
-            <p className="form-note" aria-live="polite">
-              {leadMutation.data}
-            </p>
+            {leadState.message && (
+              <p className={`form-note ${leadState.type}`} aria-live="polite">
+                <span aria-hidden="true">{leadState.type === "success" ? "✓" : "!"}</span>
+                {leadState.message}
+              </p>
+            )}
           </form>
         </section>
       </main>

@@ -10,7 +10,7 @@ const products = [
   {
     slug: "moco-go",
     name: "MOCO Go",
-    image: "/assets/product-carousel.png",
+    image: "/assets/Product/mocoGO.png",
     vi: {
       description:
         "Phiên bản tiêu chuẩn với hệ thống lái điện tích hợp, hỗ trợ người dùng di chuyển thuận tiện tại sân bay, nhà ga, khu du lịch và các không gian rộng lớn.",
@@ -33,7 +33,7 @@ const products = [
   {
     slug: "moco-plus",
     name: "MOCO Plus",
-    image: "/assets/product-carousel.png",
+    image: "/assets/Product/mocoPLUS.png",
     vi: {
       description:
         "Phiên bản vali điện có thể lái được, tích hợp hệ thống định vị GPS và chế độ tự động đi theo người dùng, cho phép vali nhận diện và di chuyển theo chủ sở hữu thông qua kết nối Bluetooth và ứng dụng trên điện thoại.",
@@ -56,7 +56,7 @@ const products = [
   {
     slug: "moco-pro",
     name: "MOCO Pro",
-    image: "/assets/product-carousel.png",
+    image: "/assets/Product/mocoPRO.png",
     vi: {
       description:
         "Phiên bản vali điện có thể lái được, tích hợp GPS, chế độ tự động đi theo người dùng thông qua Bluetooth và ứng dụng điện thoại, đồng thời được trang bị hệ thống cảm biến tránh vật cản thông minh giúp vali di chuyển an toàn hơn trong môi trường đông người.",
@@ -79,7 +79,7 @@ const products = [
   {
     slug: "moco-max",
     name: "MOCO Max",
-    image: "/assets/product-carousel.png",
+    image: "/assets/Product/mocoMAX.png",
     vi: {
       description:
         "Phiên bản vali điện cao cấp nhất, tích hợp GPS, chế độ tự động đi theo người dùng thông qua Bluetooth và ứng dụng điện thoại, cùng hệ thống cảm biến tránh vật cản thông minh, mang đến trải nghiệm di chuyển toàn diện.",
@@ -100,6 +100,93 @@ const products = [
     },
   },
 ] as const;
+
+function FeatureIcon({ title }: { title: string }) {
+  const normalizedTitle = title.toLowerCase();
+  let icon = (
+    <>
+      <path d="M12 3.5 19 7v5.2c0 4.5-2.9 7.1-7 8.3-4.1-1.2-7-3.8-7-8.3V7l7-3.5Z"></path>
+      <path d="m9.5 12 1.7 1.7 3.6-4"></path>
+    </>
+  );
+
+  if (normalizedTitle.includes("gps") || normalizedTitle.includes("định vị")) {
+    icon = (
+      <>
+        <path d="M12 21s6-5.4 6-11a6 6 0 1 0-12 0c0 5.6 6 11 6 11Z"></path>
+        <circle cx="12" cy="10" r="2.2"></circle>
+      </>
+    );
+  } else if (normalizedTitle.includes("bluetooth") || normalizedTitle.includes("kết nối") || normalizedTitle.includes("app")) {
+    icon = (
+      <>
+        <path d="m8 7 8 5-8 5V7Z"></path>
+        <path d="m16 7-8 5 8 5V7Z"></path>
+        <path d="M5 8.5a5 5 0 0 0 0 7"></path>
+        <path d="M19 8.5a5 5 0 0 1 0 7"></path>
+      </>
+    );
+  } else if (normalizedTitle.includes("pin") || normalizedTitle.includes("battery")) {
+    icon = (
+      <>
+        <rect x="7" y="6" width="10" height="14" rx="2"></rect>
+        <path d="M10 4h4"></path>
+        <path d="M10 15h4"></path>
+        <path d="M10 12h4"></path>
+      </>
+    );
+  } else if (normalizedTitle.includes("cảm biến") || normalizedTitle.includes("sensor") || normalizedTitle.includes("obstacle")) {
+    icon = (
+      <>
+        <path d="M12 3.5 19 7v5.2c0 4.5-2.9 7.1-7 8.3-4.1-1.2-7-3.8-7-8.3V7l7-3.5Z"></path>
+        <path d="M8.5 12h7"></path>
+        <path d="M12 8.5v7"></path>
+      </>
+    );
+  } else if (normalizedTitle.includes("lái điện") || normalizedTitle.includes("drive")) {
+    icon = (
+      <>
+        <circle cx="12" cy="12" r="8.5"></circle>
+        <circle cx="12" cy="12" r="2.1"></circle>
+        <path d="M12 14.2v6"></path>
+        <path d="m9.8 10.9-5.2-3"></path>
+        <path d="m14.2 10.9 5.2-3"></path>
+      </>
+    );
+  } else if (normalizedTitle.includes("nhỏ gọn") || normalizedTitle.includes("compact") || normalizedTitle.includes("thiết kế")) {
+    icon = (
+      <>
+        <rect x="7" y="6" width="10" height="14" rx="2"></rect>
+        <path d="M9.5 6V4.8A1.8 1.8 0 0 1 11.3 3h1.4a1.8 1.8 0 0 1 1.8 1.8V6"></path>
+        <path d="M9.5 9.5h5"></path>
+        <path d="M9.5 16.5h5"></path>
+      </>
+    );
+  } else if (normalizedTitle.includes("theo") || normalizedTitle.includes("follow")) {
+    icon = (
+      <>
+        <circle cx="8" cy="8" r="3"></circle>
+        <path d="M3.8 19a4.2 4.2 0 0 1 8.4 0"></path>
+        <path d="M15 7h5"></path>
+        <path d="m17.5 4.5 2.5 2.5-2.5 2.5"></path>
+        <path d="M15 15h5"></path>
+        <path d="m17.5 12.5 2.5 2.5-2.5 2.5"></path>
+      </>
+    );
+  } else if (normalizedTitle.includes("premium") || normalizedTitle.includes("cao cấp") || normalizedTitle.includes("pro")) {
+    icon = (
+      <>
+        <path d="m12 3 2.5 5 5.5.8-4 3.9.9 5.5L12 15.6 7.1 18.2l.9-5.5-4-3.9 5.5-.8L12 3Z"></path>
+      </>
+    );
+  }
+
+  return (
+    <svg className="feature-row-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {icon}
+    </svg>
+  );
+}
 
 export default function ProductDetailPage() {
   const params = useParams<{ slug: string }>();
@@ -231,12 +318,13 @@ export default function ProductDetailPage() {
           </div>
 
           <button className={`add-cart-button${showAddedFeedback ? " added" : ""}`} type="button" onClick={handleAddToCart}>
-            <svg className="add-cart-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
-              <path d="M3 6h18"></path>
-              <path d="M16 10a4 4 0 0 1-8 0"></path>
+            <svg className="add-cart-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="9" cy="20" r="1.6"></circle>
+              <circle cx="18" cy="20" r="1.6"></circle>
+              <path d="M3.4 4H5l2.2 11.2a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 1.9-1.4L21 8H7"></path>
+              <path d="M12 11h4"></path>
+              <path d="M14 9v4"></path>
             </svg>
-            <span aria-hidden="true">□</span>
             {t.add}
           </button>
 
@@ -260,8 +348,11 @@ export default function ProductDetailPage() {
             {details.specs.map(([title, body], index) => (
               <article key={title}>
                 <button type="button" onClick={() => setOpenIndex(index)}>
+                  <FeatureIcon title={title} />
                   <span>{title}</span>
-                  <span aria-hidden="true">{openIndex === index ? "^" : "v"}</span>
+                  <svg className="feature-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d={openIndex === index ? "m18 15-6-6-6 6" : "m6 9 6 6 6-6"}></path>
+                  </svg>
                 </button>
                 {openIndex === index && <p>{body}</p>}
               </article>

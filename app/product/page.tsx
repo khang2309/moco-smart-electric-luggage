@@ -9,24 +9,28 @@ const products = [
   {
     slug: "moco-go",
     name: "MOCO Go",
+    image: "/assets/Product/mocoGO.png",
     vi: "Phiên bản tiêu chuẩn với hệ thống lái điện tích hợp, hỗ trợ người dùng di chuyển thuận tiện tại sân bay, nhà ga, khu du lịch và các không gian rộng lớn.",
     en: "The standard edition with integrated electric driving for airports, stations, travel areas, and large spaces.",
   },
   {
     slug: "moco-plus",
     name: "MOCO Plus",
+    image: "/assets/Product/mocoPLUS.png",
     vi: "Phiên bản vali điện có thể lái được, tích hợp hệ thống định vị GPS và chế độ tự động đi theo người dùng qua Bluetooth và ứng dụng điện thoại.",
     en: "A rideable electric luggage version with GPS positioning and automatic follow mode through Bluetooth and the mobile app.",
   },
   {
     slug: "moco-pro",
     name: "MOCO Pro",
+    image: "/assets/Product/mocoPRO.png",
     vi: "Phiên bản vali điện có thể lái được, tích hợp GPS, chế độ tự động đi theo người dùng qua Bluetooth và ứng dụng điện thoại, đồng thời trang bị cảm biến tránh vật cản thông minh.",
     en: "A rideable electric luggage version with GPS, app connection, automatic follow mode, and intelligent obstacle avoidance sensors.",
   },
   {
     slug: "moco-max",
     name: "MOCO Max",
+    image: "/assets/Product/mocoMAX.png",
     vi: "Phiên bản cao cấp nhất, tích hợp GPS, chế độ tự động đi theo người dùng qua Bluetooth và ứng dụng điện thoại, cùng hệ thống cảm biến tránh vật cản thông minh toàn diện.",
     en: "The most advanced edition with GPS, Bluetooth app follow mode, and a complete intelligent obstacle avoidance system.",
   },
@@ -143,7 +147,7 @@ export default function ProductPage() {
                   onClick={() => setActiveIndex(index)}
                 >
                   <Image
-                    src="/assets/product-carousel.png"
+                    src={product.image}
                     alt=""
                     fill
                     sizes="(max-width: 560px) 76vw, 38vw"

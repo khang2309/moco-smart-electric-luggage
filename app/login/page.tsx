@@ -2,23 +2,52 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { FormEvent } from "react";
+import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { findUser, readCurrentUser, saveUser } from "../auth-storage";
 import { useLanguage } from "../providers";
 
 export default function LoginPage() {
   const { language } = useLanguage();
   const router = useRouter();
+  const [error, setError] = useState("");
 
   const handleLogin = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const email = formData.get("email") as string;
-    const name = email ? email.split('@')[0] : "User";
-    
-    window.localStorage.setItem("moco-auth", "true");
-    window.localStorage.setItem("moco-user", JSON.stringify({ email, name }));
-    window.dispatchEvent(new Event("moco-auth-updated"));
+    const password = formData.get("password") as string;
+    const existingUser = findUser(email);
+    const currentUser = readCurrentUser();
+
+    if (!existingUser && currentUser?.email?.toLowerCase() === email.trim().toLowerCase()) {
+      saveUser({
+        ...currentUser,
+        email: currentUser.email,
+        password,
+      });
+      setError("");
+      router.push("/#home");
+      return;
+    }
+
+    if (!existingUser) {
+      setError(language === "vi" ? "Không tìm thấy tài khoản với email này." : "No account found for this email.");
+      return;
+    }
+
+    if (existingUser.password && existingUser.password !== password) {
+      setError(language === "vi" ? "Mật khẩu không đúng." : "Incorrect password.");
+      return;
+    }
+
+    saveUser({
+      ...currentUser,
+      ...existingUser,
+      email: existingUser.email,
+      name: existingUser.name || existingUser.email.split("@")[0],
+    });
+    setError("");
     router.push("/#home");
   };
 
@@ -32,7 +61,7 @@ export default function LoginPage() {
           sizes="100vw"
           priority
         />
-        
+
         <form className="login-card" onSubmit={handleLogin}>
           <h1>{language === "vi" ? "Đăng nhập MOCO Account" : "Login to MOCO Account"}</h1>
           <p>
@@ -48,8 +77,9 @@ export default function LoginPage() {
           </Link>
           <label>
             <span>{language === "vi" ? "Mật khẩu *" : "Password *"}</span>
-            <input type="password" required />
+            <input type="password" name="password" required />
           </label>
+          {error && <p className="auth-error" aria-live="polite">{error}</p>}
           <button type="submit">{language === "vi" ? "Đăng nhập" : "Login"}</button>
         </form>
       </section>
