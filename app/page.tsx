@@ -88,25 +88,25 @@ const pageCopy = {
       products: [
         {
           name: "MOCO Go",
-          image: "/assets/product/mocoGO.png",
+          image: "/assets/Product/mocoGO.png",
           description:
             "Phiên bản tiêu chuẩn với hệ thống lái điện tích hợp cho sân bay, nhà ga và khu du lịch.",
         },
         {
           name: "MOCO Plus",
-          image: "/assets/product/mocoPLUS.png",
+          image: "/assets/Product/mocoPLUS.png",
           description:
             "Tích hợp GPS, Bluetooth và chế độ tự động đi theo người dùng qua ứng dụng.",
         },
         {
           name: "MOCO Pro",
-          image: "/assets/product/mocoPRO.png",
+          image: "/assets/Product/mocoPRO.png",
           description:
             "Bổ sung cảm biến tránh vật cản thông minh, an toàn hơn trong môi trường đông người.",
         },
         {
           name: "MOCO Max",
-          image: "/assets/product/mocoMAX.png",
+          image: "/assets/Product/mocoMAX.png",
           description:
             "Phiên bản cao cấp nhất với GPS, Bluetooth, app và cảm biến toàn diện.",
         },
@@ -349,25 +349,25 @@ const pageCopy = {
       products: [
         {
           name: "MOCO Go",
-          image: "/assets/product/mocoGO.png",
+          image: "/assets/Product/mocoGO.png",
           description:
             "The standard edition with integrated electric driving for airports, stations, and travel areas.",
         },
         {
           name: "MOCO Plus",
-          image: "/assets/product/mocoPLUS.png",
+          image: "/assets/Product/mocoPLUS.png",
           description:
             "Adds GPS, Bluetooth, and automatic follow mode through the mobile app.",
         },
         {
           name: "MOCO Pro",
-          image: "/assets/product/mocoPRO.png",
+          image: "/assets/Product/mocoPRO.png",
           description:
             "Adds intelligent obstacle avoidance sensors for safer movement in crowded spaces.",
         },
         {
           name: "MOCO Max",
-          image: "/assets/product/mocoMAX.png",
+          image: "/assets/Product/mocoMAX.png",
           description:
             "The premium edition with GPS, Bluetooth, app control, and complete sensing.",
         },
@@ -617,25 +617,25 @@ const fixedViCopy = {
     products: [
       {
         name: "MOCO Go",
-        image: "/assets/product/mocoGO.png",
+        image: "/assets/Product/mocoGO.png",
         description:
           "Phiên bản tiêu chuẩn với hệ thống lái điện tích hợp cho sân bay, nhà ga và khu du lịch.",
       },
       {
         name: "MOCO Plus",
-        image: "/assets/product/mocoPLUS.png",
+        image: "/assets/Product/mocoPLUS.png",
         description:
           "Tích hợp GPS, Bluetooth và chế độ tự động đi theo người dùng qua ứng dụng.",
       },
       {
         name: "MOCO Pro",
-        image: "/assets/product/mocoPRO.png",
+        image: "/assets/Product/mocoPRO.png",
         description:
           "Bổ sung cảm biến tránh vật cản thông minh, an toàn hơn trong môi trường đông người.",
       },
       {
         name: "MOCO Max",
-        image: "/assets/product/mocoMAX.png",
+        image: "/assets/Product/mocoMAX.png",
         description:
           "Phiên bản cao cấp nhất với GPS, Bluetooth, app và cảm biến toàn diện.",
       },
