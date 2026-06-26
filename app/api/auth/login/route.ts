@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/mongodb";
+import { getDatabaseErrorMessage } from "@/lib/api-error";
 import bcrypt from "bcryptjs";
 
 export async function POST(request: Request) {
@@ -41,7 +42,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("Login error:", error);
     return NextResponse.json(
-      { error: "Internal server error." },
+      { error: getDatabaseErrorMessage(error) },
       { status: 500 },
     );
   }

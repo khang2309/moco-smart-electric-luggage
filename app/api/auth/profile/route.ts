@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getDatabaseErrorMessage } from "@/lib/api-error";
 import { getDb } from "@/lib/mongodb";
 
 export async function GET(request: NextRequest) {
@@ -30,7 +31,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Profile GET error:", error);
     return NextResponse.json(
-      { error: "Internal server error." },
+      { error: getDatabaseErrorMessage(error) },
       { status: 500 },
     );
   }
@@ -75,7 +76,7 @@ export async function PUT(request: Request) {
   } catch (error) {
     console.error("Profile PUT error:", error);
     return NextResponse.json(
-      { error: "Internal server error." },
+      { error: getDatabaseErrorMessage(error) },
       { status: 500 },
     );
   }

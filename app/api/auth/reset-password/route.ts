@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getDatabaseErrorMessage } from "@/lib/api-error";
 import { getDb } from "@/lib/mongodb";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
@@ -40,7 +41,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("Reset-password POST error:", error);
     return NextResponse.json(
-      { error: "Internal server error." },
+      { error: getDatabaseErrorMessage(error) },
       { status: 500 },
     );
   }
@@ -92,7 +93,7 @@ export async function PUT(request: Request) {
   } catch (error) {
     console.error("Reset-password PUT error:", error);
     return NextResponse.json(
-      { error: "Internal server error." },
+      { error: getDatabaseErrorMessage(error) },
       { status: 500 },
     );
   }
