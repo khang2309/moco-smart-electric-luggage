@@ -71,7 +71,7 @@ export default function AboutPage() {
         </article>
         <article>
           <h2>{copy.teamTitle}</h2>
-          <p>{copy.team}</p>
+          <p style={{ whiteSpace: "nowrap" }}>{copy.team}</p>
         </article>
       </section>
     </main>

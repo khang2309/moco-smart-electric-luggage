@@ -679,22 +679,6 @@ a {
   position: relative;
 }
 
-.hero::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 120px;
-  background: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgba(255, 255, 255, 0.6) 50%,
-    #ffffff 100%
-  );
-  pointer-events: none;
-  z-index: 1;
-}
 
 .hero-content {
   max-width: 600px;
@@ -776,40 +760,6 @@ a {
   position: relative;
 }
 
-.new-arrival::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 100px;
-  background: linear-gradient(
-    to bottom,
-    #ffffff 0%,
-    rgba(255, 255, 255, 0.5) 50%,
-    transparent 100%
-  );
-  pointer-events: none;
-  z-index: 1;
-}
-
-.new-arrival::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 140px;
-  background: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgba(247, 248, 249, 0.5) 40%,
-    rgba(247, 248, 249, 0.85) 70%,
-    #f7f8f9 100%
-  );
-  pointer-events: none;
-  z-index: 1;
-}
 
 @media (max-width: 1024px) {
   .new-arrival {
@@ -889,7 +839,7 @@ a {
   display: flex;
   align-items: center;
   margin: 0 auto;
-  padding: 56px 6%;
+  padding: 56px 8%;
   background:
     linear-gradient(
       90deg,
@@ -903,26 +853,9 @@ a {
   position: relative;
 }
 
-.home-showcase::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 130px;
-  background: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgba(246, 247, 250, 0.5) 40%,
-    rgba(246, 247, 250, 0.85) 70%,
-    #f6f7fa 100%
-  );
-  pointer-events: none;
-  z-index: 1;
-}
 
 .home-showcase-panel {
-  width: min(620px, 100%);
+  width: min(560px, 100%);
   position: relative;
   z-index: 2;
 }
@@ -942,10 +875,12 @@ a {
 .home-showcase-copy h2 {
   margin: 0 0 28px;
   color: #050505;
-  font-size: clamp(34px, 4vw, 48px);
+  font-family: "AvantGarde-Demi", "Century Gothic", "Futura", "Quicksand", sans-serif;
+  font-size: 65px;
   font-weight: 800;
   line-height: 1.05;
   letter-spacing: 0;
+  white-space: nowrap;
 }
 
 .home-showcase-copy > p:not(.home-showcase-kicker) {
@@ -954,15 +889,19 @@ a {
 
 .home-benefit-list {
   display: grid;
-  gap: 10px;
-  width: min(580px, 100%);
+  grid-template-columns: 1fr;
+  gap: 12px;
+  width: min(520px, 100%);
+  margin: 0;
 }
 
 .home-benefit-list article {
-  min-height: 62px;
-  display: flex;
+  min-height: 60px;
+  display: grid;
+  grid-template-columns: 54px 1fr;
   align-items: center;
-  padding: 12px 54px;
+  gap: 18px;
+  padding: 10px 26px 10px 18px;
   border: 1px solid rgba(255, 255, 255, 0.68);
   border-left: 2px solid rgba(66, 211, 255, 0.85);
   border-radius: 8px;
@@ -970,31 +909,31 @@ a {
   box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, 0.36),
     0 10px 30px rgba(20, 48, 76, 0.06);
+  text-align: left;
   backdrop-filter: blur(8px);
 }
 
 .benefit-icon {
   display: grid;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   place-items: center;
-  border: 1px solid rgba(84, 217, 255, 0.55);
   border-radius: 8px;
-  color: #08111f;
-  background: #ffffff;
-  line-height: 1;
+  color: #091227;
+  background: transparent;
 }
 
 .benefit-icon svg {
   display: block;
-  width: 24px;
-  height: 24px;
+  width: 30px;
+  height: 30px;
 }
 
 .home-benefit-list p {
   margin: 0;
   color: #10345d;
-  font-size: 16px;
+  font-family: "Quicksand", "Segoe UI", Arial, sans-serif;
+  font-size: 13px;
   font-weight: 700;
   line-height: 1.35;
 }
@@ -1016,23 +955,6 @@ a {
   position: relative;
 }
 
-.home-audience::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 120px;
-  background: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgba(255, 255, 255, 0.55) 45%,
-    rgba(255, 255, 255, 0.85) 70%,
-    #ffffff 100%
-  );
-  pointer-events: none;
-  z-index: 1;
-}
 
 .home-audience-heading {
   width: min(560px, 100%);
@@ -1045,10 +967,12 @@ a {
 .home-audience-heading h2 {
   margin: 0;
   color: #050505;
-  font-size: clamp(36px, 4vw, 48px);
+  font-family: "AvantGarde-Demi", "Century Gothic", "Futura", "Quicksand", sans-serif;
+  font-size: 65px;
   font-weight: 800;
   line-height: 1.1;
   letter-spacing: 0;
+  white-space: nowrap;
 }
 
 .home-audience-heading p {
@@ -1102,7 +1026,8 @@ a {
 .home-audience-grid p {
   margin: 0;
   color: #111827;
-  font-size: 16px;
+  font-family: "Quicksand", "Segoe UI", Arial, sans-serif;
+  font-size: 13px;
   font-weight: 700;
   line-height: 1.35;
 }
