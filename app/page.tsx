@@ -1048,13 +1048,9 @@ export default function Home() {
             <div className="home-showcase-copy">
               {text.why.kicker ? <p className="home-showcase-kicker">{text.why.kicker}</p> : null}
               <h2 id="home-showcase-title">{text.why.title}</h2>
-              <p>{text.why.description}</p>
               <div className="home-benefit-list">
-                {text.why.benefits.map(([icon, label]) => (
+                {text.why.benefits.map(([, label]) => (
                   <article key={label}>
-                    <span className="benefit-icon">
-                      <SimpleIcon type={icon} />
-                    </span>
                     <p>{label}</p>
                   </article>
                 ))}
