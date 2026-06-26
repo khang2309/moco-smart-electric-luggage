@@ -1011,7 +1011,7 @@ export default function Home() {
       <main>
         <section className="hero" id="home">
           <div className="hero-content">
-            <h1 className="hero-title-main">MOCO</h1>
+            <h2 className="hero-title-main">MOCO</h2>
             <h2 className="hero-subtitle">{text.hero.subtitle}</h2>
             <div className="hero-divider"></div>
             <p className="hero-description">{text.hero.description}</p>
