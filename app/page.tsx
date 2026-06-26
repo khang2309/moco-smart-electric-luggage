@@ -966,7 +966,6 @@ export default function Home() {
     const formData = new FormData(form);
     const email = formData.get("email") as string;
     const name = (formData.get("name") as string) || "";
-    const isPreorderForm = form.closest("#preorder") !== null;
 
     setLeadState({ pending: true, message: "", type: "" });
 
@@ -977,7 +976,7 @@ export default function Home() {
         body: JSON.stringify({
           email,
           name,
-          type: isPreorderForm ? "interest" : "contact",
+          type: "contact",
         }),
       });
       const data = await response.json();
@@ -1019,9 +1018,6 @@ export default function Home() {
             <div className="hero-actions">
               <a className="button primary glow" href="#product">
                 {text.hero.primary}
-              </a>
-              <a className="button white glow-light" href="#preorder">
-                {text.hero.secondary}
               </a>
             </div>
           </div>
@@ -1391,7 +1387,6 @@ export default function Home() {
 
         <section className="section faq" id="faq">
           <div className="section-heading">
-            <p className="eyebrow">{text.headings.faqEyebrow}</p>
             <h2>{text.headings.faq}</h2>
           </div>
           <div className="accordion">
@@ -1462,38 +1457,6 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="section preorder" id="preorder">
-          <div>
-            <p className="eyebrow">{text.headings.preorderEyebrow}</p>
-            <h2>{text.headings.preorder}</h2>
-            <p>{text.preorder.description}</p>
-          </div>
-          <form className="form compact" onSubmit={handleSubmit}>
-            <input
-              type="text"
-              name="name"
-              placeholder={text.preorder.namePlaceholder}
-              required
-            />
-            <input
-              type="email"
-              name="email"
-              placeholder={text.contact.email.replace(" *", "")}
-              required
-            />
-            <button className="button primary" type="submit">
-              {leadState.pending
-                ? text.preorder.pending
-                : text.preorder.button}
-            </button>
-            {leadState.message && (
-              <p className={`form-note ${leadState.type}`} aria-live="polite">
-                <span aria-hidden="true">{leadState.type === "success" ? "✓" : "!"}</span>
-                {leadState.message}
-              </p>
-            )}
-          </form>
-        </section>
       </main>
 
       <footer className="site-footer">
