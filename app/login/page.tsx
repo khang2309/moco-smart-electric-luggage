@@ -4,51 +4,45 @@ import Image from "next/image";
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { findUser, readCurrentUser, saveUser } from "../auth-storage";
+import { loginUser } from "../auth-storage";
 import { useLanguage } from "../providers";
 
 export default function LoginPage() {
   const { language } = useLanguage();
   const router = useRouter();
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = (event: FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setIsLoading(true);
+    setError("");
+
     const formData = new FormData(event.currentTarget);
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
-    const existingUser = findUser(email);
-    const currentUser = readCurrentUser();
 
-    if (!existingUser && currentUser?.email?.toLowerCase() === email.trim().toLowerCase()) {
-      saveUser({
-        ...currentUser,
-        email: currentUser.email,
-        password,
-      });
-      setError("");
+    const result = await loginUser(email, password);
+
+    if (result.success) {
       router.push("/#home");
-      return;
+    } else {
+      const msg = result.error || "";
+      // Translate known server errors
+      if (language === "vi") {
+        if (msg.includes("No account")) {
+          setError("Không tìm thấy tài khoản với email này.");
+        } else if (msg.includes("Incorrect")) {
+          setError("Mật khẩu không đúng.");
+        } else {
+          setError(msg);
+        }
+      } else {
+        setError(msg);
+      }
     }
 
-    if (!existingUser) {
-      setError(language === "vi" ? "Không tìm thấy tài khoản với email này." : "No account found for this email.");
-      return;
-    }
-
-    if (existingUser.password && existingUser.password !== password) {
-      setError(language === "vi" ? "Mật khẩu không đúng." : "Incorrect password.");
-      return;
-    }
-
-    saveUser({
-      ...currentUser,
-      ...existingUser,
-      email: existingUser.email,
-      name: existingUser.name || existingUser.email.split("@")[0],
-    });
-    setError("");
-    router.push("/#home");
+    setIsLoading(false);
   };
 
   return (
@@ -80,7 +74,11 @@ export default function LoginPage() {
             <input type="password" name="password" required />
           </label>
           {error && <p className="auth-error" aria-live="polite">{error}</p>}
-          <button type="submit">{language === "vi" ? "Đăng nhập" : "Login"}</button>
+          <button type="submit" disabled={isLoading}>
+            {isLoading
+              ? (language === "vi" ? "Đang đăng nhập..." : "Logging in...")
+              : (language === "vi" ? "Đăng nhập" : "Login")}
+          </button>
         </form>
       </section>
     </main>

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FormEvent, useState } from "react";
-import { createPasswordReset, findUser } from "../auth-storage";
+import { createPasswordReset } from "../auth-storage";
 import { useLanguage } from "../providers";
 
 export default function ForgotPasswordPage() {
@@ -16,28 +16,37 @@ export default function ForgotPasswordPage() {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const email = formData.get("email") as string;
-    const user = findUser(email);
-
-    if (!user) {
-      setError(language === "vi" ? "Không tìm thấy tài khoản với email này." : "No account found for this email.");
-      return;
-    }
 
     setIsSending(true);
     setError("");
 
     try {
-      const resetRequest = createPasswordReset(email);
-      const resetLink = `${window.location.origin}/account?reset=true&email=${encodeURIComponent(resetRequest.email)}&token=${encodeURIComponent(resetRequest.token)}`;
+      // Create reset token via MongoDB
+      const resetResult = await createPasswordReset(email);
+
+      if (!resetResult.success || !resetResult.email || !resetResult.token) {
+        const msg = resetResult.error || "";
+        if (language === "vi" && msg.includes("No account")) {
+          setError("Không tìm thấy tài khoản với email này.");
+        } else {
+          setError(msg || (language === "vi" ? "Lỗi tạo token." : "Token creation error."));
+        }
+        setIsSending(false);
+        return;
+      }
+
+      // Send email with reset link
+      const resetLink = `${window.location.origin}/account?reset=true&email=${encodeURIComponent(resetResult.email)}&token=${encodeURIComponent(resetResult.token)}`;
       const response = await fetch("/api/send-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ to: resetRequest.email, name: user.name, resetLink }),
+        body: JSON.stringify({ to: resetResult.email, name: email.split("@")[0], resetLink }),
       });
       const data = await response.json();
 
       if (!data.success) {
         setError(data.error || (language === "vi" ? "Không thể gửi email." : "Cannot send email."));
+        setIsSending(false);
         return;
       }
 

@@ -2,36 +2,49 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { FormEvent } from "react";
+import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "../providers";
-import { findUser, saveUser } from "../auth-storage";
+import { signUpUser } from "../auth-storage";
 
 export default function SignupPage() {
   const { language } = useLanguage();
   const router = useRouter();
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSignup = (event: FormEvent<HTMLFormElement>) => {
+  const handleSignup = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setIsLoading(true);
+    setError("");
+
     const formData = new FormData(event.currentTarget);
     const name = formData.get("name") as string;
     const email = formData.get("email") as string;
-    const phone = formData.get("phone") as string || "";
+    const phone = (formData.get("phone") as string) || "";
     const password = formData.get("password") as string;
     const confirmPassword = formData.get("confirmPassword") as string;
 
     if (password !== confirmPassword) {
-      alert(language === "vi" ? "Mật khẩu xác nhận không khớp." : "Passwords do not match.");
+      setError(language === "vi" ? "Mật khẩu xác nhận không khớp." : "Passwords do not match.");
+      setIsLoading(false);
       return;
     }
 
-    if (findUser(email)) {
-      alert(language === "vi" ? "Email này đã có tài khoản. Vui lòng đăng nhập." : "This email already has an account. Please login.");
-      return;
+    const result = await signUpUser({ name, email, phone, password });
+
+    if (result.success) {
+      router.push("/account");
+    } else {
+      const msg = result.error || "";
+      if (language === "vi" && msg.includes("already exists")) {
+        setError("Email này đã có tài khoản. Vui lòng đăng nhập.");
+      } else {
+        setError(msg);
+      }
     }
 
-    saveUser({ name, email, phone, password });
-    router.push("/account");
+    setIsLoading(false);
   };
 
   return (
@@ -71,7 +84,12 @@ export default function SignupPage() {
             <span>{language === "vi" ? "Nhập lại mật khẩu *" : "Confirm password *"}</span>
             <input type="password" name="confirmPassword" required minLength={6} />
           </label>
-          <button type="submit">{language === "vi" ? "Tạo tài khoản" : "Create account"}</button>
+          {error && <p className="auth-error" aria-live="polite">{error}</p>}
+          <button type="submit" disabled={isLoading}>
+            {isLoading
+              ? (language === "vi" ? "Đang tạo..." : "Creating...")
+              : (language === "vi" ? "Tạo tài khoản" : "Create account")}
+          </button>
         </form>
       </section>
     </main>

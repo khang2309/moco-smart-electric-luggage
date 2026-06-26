@@ -5,11 +5,11 @@ import Link from "next/link";
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
-  clearPasswordReset,
   createPasswordReset,
+  fetchProfile,
   readCurrentUser,
-  saveUser,
-  validatePasswordReset,
+  resetPassword,
+  updateProfile,
   type MocoUser,
 } from "../auth-storage";
 import { useLanguage } from "../providers";
@@ -31,14 +31,27 @@ function AccountContent() {
   useEffect(() => {
     const user = readCurrentUser();
 
-    if (user) {
-      const storedUser = saveUser(user);
-      setUserInfo(storedUser);
-      setEditForm({
-        name: storedUser.name || "",
-        phone: storedUser.phone || "",
-        city: storedUser.city || "",
-        address: storedUser.address || "",
+    if (user?.email) {
+      // Fetch latest profile from MongoDB
+      fetchProfile(user.email).then((result) => {
+        if (result.success && result.user) {
+          setUserInfo(result.user);
+          setEditForm({
+            name: result.user.name || "",
+            phone: result.user.phone || "",
+            city: result.user.city || "",
+            address: result.user.address || "",
+          });
+        } else {
+          // Fallback to local session data
+          setUserInfo(user);
+          setEditForm({
+            name: user.name || "",
+            phone: user.phone || "",
+            city: user.city || "",
+            address: user.address || "",
+          });
+        }
       });
     }
   }, []);
@@ -47,24 +60,27 @@ function AccountContent() {
     const email = searchParams?.get("email") || "";
     const token = searchParams?.get("token") || "";
 
-    if (searchParams?.get("reset") === "true" && email && token && validatePasswordReset(email, token)) {
+    if (searchParams?.get("reset") === "true" && email && token) {
       setResetEmail(email);
       setResetToken(token);
       setShowPasswordForm(true);
     }
   }, [searchParams]);
 
-  const handleSaveProfile = () => {
+  const handleSaveProfile = async () => {
     if (!userInfo?.email) return;
 
-    const updatedUser = saveUser({
-      ...userInfo,
-      ...editForm,
+    const result = await updateProfile({
       email: userInfo.email,
+      ...editForm,
     });
 
-    setUserInfo(updatedUser);
-    setIsEditing(false);
+    if (result.success && result.user) {
+      setUserInfo(result.user);
+      setIsEditing(false);
+    } else {
+      alert(result.error || (language === "vi" ? "Lỗi cập nhật hồ sơ." : "Profile update error."));
+    }
   };
 
   const handleSendRealEmail = async () => {
@@ -72,8 +88,15 @@ function AccountContent() {
 
     setIsSendingEmail(true);
     try {
-      const resetRequest = createPasswordReset(userInfo.email);
-      const resetUrl = `${window.location.origin}/account?reset=true&email=${encodeURIComponent(resetRequest.email)}&token=${encodeURIComponent(resetRequest.token)}`;
+      const resetResult = await createPasswordReset(userInfo.email);
+
+      if (!resetResult.success || !resetResult.email || !resetResult.token) {
+        alert(resetResult.error || (language === "vi" ? "Lỗi tạo token đặt lại." : "Error creating reset token."));
+        setIsSendingEmail(false);
+        return;
+      }
+
+      const resetUrl = `${window.location.origin}/account?reset=true&email=${encodeURIComponent(resetResult.email)}&token=${encodeURIComponent(resetResult.token)}`;
 
       const response = await fetch("/api/send-email", {
         method: "POST",
@@ -102,7 +125,7 @@ function AccountContent() {
     }
   };
 
-  const handleSavePassword = (event: React.FormEvent) => {
+  const handleSavePassword = async (event: React.FormEvent) => {
     event.preventDefault();
 
     if (newPassword !== confirmPassword) {
@@ -111,28 +134,32 @@ function AccountContent() {
     }
 
     const emailToUpdate = resetEmail || userInfo?.email || "";
+    const tokenToUse = resetToken;
 
-    if (!emailToUpdate || (resetToken && !validatePasswordReset(emailToUpdate, resetToken))) {
-      alert(language === "vi" ? "Liên kết đổi mật khẩu không hợp lệ hoặc đã hết hạn." : "The password reset link is invalid or expired.");
+    if (!emailToUpdate || !tokenToUse) {
+      alert(language === "vi" ? "Liên kết đổi mật khẩu không hợp lệ." : "The password reset link is invalid.");
       return;
     }
 
-    const updatedUser = saveUser({
-      ...(userInfo || { email: emailToUpdate, name: emailToUpdate.split("@")[0] }),
-      email: emailToUpdate,
-      password: newPassword,
-    });
+    const result = await resetPassword(emailToUpdate, tokenToUse, newPassword);
 
-    if (resetEmail) clearPasswordReset(resetEmail);
-
-    setUserInfo(updatedUser);
-    setShowPasswordForm(false);
-    setNewPassword("");
-    setConfirmPassword("");
-    setResetEmail("");
-    setResetToken("");
-    alert(language === "vi" ? "Đổi mật khẩu thành công!" : "Password changed successfully!");
-    router.replace("/account");
+    if (result.success) {
+      if (result.user) setUserInfo(result.user);
+      setShowPasswordForm(false);
+      setNewPassword("");
+      setConfirmPassword("");
+      setResetEmail("");
+      setResetToken("");
+      alert(language === "vi" ? "Đổi mật khẩu thành công!" : "Password changed successfully!");
+      router.replace("/account");
+    } else {
+      const msg = result.error || "";
+      if (language === "vi" && msg.includes("expired")) {
+        alert("Liên kết đổi mật khẩu không hợp lệ hoặc đã hết hạn.");
+      } else {
+        alert(msg || (language === "vi" ? "Đổi mật khẩu thất bại." : "Password change failed."));
+      }
+    }
   };
 
   const closePasswordModal = () => {
