@@ -25,6 +25,17 @@ type IconName =
   | "manual"
   | "flight";
 
+const supportCardLinks = [
+  "/register-product",
+  "#contact",
+  "/support/user-guide",
+  "#features",
+  "/support/battery-airline-policy",
+  "#faq",
+] as const;
+
+const supportTopicLinks = ["#features", "#faq", "#faq"] as const;
+
 const pageCopy = {
   vi: {
     hero: {
@@ -699,7 +710,7 @@ const fixedViCopy = {
   },
   support: {
     ...pageCopy.vi.support,
-    kicker: "Hỗ trợ",
+    kicker: "",
     title: "Trung tâm hỗ trợ MOCO",
     description: "Tìm hướng dẫn, bảo hành và hỗ trợ cho vali điện của bạn.",
     searchPlaceholder: "Tìm theo model, số serial hoặc từ khóa...",
@@ -907,6 +918,7 @@ export default function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [activeProductIndex, setActiveProductIndex] = useState(0);
   const [favoriteProducts, setFavoriteProducts] = useState<string[]>([]);
+  const [supportSearchQuery, setSupportSearchQuery] = useState("");
   const [leadState, setLeadState] = useState<{
     pending: boolean;
     message: string;
@@ -936,6 +948,53 @@ export default function Home() {
       return (current - 1 + data.products.length) % data.products.length;
     });
   };
+
+  function getSupportSearchTarget(query: string) {
+    const normalized = query
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
+    if (!normalized) return "#support-options";
+    if (/(dang ky|registration|serial|kich hoat|product)/.test(normalized)) {
+      return "/register-product";
+    }
+    if (/(bao hanh|sua chua|repair|warranty|lien he|hotline)/.test(normalized)) {
+      return "#contact";
+    }
+    if (/(hang khong|may bay|flight|airline|policy|pin|sac du phong|battery)/.test(normalized)) {
+      return "/support/battery-airline-policy";
+    }
+    if (/(huong dan|manual|guide|van hanh|su dung|sac|charging)/.test(normalized)) {
+      return "/support/user-guide";
+    }
+    if (/(app|gps|model)/.test(normalized)) {
+      return "#features";
+    }
+    if (/(faq|cau hoi)/.test(normalized)) {
+      return "#faq";
+    }
+    if (/(moco|go|plus|pro|max|vali|suitcase|luggage)/.test(normalized)) {
+      return "#product";
+    }
+
+    return "#support-options";
+  }
+
+  function handleSupportSearch(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const target = getSupportSearchTarget(supportSearchQuery);
+
+    if (target.startsWith("#")) {
+      document
+        .querySelector(target)
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+
+    window.location.href = target;
+  }
 
   useEffect(() => {
     try {
@@ -1305,23 +1364,29 @@ export default function Home() {
         >
           <div className="support-hero">
             <div className="support-copy">
-              <p className="support-kicker">{text.support.kicker}</p>
+              {text.support.kicker ? (
+                <p className="support-kicker">{text.support.kicker}</p>
+              ) : null}
               <h2 id="support-title">{text.support.title}</h2>
               <p>{text.support.description}</p>
-              <form className="support-search" role="search">
-                <span aria-hidden="true">⌕</span>
+              <form className="support-search" role="search" onSubmit={handleSupportSearch}>
+                <span aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="24" height="24" fill="none">
+                    <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
+                    <path d="m16.5 16.5 4 4" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
+                  </svg>
+                </span>
                 <input
                   type="search"
                   placeholder={text.support.searchPlaceholder}
+                  value={supportSearchQuery}
+                  onChange={(event) => setSupportSearchQuery(event.target.value)}
                 />
                 <button type="submit">{text.support.searchButton}</button>
               </form>
-              <a className="support-model-link" href="#contact">
+              <a className="support-model-link" href="#product">
                 {text.support.modelHelp}
               </a>
-            </div>
-            <div className="support-visual" aria-hidden="true">
-              <div className="support-suitcase"></div>
             </div>
           </div>
 
@@ -1340,11 +1405,11 @@ export default function Home() {
           </div>
 
           <div className="support-layout">
-            <div className="support-main">
+            <div className="support-main" id="support-options">
               <h3>{text.support.needHelp}</h3>
               <div className="support-card-grid">
-                {text.support.cards.map(([icon, title, description]) => (
-                  <a href="#contact" key={title}>
+                {text.support.cards.map(([icon, title, description], index) => (
+                  <a href={supportCardLinks[index]} key={title}>
                     <SimpleIcon type={icon} />
                     <span>
                       <strong>{title}</strong>
@@ -1358,16 +1423,16 @@ export default function Home() {
 
             <aside className="support-side">
               <h3>{text.support.quickInfo}</h3>
-              <p>{text.support.supportTime}</p>
-              <p>{language === "vi" ? "Đường dây nóng" : "Hotline"}: 1900 6868</p>
-              <p>{language === "vi" ? "Email hỗ trợ" : "Support email"}: mocoluggage@gmail.com</p>
+              <p><SimpleIcon type="faq" />{text.support.supportTime}</p>
+              <p><SimpleIcon type="manual" />{language === "vi" ? "Đường dây nóng" : "Hotline"}: 1900 6868</p>
+              <p><SimpleIcon type="guide" />{language === "vi" ? "Email hỗ trợ" : "Support email"}: mocoluggage@gmail.com</p>
               <div className="direct-support">
                 <strong>{text.support.directTitle}</strong>
                 <span>{text.support.directText}</span>
                 <a className="support-contact-button" href="#contact">
                   {text.support.contactNow}
                 </a>
-                <a className="support-chat-button" href="#contact">
+                <a className="support-chat-button" href="mailto:mocoluggage@gmail.com?subject=MOCO%20Support">
                   {text.support.chat}
                 </a>
               </div>
@@ -1375,8 +1440,8 @@ export default function Home() {
           </div>
 
           <div className="support-topics">
-            {text.support.topics.map(([icon, label]) => (
-              <a href="#features" key={label}>
+            {text.support.topics.map(([icon, label], index) => (
+              <a href={supportTopicLinks[index]} key={label}>
                 <SimpleIcon type={icon} />
                 {label}
               </a>

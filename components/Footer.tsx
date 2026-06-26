@@ -127,7 +127,18 @@ export default function Footer() {
         <section>
           <h2>{copy.support}</h2>
           {copy.supportLinks.map((item, index) => (
-            <Link href={index === 0 ? "/register-product" : index === 5 ? "/#contact" : "/#support"} key={item}>
+            <Link
+              href={
+                index === 0
+                  ? "/register-product"
+                  : index === 2
+                    ? "/support/user-guide"
+                    : index === 5
+                      ? "/#contact"
+                      : "/#support"
+              }
+              key={item}
+            >
               {item}
             </Link>
           ))}
