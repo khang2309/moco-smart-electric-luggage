@@ -144,7 +144,9 @@ export default function ProductPage() {
                   type="button"
                   aria-label={product.name}
                   aria-current={isActive}
-                  onClick={() => setActiveIndex(index)}
+                  onClick={() => {
+                    window.location.href = `/product/${product.slug}`;
+                  }}
                 >
                   <Image
                     src={product.image}

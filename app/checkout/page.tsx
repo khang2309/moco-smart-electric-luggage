@@ -238,7 +238,14 @@ export default function CheckoutPage() {
           <div className="checkout-summary-items">
             {items.map((item) => (
               <article key={item.slug}>
-                <Image src={item.image} alt="" width={58} height={58} />
+                <Image
+                  src={item.image}
+                  alt=""
+                  width={58}
+                  height={58}
+                  loading="lazy"
+                  decoding="async"
+                />
                 <div>
                   <strong>{item.name}</strong>
                   <span>{item.quantity} x {currency(item.price)} VND</span>

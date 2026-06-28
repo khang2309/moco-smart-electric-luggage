@@ -6,9 +6,9 @@ import { useLanguage } from "../app/providers";
 
 const footerCopy = {
   vi: {
-    brand: "ELECTRIC SUITCASE",
+    brand: "VALI ĐIỆN THÔNG MINH",
     products: "Sản phẩm",
-    productLinks: ["MOCO Go", "MOCO Air", "MOCO Clear", "Phụ kiện", "So sánh sản phẩm"],
+    productLinks: ["MOCO Go", "MOCO Plus", "MOCO Pro", "MOCO Max", "So sánh sản phẩm"],
     support: "Hỗ trợ",
     supportLinks: ["Đăng ký sản phẩm", "Bảo hành & sửa chữa", "Hướng dẫn sử dụng", "Kết nối MOCO App", "Câu hỏi thường gặp", "Liên hệ hỗ trợ"],
     policy: "Chính sách",
@@ -18,22 +18,43 @@ const footerCopy = {
     placeholder: "Nhập email của bạn",
     terms: "Điều khoản sử dụng",
     privacy: "Chính sách bảo mật",
+    success: "Đăng ký thành công. Email xác nhận đã được gửi đến bạn.",
+    error: "Chưa thể gửi email xác nhận. Vui lòng thử lại.",
   },
   en: {
-    brand: "ELECTRIC SUITCASE",
+    brand: "SMART ELECTRIC LUGGAGE",
     products: "Products",
-    productLinks: ["MOCO Go", "MOCO Air", "MOCO Clear", "Accessories", "Compare products"],
+    productLinks: ["MOCO Go", "MOCO Plus", "MOCO Pro", "MOCO Max", "Compare products"],
     support: "Support",
     supportLinks: ["Register product", "Warranty & repair", "User guide", "Connect MOCO App", "FAQ", "Contact support"],
     policy: "Policy",
     policyLinks: ["Warranty policy", "Return policy", "Shipping policy", "Payment policy", "Privacy policy", "Terms of use"],
     newsletter: "Newsletter",
-    newsletterText: "Get new product news and offers from MOCO",
+    newsletterText: "Get new product updates and offers from MOCO",
     placeholder: "Enter your email",
     terms: "Terms of use",
     privacy: "Privacy policy",
+    success: "Subscribed successfully. A confirmation email has been sent.",
+    error: "Could not send the confirmation email. Please try again.",
   },
 } as const;
+
+const productLinks = [
+  "/product/moco-go",
+  "/product/moco-plus",
+  "/product/moco-pro",
+  "/product/moco-max",
+  "/product",
+] as const;
+
+const supportLinks = [
+  "/register-product",
+  "/contact",
+  "/support/user-guide",
+  "/contact",
+  "/contact",
+  "/contact",
+] as const;
 
 export default function Footer() {
   const { language } = useLanguage();
@@ -48,7 +69,7 @@ export default function Footer() {
     event.preventDefault();
     const form = event.currentTarget;
     const formData = new FormData(form);
-    const email = formData.get("email") as string;
+    const email = String(formData.get("email") || "").trim();
 
     setNewsletterState({ pending: true, message: "", type: "" });
 
@@ -60,26 +81,12 @@ export default function Footer() {
       });
       const data = await response.json();
 
-      if (!data.success) throw new Error(data.error || "Unable to subscribe");
+      if (!response.ok || !data.success) throw new Error(data.error || copy.error);
 
-      setNewsletterState({
-        pending: false,
-        message:
-          language === "vi"
-            ? "Đăng ký thành công. Email xác nhận đã được gửi đến bạn."
-            : "Subscribed successfully. A confirmation email has been sent.",
-        type: "success",
-      });
+      setNewsletterState({ pending: false, message: copy.success, type: "success" });
       form.reset();
     } catch {
-      setNewsletterState({
-        pending: false,
-        message:
-          language === "vi"
-            ? "Chưa thể gửi email xác nhận. Vui lòng thử lại."
-            : "Could not send confirmation email. Please try again.",
-        type: "error",
-      });
+      setNewsletterState({ pending: false, message: copy.error, type: "error" });
     }
   };
 
@@ -118,7 +125,7 @@ export default function Footer() {
         <section>
           <h2>{copy.products}</h2>
           {copy.productLinks.map((item, index) => (
-            <Link href={index === 0 ? "/product/moco-go" : "/#product"} key={item}>
+            <Link href={productLinks[index]} key={item}>
               {item}
             </Link>
           ))}
@@ -127,18 +134,7 @@ export default function Footer() {
         <section>
           <h2>{copy.support}</h2>
           {copy.supportLinks.map((item, index) => (
-            <Link
-              href={
-                index === 0
-                  ? "/register-product"
-                  : index === 2
-                    ? "/support/user-guide"
-                    : index === 5
-                      ? "/#contact"
-                      : "/#support"
-              }
-              key={item}
-            >
+            <Link href={supportLinks[index]} key={item}>
               {item}
             </Link>
           ))}
@@ -147,7 +143,7 @@ export default function Footer() {
         <section>
           <h2>{copy.policy}</h2>
           {copy.policyLinks.map((item) => (
-            <Link href="/#faq" key={item}>
+            <Link href="/contact" key={item}>
               {item}
             </Link>
           ))}
@@ -174,8 +170,8 @@ export default function Footer() {
       <div className="global-footer-bottom">
         <span>© 2026 MOCO. All rights reserved.</span>
         <span>
-          <Link href="/#faq">{copy.terms}</Link>
-          <Link href="/#faq">{copy.privacy}</Link>
+          <Link href="/contact">{copy.terms}</Link>
+          <Link href="/contact">{copy.privacy}</Link>
         </span>
       </div>
     </footer>

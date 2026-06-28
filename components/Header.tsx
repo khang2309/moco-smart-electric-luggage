@@ -19,9 +19,10 @@ type CartItem = {
 };
 
 const navItems = [
-  ["Home", "/#home"],
-  ["Product", "/#product"],
-  ["Contact", "/#contact"],
+  ["Home", "/"],
+  ["Product", "/product"],
+  ["About", "/about"],
+  ["Contact", "/contact"],
 ] as const;
 
 const trackedHeaderItems = [
@@ -39,6 +40,7 @@ const copy = {
     nav: {
       home: "Trang ch\u1ee7",
       product: "S\u1ea3n ph\u1ea9m",
+      about: "V\u1ec1 MOCO",
       contact: "Li\u00ean h\u1ec7",
     },
     support: "H\u1ed7 tr\u1ee3",
@@ -71,6 +73,7 @@ const copy = {
     nav: {
       home: "Home",
       product: "Product",
+      about: "About",
       contact: "Contact",
     },
     support: "Support",
@@ -325,42 +328,35 @@ export default function Header() {
     event.preventDefault();
 
     const normalizedQuery = searchQuery.trim().toLowerCase();
-    let target = "#support";
+    let target = "/support";
 
     if (
       normalizedQuery.includes("li\u00ean h\u1ec7") ||
       normalizedQuery.includes("contact")
     ) {
-      target = "#contact";
+      target = "/contact";
     } else if (
       normalizedQuery.includes("pin") ||
       normalizedQuery.includes("bay") ||
       normalizedQuery.includes("gps") ||
       normalizedQuery.includes("kh\u00f3a")
     ) {
-      target = "#features";
+      target = "/product";
     } else if (
       normalizedQuery.includes("product") ||
       normalizedQuery.includes("s\u1ea3n ph\u1ea9m") ||
       normalizedQuery.includes("vali")
     ) {
-      target = "#product";
+      target = "/product";
     } else if (
       normalizedQuery.includes("faq") ||
       normalizedQuery.includes("c\u00e2u h\u1ecfi")
     ) {
-      target = "#faq";
+      target = "/contact";
     }
 
     setIsSearchOpen(false);
-    window.setTimeout(() => {
-      if (pathname !== "/") {
-        router.push(`/${target}`);
-        return;
-      }
-
-      document.querySelector(target)?.scrollIntoView({ behavior: "smooth" });
-    }, 0);
+    window.setTimeout(() => router.push(target), 0);
   };
 
   const currentCopy = copy[language];
@@ -374,9 +370,10 @@ export default function Header() {
   const isEveryCartItemSelected = cartItems.length > 0 && selectedCartSlugs.length === cartItems.length;
   const currency = new Intl.NumberFormat("vi-VN").format;
   const translatedNavItems = [
-    [currentCopy.nav.home, "/#home"],
-    [currentCopy.nav.product, "/#product"],
-    [currentCopy.nav.contact, "/#contact"],
+    [currentCopy.nav.home, "/"],
+    [currentCopy.nav.product, "/product"],
+    [currentCopy.nav.about, "/about"],
+    [currentCopy.nav.contact, "/contact"],
   ] as const;
 
   return (
@@ -386,7 +383,7 @@ export default function Header() {
         <span>mocoluggage@gmail.com</span>
       </div>
       <header className="site-header">
-        <a className="brand" href="/#home" aria-label="MOCO home">
+        <a className="brand" href="/" aria-label="MOCO home">
           <Image
             src="/assets/logo.jpg"
             alt="MOCO logo"
@@ -409,7 +406,7 @@ export default function Header() {
                 key={href}
                 href={href}
                 className={
-                  pathname === "/" && activeSection === href.replace("/", "")
+                  pathname === href
                     ? "active"
                     : ""
                 }
@@ -422,9 +419,9 @@ export default function Header() {
           <div className="header-actions">
             <div className="divider"></div>
             <Link
-              href="/#support"
-              className={`action-item action-support${activeSection === "#support" ? " active" : ""}`}
-              onClick={() => handleNavClick("/#support")}
+              href="/support"
+              className={`action-item action-support${pathname === "/support" ? " active" : ""}`}
+              onClick={() => handleNavClick("/support")}
             >
               <svg
                 width="18"
@@ -582,15 +579,6 @@ export default function Header() {
                   </div>
                   <div className="account-dropdown-divider"></div>
                   <div className="account-dropdown-links">
-                    <Link href="/about" onClick={() => setIsAccountOpen(false)}>
-                      <span>{currentCopy.aboutUs}</span>
-                    </Link>
-                    <Link
-                      href="/#features"
-                      onClick={() => handleNavClick("/#features")}
-                    >
-                      <span>{currentCopy.experience}</span>
-                    </Link>
                     <Link
                       href="/register-product"
                       onClick={() => setIsAccountOpen(false)}
@@ -604,14 +592,14 @@ export default function Header() {
                       <span>{currentCopy.profile}</span>
                     </Link>
                     <Link
-                      href="/#product"
-                      onClick={() => handleNavClick("/#product")}
+                      href="/product"
+                      onClick={() => handleNavClick("/product")}
                     >
                       <span>{currentCopy.favorites}</span>
                     </Link>
                     <Link
-                      href="/#contact"
-                      onClick={() => handleNavClick("/#contact")}
+                      href="/contact"
+                      onClick={() => handleNavClick("/contact")}
                     >
                       <span>{currentCopy.coupons}</span>
                     </Link>
@@ -679,10 +667,10 @@ export default function Header() {
                 {currentCopy.quickLinks.map((link, index) => {
                   const href =
                     index === 1
-                      ? "#features"
+                      ? "/product"
                       : index === 3
-                        ? "#contact"
-                        : "#support";
+                        ? "/contact"
+                        : "/contact";
 
                   return (
                     <li key={link}>

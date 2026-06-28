@@ -72,7 +72,7 @@ export async function POST(request: Request) {
           <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f5f8fc;padding:28px 12px;">
             <tr>
               <td align="center">
-                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:660px;background:#ffffff;border-radius:18px;overflow:hidden;border:1px solid #e3ebf5;box-shadow:0 24px 70px rgba(17,24,39,.10);font-family:Arial,sans-serif;color:#172033;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:660px;background:#ffffff;border-radius:18px;overflow:hidden;border:1px solid #e3ebf5;box-shadow:0 24px 70px rgba(17,24,39,.10);font-family:'Be Vietnam Pro','Segoe UI',system-ui,-apple-system,sans-serif;color:#172033;">
                   <tr>
                     <td style="background:linear-gradient(135deg,#1681f5,#52d3c7);padding:30px 34px;color:#ffffff;">
                       <p style="margin:0 0 8px;font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:700;">${company.name} Newsletter</p>
