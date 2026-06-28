@@ -2605,7 +2605,7 @@ a {
 
 .product-feature-stage {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.52fr);
+  grid-template-columns: minmax(0, 1fr) minmax(480px, 0.85fr);
   gap: clamp(26px, 4vw, 64px);
   align-items: center;
 }
@@ -2775,14 +2775,17 @@ a {
   font-weight: 900;
   line-height: 1.1;
   letter-spacing: 0;
+  text-transform: uppercase;
 }
 
 .feature-detail-panel p,
 .feature-detail-panel dd {
   margin: 0;
   color: #4b5563;
-  font-size: 15px;
-  font-weight: 700;
+  font-family: "Quicksand", "Segoe UI", Arial, sans-serif;
+  font-size: 13px;
+  text-transform: none;
+  font-weight: 500;
   line-height: 1.65;
 }
 
