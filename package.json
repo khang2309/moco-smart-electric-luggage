@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "seed:mongodb": "node scripts/seed-mongodb.js",
     "lint": "next lint",
     "deploy": "vercel --prod"
   },
