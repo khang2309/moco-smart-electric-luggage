@@ -46,5 +46,5 @@ export default getClientPromise;
 
 export async function getDb(): Promise<Db> {
   const client = await getClientPromise();
-  return client.db(); // uses the database name from the URI ("moco")
+  return client.db("moco"); // Explicitly use "moco" to avoid Vercel connection string issues
 }
