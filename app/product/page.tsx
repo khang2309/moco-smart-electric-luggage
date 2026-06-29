@@ -49,8 +49,9 @@ function getLoopOffset(index: number, activeIndex: number) {
 export default function ProductPage() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [favoriteProducts, setFavoriteProducts] = useState<string[]>([]);
+  const [visibleProducts, setVisibleProducts] = useState<typeof products | null>(null);
   const { language } = useLanguage();
-  const activeProduct = products[activeIndex];
+  const activeProduct = visibleProducts ? visibleProducts[activeIndex] : null;
 
   const copy = useMemo(
     () => ({
@@ -81,14 +82,40 @@ export default function ProductPage() {
   const t = copy[language];
 
   const moveProduct = (direction: "next" | "previous") => {
+    if (!visibleProducts || visibleProducts.length === 0) return;
     setActiveIndex((current) => {
       if (direction === "next") {
-        return (current + 1) % products.length;
+        return (current + 1) % visibleProducts.length;
       }
 
-      return (current - 1 + products.length) % products.length;
+      return (current - 1 + visibleProducts.length) % visibleProducts.length;
     });
   };
+
+  useEffect(() => {
+    const fetchStatus = async () => {
+      try {
+        const res = await fetch("/api/admin/products");
+        const data = await res.json();
+        
+        if (data.products) {
+          const activeSlugs = new Set(
+            data.products
+              .filter((p: any) => p.status !== "deleted" && p.status !== "draft")
+              .map((p: any) => p.slug)
+          );
+          setVisibleProducts(
+            products.filter(p => activeSlugs.has(p.slug)) as unknown as typeof products
+          );
+        } else {
+          setVisibleProducts(products); // fallback
+        }
+      } catch {
+        setVisibleProducts(products); // fallback
+      }
+    };
+    fetchStatus();
+  }, []);
 
   useEffect(() => {
     try {
@@ -133,8 +160,13 @@ export default function ProductPage() {
         </button>
 
         <div className="product-wheel" aria-live="polite">
-          {products.map((product, index) => {
-            const offset = getLoopOffset(index, activeIndex);
+          {visibleProducts?.map((product, index) => {
+            const rawOffset = index - activeIndex;
+            const half = visibleProducts.length / 2;
+            let offset = rawOffset;
+            if (rawOffset > half) offset = rawOffset - visibleProducts.length;
+            if (rawOffset < -half) offset = rawOffset + visibleProducts.length;
+
             const isActive = offset === 0;
 
             return (
@@ -172,11 +204,15 @@ export default function ProductPage() {
         </div>
 
         <div className="product-carousel-copy">
-          <Link href={`/product/${activeProduct.slug}`} className="product-stage-title">
-            {activeProduct.name}
-          </Link>
-          <p>{activeProduct[language]}</p>
-          <span>{t.hint}</span>
+          {activeProduct && (
+            <>
+              <Link href={`/product/${activeProduct.slug}`} className="product-stage-title">
+                {activeProduct.name}
+              </Link>
+              <p>{activeProduct[language]}</p>
+              <span>{t.hint}</span>
+            </>
+          )}
         </div>
       </section>
 
@@ -188,7 +224,7 @@ export default function ProductPage() {
           ))}
         </div>
         <div className="product-info-grid">
-          {products.map((product) => (
+          {visibleProducts?.map((product) => (
             <Link href={`/product/${product.slug}`} key={product.slug}>
               <h2>{product.name}</h2>
               <p>{product[language]}</p>

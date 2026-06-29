@@ -487,7 +487,6 @@ export default function AdminProducts() {
                 >
                   <option value="active">{labels.activeStatus}</option>
                   <option value="draft">{labels.draftStatus}</option>
-                  <option value="deleted">{labels.deletedStatus}</option>
                 </select>
               </label>
               <label className="grid gap-1 text-sm font-bold text-gray-700 lg:col-span-4">

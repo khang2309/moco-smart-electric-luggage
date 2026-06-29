@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useLanguage } from "./providers";
 
 const featuredProduct = {
@@ -84,6 +85,36 @@ function LineIcon() {
 
 export default function HomePage() {
   const { language } = useLanguage();
+  const [activeFeatured, setActiveFeatured] = useState<typeof featuredProduct | null>(featuredProduct);
+
+  useEffect(() => {
+    const fetchStatus = async () => {
+      try {
+        const res = await fetch("/api/admin/products");
+        const data = await res.json();
+        
+        if (data.products) {
+          const dbFeatured = data.products.find((p: any) => p.slug === featuredProduct.slug);
+          if (!dbFeatured || dbFeatured.status === "deleted" || dbFeatured.status === "draft") {
+            const firstActive = data.products.find((p: any) => p.status !== "deleted" && p.status !== "draft");
+            if (firstActive) {
+              setActiveFeatured({
+                ...featuredProduct,
+                slug: firstActive.slug,
+                name: firstActive.name,
+                image: firstActive.image || featuredProduct.image
+              });
+            } else {
+              setActiveFeatured(null);
+            }
+          }
+        }
+      } catch {
+        // Fallback silently
+      }
+    };
+    fetchStatus();
+  }, []);
   const copy = {
     vi: {
       heroDescription: (
@@ -205,31 +236,33 @@ export default function HomePage() {
         </div>
       </div>
 
-      <section className="home-featured-product" aria-label={copy.productTitle}>
-        <Link
-          className="home-featured-visual"
-          href={`/product/${featuredProduct.slug}`}
-          aria-label={featuredProduct.name}
-        >
-          <Image
-            src={featuredProduct.image}
-            alt={featuredProduct.name}
-            fill
-            sizes="(max-width: 760px) 76vw, 420px"
-          />
-        </Link>
+      {activeFeatured && (
+        <section className="home-featured-product" aria-label={copy.productTitle}>
+          <Link
+            className="home-featured-visual"
+            href={`/product/${activeFeatured.slug}`}
+            aria-label={activeFeatured.name}
+          >
+            <Image
+              src={activeFeatured.image}
+              alt={activeFeatured.name}
+              fill
+              sizes="(max-width: 760px) 76vw, 420px"
+            />
+          </Link>
 
-        <div className="home-featured-card">
-          <h2 className="home-featured-title">{copy.productTitle}</h2>
-          <Link href={`/product/${featuredProduct.slug}`} className="product-stage-title">
-            {featuredProduct.name}
-          </Link>
-          <p className="home-featured-description">{featuredProduct[language]}</p>
-          <Link className="home-product-link" href={`/product/${featuredProduct.slug}`}>
-            {copy.productLink}
-          </Link>
-        </div>
-      </section>
+          <div className="home-featured-card">
+            <h2 className="home-featured-title">{copy.productTitle}</h2>
+            <Link href={`/product/${activeFeatured.slug}`} className="product-stage-title">
+              {activeFeatured.name}
+            </Link>
+            <p className="home-featured-description">{activeFeatured[language]}</p>
+            <Link className="home-product-link" href={`/product/${activeFeatured.slug}`}>
+              {copy.productLink}
+            </Link>
+          </div>
+        </section>
+      )}
     </main>
   );
 }
