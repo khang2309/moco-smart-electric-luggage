@@ -34,19 +34,24 @@ export default function CheckoutSuccessPage() {
             <path d="M20 6 9 17l-5-5"></path>
           </svg>
         </div>
-        <h1>{language === "vi" ? "Thanh toán thành công" : "Order complete"}</h1>
+        <h1>{language === "vi" ? "Thanh to\u00e1n th\u00e0nh c\u00f4ng" : "Order complete"}</h1>
         {order ? (
           <dl>
-            <div><dt>{language === "vi" ? "Mã đơn hàng" : "Order code"}</dt><dd>{order.code}</dd></div>
-            <div><dt>{language === "vi" ? "Tổng tiền" : "Total"}</dt><dd>{currency(order.total)} VND</dd></div>
-            <div><dt>{language === "vi" ? "Trạng thái thanh toán" : "Payment status"}</dt><dd>{order.paymentStatus === "paid" ? (language === "vi" ? "Đã thanh toán" : "Paid") : (language === "vi" ? "Chờ thanh toán khi nhận hàng" : "Pending COD")}</dd></div>
-            <div><dt>{language === "vi" ? "Giao hàng" : "Delivery"}</dt><dd>{order.shipping}</dd></div>
-            <div><dt>{language === "vi" ? "Phương thức thanh toán" : "Payment method"}</dt><dd>{order.payment}</dd></div>
+            <div><dt>{language === "vi" ? "M\u00e3 \u0111\u01a1n h\u00e0ng" : "Order code"}</dt><dd>{order.code}</dd></div>
+            <div><dt>{language === "vi" ? "T\u1ed5ng ti\u1ec1n" : "Total"}</dt><dd>{currency(order.total)} VND</dd></div>
+            <div><dt>{language === "vi" ? "Tr\u1ea1ng th\u00e1i thanh to\u00e1n" : "Payment status"}</dt><dd>{order.paymentStatus === "paid" ? (language === "vi" ? "\u0110\u00e3 thanh to\u00e1n" : "Paid") : (language === "vi" ? "Ch\u1edd thanh to\u00e1n khi nh\u1eadn h\u00e0ng" : "Pending COD")}</dd></div>
+            <div><dt>{language === "vi" ? "Giao h\u00e0ng" : "Delivery"}</dt><dd>{order.shipping}</dd></div>
+            <div><dt>{language === "vi" ? "Ph\u01b0\u01a1ng th\u1ee9c thanh to\u00e1n" : "Payment method"}</dt><dd>{order.payment}</dd></div>
           </dl>
         ) : (
-          <p>{language === "vi" ? "Không tìm thấy đơn hàng gần nhất." : "No recent order found."}</p>
+          <p>{language === "vi" ? "Kh\u00f4ng t\u00ecm th\u1ea5y \u0111\u01a1n h\u00e0ng g\u1ea7n nh\u1ea5t." : "No recent order found."}</p>
         )}
-        <Link href="/product">{language === "vi" ? "Tiếp tục mua sắm" : "Continue shopping"}</Link>
+        <div className="checkout-success-actions">
+          <Link href={order ? `/order/${encodeURIComponent(order.code)}` : "/order"}>
+            {language === "vi" ? "Xem \u0111\u01a1n h\u00e0ng" : "View order"}
+          </Link>
+          <Link href="/product">{language === "vi" ? "Ti\u1ebfp t\u1ee5c mua s\u1eafm" : "Continue shopping"}</Link>
+        </div>
       </section>
     </main>
   );

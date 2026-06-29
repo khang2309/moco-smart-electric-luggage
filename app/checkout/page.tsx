@@ -18,16 +18,16 @@ type CartItem = {
 };
 
 const shippingOptions = {
-  standard: { vi: "Giao tiêu chuẩn", en: "Standard delivery", fee: 35000 },
+  standard: { vi: "Giao ti\u00eau chu\u1ea9n", en: "Standard delivery", fee: 35000 },
   express: { vi: "Giao nhanh", en: "Express delivery", fee: 65000 },
-  pickup: { vi: "Nhận tại cửa hàng", en: "Store pickup", fee: 0 },
+  pickup: { vi: "Nh\u1eadn t\u1ea1i c\u1eeda h\u00e0ng", en: "Store pickup", fee: 0 },
 } as const;
 
 const paymentOptions = {
-  cod: { vi: "Thanh toán khi nhận hàng", en: "Cash on delivery" },
-  bank: { vi: "Chuyển khoản ngân hàng", en: "Bank transfer" },
-  wallet: { vi: "Ví điện tử", en: "E-wallet" },
-  card: { vi: "Thẻ ATM / Visa / Mastercard", en: "ATM / Visa / Mastercard" },
+  cod: { vi: "Thanh to\u00e1n khi nh\u1eadn h\u00e0ng", en: "Cash on delivery" },
+  bank: { vi: "Chuy\u1ec3n kho\u1ea3n ng\u00e2n h\u00e0ng", en: "Bank transfer" },
+  wallet: { vi: "V\u00ed \u0111i\u1ec7n t\u1eed", en: "E-wallet" },
+  card: { vi: "Th\u1ebb ATM / Visa / Mastercard", en: "ATM / Visa / Mastercard" },
 } as const;
 
 export default function CheckoutPage() {
@@ -71,32 +71,44 @@ export default function CheckoutPage() {
 
     if (normalizedVoucher === "MOCO10") {
       setAppliedVoucher(normalizedVoucher);
-      setVoucherMessage(language === "vi" ? "Đã áp dụng giảm 10%." : "10% discount applied.");
+      setVoucherMessage(language === "vi" ? "\u0110\u00e3 \u00e1p d\u1ee5ng gi\u1ea3m 10%." : "10% discount applied.");
       return;
     }
 
     if (normalizedVoucher === "FREESHIP") {
       setAppliedVoucher(normalizedVoucher);
-      setVoucherMessage(language === "vi" ? "Đã áp dụng miễn phí vận chuyển." : "Free shipping applied.");
+      setVoucherMessage(language === "vi" ? "\u0110\u00e3 \u00e1p d\u1ee5ng mi\u1ec5n ph\u00ed v\u1eadn chuy\u1ec3n." : "Free shipping applied.");
       return;
     }
 
     setAppliedVoucher("");
-    setVoucherMessage(language === "vi" ? "Mã giảm giá không hợp lệ." : "Invalid voucher code.");
+    setVoucherMessage(language === "vi" ? "M\u00e3 gi\u1ea3m gi\u00e1 kh\u00f4ng h\u1ee3p l\u1ec7." : "Invalid voucher code.");
   };
 
   const completeOrder = (status: "paid" | "pending") => {
+    const createdAt = new Date();
+    const estimatedDelivery = new Date(createdAt);
+    estimatedDelivery.setDate(createdAt.getDate() + (shipping === "express" ? 2 : shipping === "pickup" ? 1 : 5));
+
     const order = {
       code: `MOCO-${Date.now().toString().slice(-6)}`,
       items,
       total,
       paymentStatus: status,
+      fulfillmentStatus: "processing",
       shipping: shippingOptions[shipping][language],
       payment: paymentOptions[payment][language],
-      createdAt: new Date().toISOString(),
+      createdAt: createdAt.toISOString(),
+      estimatedDelivery: estimatedDelivery.toISOString(),
     };
 
     window.localStorage.setItem("moco-last-order", JSON.stringify(order));
+    try {
+      const currentOrders = JSON.parse(window.localStorage.getItem("moco-orders") || "[]");
+      window.localStorage.setItem("moco-orders", JSON.stringify([order, ...currentOrders].slice(0, 10)));
+    } catch {
+      window.localStorage.setItem("moco-orders", JSON.stringify([order]));
+    }
     const orderedSlugs = new Set(items.map((item) => item.slug));
     const currentCart: CartItem[] = JSON.parse(window.localStorage.getItem("moco-cart") || "[]");
     window.localStorage.setItem(
@@ -123,8 +135,8 @@ export default function CheckoutPage() {
     return (
       <main className="checkout-page">
         <section className="checkout-empty">
-          <h1>{language === "vi" ? "Chưa có sản phẩm để thanh toán" : "No items selected"}</h1>
-          <Link href="/product">{language === "vi" ? "Tiếp tục mua sắm" : "Continue shopping"}</Link>
+          <h1>{language === "vi" ? "Ch\u01b0a c\u00f3 s\u1ea3n ph\u1ea9m \u0111\u1ec3 thanh to\u00e1n" : "No items selected"}</h1>
+          <Link href="/product">{language === "vi" ? "Ti\u1ebfp t\u1ee5c mua s\u1eafm" : "Continue shopping"}</Link>
         </section>
       </main>
     );
@@ -134,29 +146,29 @@ export default function CheckoutPage() {
     <main className="checkout-page">
       <form className="checkout-shell" onSubmit={handleSubmit}>
         <section className="checkout-form-panel">
-          <h1>{language === "vi" ? "Thông tin đặt hàng" : "Checkout"}</h1>
+          <h1>{language === "vi" ? "Th\u00f4ng tin \u0111\u1eb7t h\u00e0ng" : "Checkout"}</h1>
           <p className="checkout-intro">
             {language === "vi"
-              ? "Kiểm tra sản phẩm đã chọn, nhập thông tin giao hàng và chọn phương thức thanh toán phù hợp."
+              ? "Ki\u1ec3m tra s\u1ea3n ph\u1ea9m \u0111\u00e3 ch\u1ecdn, nh\u1eadp th\u00f4ng tin giao h\u00e0ng v\u00e0 ch\u1ecdn ph\u01b0\u01a1ng th\u1ee9c thanh to\u00e1n ph\u00f9 h\u1ee3p."
               : "Review selected items, confirm delivery details, and choose how you want to pay."}
           </p>
 
           <fieldset>
-            <legend>{language === "vi" ? "1. Thông tin người nhận" : "1. Recipient information"}</legend>
+            <legend>{language === "vi" ? "1. Th\u00f4ng tin ng\u01b0\u1eddi nh\u1eadn" : "1. Recipient information"}</legend>
             <div className="checkout-field-grid">
-              <input required placeholder={language === "vi" ? "Họ và tên" : "Full name"} />
-              <input required placeholder={language === "vi" ? "Số điện thoại" : "Phone number"} />
+              <input required placeholder={language === "vi" ? "H\u1ecd v\u00e0 t\u00ean" : "Full name"} />
+              <input required placeholder={language === "vi" ? "S\u1ed1 \u0111i\u1ec7n tho\u1ea1i" : "Phone number"} />
               <input type="email" placeholder="Email" />
             </div>
           </fieldset>
 
           <fieldset>
-            <legend>{language === "vi" ? "2. Địa chỉ giao hàng" : "2. Shipping address"}</legend>
-            <textarea required placeholder={language === "vi" ? "Nhập địa chỉ giao hàng hoặc chọn địa chỉ đã lưu" : "Enter a new address or confirm a saved address"} />
+            <legend>{language === "vi" ? "2. \u0110\u1ecba ch\u1ec9 giao h\u00e0ng" : "2. Shipping address"}</legend>
+            <textarea required placeholder={language === "vi" ? "Nh\u1eadp \u0111\u1ecba ch\u1ec9 giao h\u00e0ng ho\u1eb7c ch\u1ecdn \u0111\u1ecba ch\u1ec9 \u0111\u00e3 l\u01b0u" : "Enter a new address or confirm a saved address"} />
           </fieldset>
 
           <fieldset>
-            <legend>{language === "vi" ? "3. Phương thức vận chuyển" : "3. Delivery method"}</legend>
+            <legend>{language === "vi" ? "3. Ph\u01b0\u01a1ng th\u1ee9c v\u1eadn chuy\u1ec3n" : "3. Delivery method"}</legend>
             <div className="checkout-option-list">
               {Object.entries(shippingOptions).map(([key, option]) => (
                 <label key={key}>
@@ -174,16 +186,16 @@ export default function CheckoutPage() {
           </fieldset>
 
           <fieldset>
-            <legend>{language === "vi" ? "4. Mã giảm giá / voucher" : "4. Voucher"}</legend>
+            <legend>{language === "vi" ? "4. M\u00e3 gi\u1ea3m gi\u00e1 / voucher" : "4. Voucher"}</legend>
             <div className="checkout-voucher">
               <input value={voucher} onChange={(event) => setVoucher(event.target.value)} placeholder="MOCO10 / FREESHIP" />
-              <button type="button" onClick={applyVoucher}>{language === "vi" ? "Áp dụng" : "Apply"}</button>
+              <button type="button" onClick={applyVoucher}>{language === "vi" ? "\u00c1p d\u1ee5ng" : "Apply"}</button>
             </div>
             {voucherMessage && <p className="checkout-note">{voucherMessage}</p>}
           </fieldset>
 
           <fieldset>
-            <legend>{language === "vi" ? "5. Phương thức thanh toán" : "5. Payment method"}</legend>
+            <legend>{language === "vi" ? "5. Ph\u01b0\u01a1ng th\u1ee9c thanh to\u00e1n" : "5. Payment method"}</legend>
             <div className="checkout-option-list">
               {Object.entries(paymentOptions).map(([key, option]) => (
                 <label key={key}>
@@ -205,34 +217,34 @@ export default function CheckoutPage() {
           {paymentStep === "failed" && (
             <div className="checkout-error">
               {language === "vi"
-                ? "Thanh toán thất bại. Vui lòng thử lại hoặc chọn phương thức thanh toán khác."
+                ? "Thanh to\u00e1n th\u1ea5t b\u1ea1i. Vui l\u00f2ng th\u1eed l\u1ea1i ho\u1eb7c ch\u1ecdn ph\u01b0\u01a1ng th\u1ee9c thanh to\u00e1n kh\u00e1c."
                 : "Payment failed. Please try again or choose another payment method."}
             </div>
           )}
 
           {paymentStep === "gateway" ? (
             <div className="payment-gateway">
-              <h2>{language === "vi" ? "Cổng thanh toán mô phỏng" : "Payment gateway simulation"}</h2>
-              <p>{language === "vi" ? "Xác thực OTP hoặc xác nhận trên ứng dụng ngân hàng/ví điện tử." : "Confirm OTP or approve the payment in your banking/e-wallet app."}</p>
+              <h2>{language === "vi" ? "C\u1ed5ng thanh to\u00e1n m\u00f4 ph\u1ecfng" : "Payment gateway simulation"}</h2>
+              <p>{language === "vi" ? "X\u00e1c th\u1ef1c OTP ho\u1eb7c x\u00e1c nh\u1eadn tr\u00ean \u1ee9ng d\u1ee5ng ng\u00e2n h\u00e0ng/v\u00ed \u0111i\u1ec7n t\u1eed." : "Confirm OTP or approve the payment in your banking/e-wallet app."}</p>
               <div>
-                <button type="button" onClick={() => completeOrder("paid")}>{language === "vi" ? "Thanh toán thành công" : "Payment success"}</button>
-                <button type="button" onClick={() => setPaymentStep("failed")}>{language === "vi" ? "Thanh toán thất bại" : "Payment failed"}</button>
+                <button type="button" onClick={() => completeOrder("paid")}>{language === "vi" ? "Thanh to\u00e1n th\u00e0nh c\u00f4ng" : "Payment success"}</button>
+                <button type="button" onClick={() => setPaymentStep("failed")}>{language === "vi" ? "Thanh to\u00e1n th\u1ea5t b\u1ea1i" : "Payment failed"}</button>
               </div>
             </div>
           ) : (
             <button className="checkout-submit" type="submit">
               {isOnlinePayment
-                ? language === "vi" ? "Thanh toán" : "Pay now"
-                : language === "vi" ? "Đặt hàng" : "Place order"}
+                ? language === "vi" ? "Thanh to\u00e1n" : "Pay now"
+                : language === "vi" ? "\u0110\u1eb7t h\u00e0ng" : "Place order"}
             </button>
           )}
         </section>
 
         <aside className="checkout-summary">
-          <h2>{language === "vi" ? "Sản phẩm đã chọn" : "Selected items"}</h2>
+          <h2>{language === "vi" ? "S\u1ea3n ph\u1ea9m \u0111\u00e3 ch\u1ecdn" : "Selected items"}</h2>
           <p className="checkout-summary-note">
             {language === "vi"
-              ? "Đơn hàng chỉ bao gồm các sản phẩm bạn đã tick trong giỏ hàng."
+              ? "\u0110\u01a1n h\u00e0ng ch\u1ec9 bao g\u1ed3m c\u00e1c s\u1ea3n ph\u1ea9m b\u1ea1n \u0111\u00e3 ch\u1ecdn trong gi\u1ecf h\u00e0ng."
               : "This order only includes the items selected in your cart."}
           </p>
           <div className="checkout-summary-items">
@@ -254,10 +266,10 @@ export default function CheckoutPage() {
             ))}
           </div>
           <dl>
-            <div><dt>{language === "vi" ? "Tạm tính" : "Subtotal"}</dt><dd>{currency(subtotal)} VND</dd></div>
-            <div><dt>{language === "vi" ? "Vận chuyển" : "Shipping"}</dt><dd>{currency(shippingFee)} VND</dd></div>
-            <div><dt>{language === "vi" ? "Giảm giá" : "Discount"}</dt><dd>-{currency(discount)} VND</dd></div>
-            <div className="checkout-total"><dt>{language === "vi" ? "Tổng tiền" : "Total"}</dt><dd>{currency(total)} VND</dd></div>
+            <div><dt>{language === "vi" ? "T\u1ea1m t\u00ednh" : "Subtotal"}</dt><dd>{currency(subtotal)} VND</dd></div>
+            <div><dt>{language === "vi" ? "V\u1eadn chuy\u1ec3n" : "Shipping"}</dt><dd>{currency(shippingFee)} VND</dd></div>
+            <div><dt>{language === "vi" ? "Gi\u1ea3m gi\u00e1" : "Discount"}</dt><dd>-{currency(discount)} VND</dd></div>
+            <div className="checkout-total"><dt>{language === "vi" ? "T\u1ed5ng ti\u1ec1n" : "Total"}</dt><dd>{currency(total)} VND</dd></div>
           </dl>
         </aside>
       </form>

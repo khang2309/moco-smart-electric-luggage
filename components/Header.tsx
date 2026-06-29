@@ -49,6 +49,7 @@ const copy = {
     aboutUs: "About Us",
     experience: "Experience",
     registerProduct: "\u0110\u0103ng k\u00fd s\u1ea3n ph\u1ea9m",
+    orders: "\u0110\u01a1n h\u00e0ng c\u1ee7a t\u00f4i",
     profile: "Qu\u1ea3n l\u00fd h\u1ed3 s\u01a1",
     favorites: "Y\u00eau th\u00edch c\u1ee7a t\u00f4i",
     coupons: "Ưu đãi MOCO của tôi",
@@ -82,6 +83,7 @@ const copy = {
     aboutUs: "About Us",
     experience: "Experience",
     registerProduct: "Register product",
+    orders: "My orders",
     profile: "Profile management",
     favorites: "My favorites",
     coupons: "my MOCO rewards",
@@ -590,6 +592,12 @@ export default function Header() {
                       onClick={() => setIsAccountOpen(false)}
                     >
                       <span>{currentCopy.profile}</span>
+                    </Link>
+                    <Link
+                      href="/order"
+                      onClick={() => setIsAccountOpen(false)}
+                    >
+                      <span>{currentCopy.orders}</span>
                     </Link>
                     <Link
                       href="/product"
