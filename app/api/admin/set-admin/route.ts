@@ -12,9 +12,10 @@ export async function POST(request: Request) {
   try {
     const { email, makeAdmin } = await request.json();
     const adminSecret = request.headers.get("x-admin-secret");
+    const serverSecret = process.env.ADMIN_SECRET_KEY || "your-secret-key-123";
 
     // Kiểm tra secret key
-    if (adminSecret !== process.env.ADMIN_SECRET_KEY) {
+    if (adminSecret !== serverSecret) {
       return NextResponse.json(
         { error: "Unauthorized: Invalid secret key" },
         { status: 401 }
