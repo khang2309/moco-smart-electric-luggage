@@ -22,42 +22,42 @@ export default function RegisterProductPage() {
         </div>
 
         <form className="bg-white py-10 px-6 sm:px-10 shadow-[0_12px_40px_rgba(0,0,0,0.06)] rounded-2xl border border-gray-100">
-          <fieldset className="mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <legend className="text-[15px] font-semibold text-gray-800">
+          <div className="mb-6">
+            <div className="mb-4">
+              <p className="text-[15px] font-semibold text-gray-800">
                 {language === "vi"
                   ? "Sản phẩm của bạn có số serial không? *"
                   : "Does your product have a serial number? *"}
-              </legend>
+              </p>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-4">
               <div className="flex gap-8">
                 <label className="flex items-center gap-2.5 cursor-pointer">
                   <input
                     type="radio"
                     name="serial"
-                    className="w-4 h-4 text-black border-gray-300 focus:ring-black accent-black"
+                    className="w-4 h-4 text-black border-gray-300 focus:ring-black accent-black cursor-pointer"
                     checked={hasSerial === "yes"}
                     onChange={() => setHasSerial("yes")}
                   />
-                  <span className="text-[15px] font-medium text-gray-800">{language === "vi" ? "Có" : "Yes"}</span>
+                  <span className="text-[15px] font-medium text-gray-800 leading-none">{language === "vi" ? "Có" : "Yes"}</span>
                 </label>
                 <label className="flex items-center gap-2.5 cursor-pointer">
                   <input
                     type="radio"
                     name="serial"
-                    className="w-4 h-4 text-black border-gray-300 focus:ring-black accent-black"
+                    className="w-4 h-4 text-black border-gray-300 focus:ring-black accent-black cursor-pointer"
                     checked={hasSerial === "no"}
                     onChange={() => setHasSerial("no")}
                   />
-                  <span className="text-[15px] font-medium text-gray-800">{language === "vi" ? "Không" : "No"}</span>
+                  <span className="text-[15px] font-medium text-gray-800 leading-none">{language === "vi" ? "Không" : "No"}</span>
                 </label>
               </div>
               <a href="/#support" className="text-xs font-medium text-gray-500 hover:text-black underline underline-offset-4 transition-colors">
                 {language === "vi" ? "Tìm số serial ở đâu?" : "Where is my serial number?"}
               </a>
             </div>
-          </fieldset>
+          </div>
 
           <div className="space-y-4">
             <div>
