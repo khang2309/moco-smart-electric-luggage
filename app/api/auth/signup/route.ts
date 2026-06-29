@@ -38,6 +38,7 @@ export async function POST(request: Request) {
       phone: phone || "",
       city: "",
       address: "",
+      role: "customer", // Default role
       createdAt: now,
       updatedAt: now,
     };

@@ -17,6 +17,13 @@ type CartItem = {
   subtitle: string;
 };
 
+type CheckoutCustomer = {
+  fullName: string;
+  phone: string;
+  email: string;
+  address: string;
+};
+
 const shippingOptions = {
   standard: { vi: "Giao ti\u00eau chu\u1ea9n", en: "Standard delivery", fee: 35000 },
   express: { vi: "Giao nhanh", en: "Express delivery", fee: 65000 },
@@ -38,6 +45,12 @@ export default function CheckoutPage() {
   const [appliedVoucher, setAppliedVoucher] = useState("");
   const [voucherMessage, setVoucherMessage] = useState("");
   const [paymentStep, setPaymentStep] = useState<"form" | "gateway" | "failed">("form");
+  const [checkoutCustomer, setCheckoutCustomer] = useState<CheckoutCustomer>({
+    fullName: "",
+    phone: "",
+    email: "",
+    address: "",
+  });
   const { language } = useLanguage();
   const router = useRouter();
   const currency = new Intl.NumberFormat("vi-VN").format;
@@ -85,7 +98,19 @@ export default function CheckoutPage() {
     setVoucherMessage(language === "vi" ? "M\u00e3 gi\u1ea3m gi\u00e1 kh\u00f4ng h\u1ee3p l\u1ec7." : "Invalid voucher code.");
   };
 
-  const completeOrder = (status: "paid" | "pending") => {
+  const saveOrderToDatabase = async (order: Record<string, unknown>) => {
+    try {
+      await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(order),
+      });
+    } catch (error) {
+      console.error("Failed to sync order to database:", error);
+    }
+  };
+
+  const completeOrder = async (status: "paid" | "pending", customer = checkoutCustomer) => {
     const createdAt = new Date();
     const estimatedDelivery = new Date(createdAt);
     estimatedDelivery.setDate(createdAt.getDate() + (shipping === "express" ? 2 : shipping === "pickup" ? 1 : 5));
@@ -100,6 +125,7 @@ export default function CheckoutPage() {
       payment: paymentOptions[payment][language],
       createdAt: createdAt.toISOString(),
       estimatedDelivery: estimatedDelivery.toISOString(),
+      customer,
     };
 
     window.localStorage.setItem("moco-last-order", JSON.stringify(order));
@@ -109,6 +135,7 @@ export default function CheckoutPage() {
     } catch {
       window.localStorage.setItem("moco-orders", JSON.stringify([order]));
     }
+    await saveOrderToDatabase(order);
     const orderedSlugs = new Set(items.map((item) => item.slug));
     const currentCart: CartItem[] = JSON.parse(window.localStorage.getItem("moco-cart") || "[]");
     window.localStorage.setItem(
@@ -122,13 +149,21 @@ export default function CheckoutPage() {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const customer = {
+      fullName: String(formData.get("fullName") || ""),
+      phone: String(formData.get("phone") || ""),
+      email: String(formData.get("email") || ""),
+      address: String(formData.get("address") || ""),
+    };
+    setCheckoutCustomer(customer);
 
     if (isOnlinePayment) {
       setPaymentStep("gateway");
       return;
     }
 
-    completeOrder("pending");
+    completeOrder("pending", customer);
   };
 
   if (items.length === 0) {
@@ -156,15 +191,15 @@ export default function CheckoutPage() {
           <fieldset>
             <legend>{language === "vi" ? "1. Th\u00f4ng tin ng\u01b0\u1eddi nh\u1eadn" : "1. Recipient information"}</legend>
             <div className="checkout-field-grid">
-              <input required placeholder={language === "vi" ? "H\u1ecd v\u00e0 t\u00ean" : "Full name"} />
-              <input required placeholder={language === "vi" ? "S\u1ed1 \u0111i\u1ec7n tho\u1ea1i" : "Phone number"} />
-              <input type="email" placeholder="Email" />
+              <input name="fullName" required placeholder={language === "vi" ? "H\u1ecd v\u00e0 t\u00ean" : "Full name"} />
+              <input name="phone" required placeholder={language === "vi" ? "S\u1ed1 \u0111i\u1ec7n tho\u1ea1i" : "Phone number"} />
+              <input name="email" type="email" placeholder="Email" />
             </div>
           </fieldset>
 
           <fieldset>
             <legend>{language === "vi" ? "2. \u0110\u1ecba ch\u1ec9 giao h\u00e0ng" : "2. Shipping address"}</legend>
-            <textarea required placeholder={language === "vi" ? "Nh\u1eadp \u0111\u1ecba ch\u1ec9 giao h\u00e0ng ho\u1eb7c ch\u1ecdn \u0111\u1ecba ch\u1ec9 \u0111\u00e3 l\u01b0u" : "Enter a new address or confirm a saved address"} />
+            <textarea name="address" required placeholder={language === "vi" ? "Nh\u1eadp \u0111\u1ecba ch\u1ec9 giao h\u00e0ng ho\u1eb7c ch\u1ecdn \u0111\u1ecba ch\u1ec9 \u0111\u00e3 l\u01b0u" : "Enter a new address or confirm a saved address"} />
           </fieldset>
 
           <fieldset>

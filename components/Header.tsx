@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { signOutUser } from "../app/auth-storage";
+import { signOutUser, readCurrentUser } from "../app/auth-storage";
 import { useLanguage } from "../app/providers";
 
 type CartItem = {
@@ -112,9 +112,11 @@ export default function Header() {
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [isCartPulsing, setIsCartPulsing] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [userInfo, setUserInfo] = useState<{
     name: string;
     email: string;
+    role?: string;
   } | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -193,10 +195,14 @@ export default function Header() {
           const user = JSON.parse(
             window.localStorage.getItem("moco-user") || "{}",
           );
-          if (user.name) setUserInfo(user);
+          if (user.name) {
+            setUserInfo(user);
+            setIsAdmin(user.role === "admin");
+          }
         } catch (e) {}
       } else {
         setUserInfo(null);
+        setIsAdmin(false);
       }
     };
 
@@ -581,6 +587,17 @@ export default function Header() {
                   </div>
                   <div className="account-dropdown-divider"></div>
                   <div className="account-dropdown-links">
+                    {isAdmin && (
+                      <>
+                        <Link
+                          href="/admin"
+                          onClick={() => setIsAccountOpen(false)}
+                        >
+                          <span>🔐 Admin Panel</span>
+                        </Link>
+                        <div className="border-b border-gray-600 my-1"></div>
+                      </>
+                    )}
                     <Link
                       href="/register-product"
                       onClick={() => setIsAccountOpen(false)}

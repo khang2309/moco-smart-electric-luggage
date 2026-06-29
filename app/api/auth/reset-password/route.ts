@@ -30,10 +30,14 @@ export async function POST(request: Request) {
 
     const token = crypto.randomBytes(32).toString("hex");
     const expiresAt = new Date(Date.now() + 30 * 60 * 1000); // 30 min
+    const now = new Date();
 
     await db.collection("password_resets").updateOne(
       { email: normalizedEmail },
-      { $set: { token, expiresAt } },
+      {
+        $set: { token, expiresAt, updatedAt: now },
+        $setOnInsert: { createdAt: now },
+      },
       { upsert: true },
     );
 

@@ -1,3 +1,5 @@
+export type UserRole = "admin" | "customer";
+
 export type MocoUser = {
   email: string;
   name: string;
@@ -5,6 +7,7 @@ export type MocoUser = {
   phone?: string;
   city?: string;
   address?: string;
+  role?: UserRole;
 };
 
 const CURRENT_USER_KEY = "moco-user";
