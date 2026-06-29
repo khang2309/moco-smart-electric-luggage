@@ -31,6 +31,9 @@ const labels = {
     admin: "Quản trị viên",
     customer: "Khách hàng",
     unknown: "Chưa cập nhật",
+    actions: "Thao tác",
+    makeAdmin: "Thêm quyền Admin",
+    removeAdmin: "Hủy quyền Admin",
   },
   en: {
     title: "User Management",
@@ -49,6 +52,9 @@ const labels = {
     admin: "Administrator",
     customer: "Customer",
     unknown: "Not updated",
+    actions: "Actions",
+    makeAdmin: "Make Admin",
+    removeAdmin: "Remove Admin",
   },
 } as const;
 
@@ -58,6 +64,35 @@ export default function AdminUsers() {
   const locale = language === "vi" ? "vi-VN" : "en-US";
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isUpdating, setIsUpdating] = useState<string | null>(null);
+
+  const toggleRole = async (email: string, currentRole: string) => {
+    const makeAdmin = currentRole !== "admin";
+    if (!confirm(makeAdmin ? (language === "vi" ? "Cấp quyền Quản trị viên cho người dùng này?" : "Grant Administrator rights to this user?") : (language === "vi" ? "Hủy quyền Quản trị viên của người dùng này?" : "Revoke Administrator rights from this user?"))) return;
+    
+    try {
+      setIsUpdating(email);
+      const res = await fetch("/api/admin/set-admin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-secret": "your-secret-key-123", // Using the default secret
+        },
+        body: JSON.stringify({ email, makeAdmin }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        fetchUsers();
+      } else {
+        alert(data.error || "Error");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Error updating role");
+    } finally {
+      setIsUpdating(null);
+    }
+  };
 
   const fetchUsers = async () => {
     try {
@@ -143,6 +178,7 @@ export default function AdminUsers() {
                     <th className="px-4 py-3">{t.phone}</th>
                     <th className="px-4 py-3">{t.role}</th>
                     <th className="px-4 py-3">{t.createdAt}</th>
+                    <th className="px-4 py-3 text-right">{t.actions}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 text-sm">
@@ -162,6 +198,23 @@ export default function AdminUsers() {
                       </td>
                       <td className="px-4 py-4 font-semibold text-gray-500">
                         {user.createdAt ? new Date(user.createdAt).toLocaleDateString(locale) : "-"}
+                      </td>
+                      <td className="px-4 py-4 text-right">
+                        <button
+                          onClick={() => toggleRole(user.email, user.role)}
+                          disabled={isUpdating === user.email}
+                          className={`inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-bold transition-colors ${
+                            user.role === "admin"
+                              ? "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                              : "bg-blue-50 text-blue-700 hover:bg-blue-100"
+                          } disabled:opacity-50`}
+                        >
+                          {isUpdating === user.email
+                            ? "..."
+                            : user.role === "admin"
+                            ? t.removeAdmin
+                            : t.makeAdmin}
+                        </button>
                       </td>
                     </tr>
                   ))}
