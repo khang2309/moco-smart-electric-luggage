@@ -8383,23 +8383,25 @@ h2,
   .home-showcase {
     position: relative;
     min-height: auto;
-    padding: 36px 20px 0;
+    padding: 36px 20px 60px;
     flex-direction: column;
     align-items: flex-start;
     overflow: hidden;
-    background: linear-gradient(180deg, rgba(248, 251, 255, 0.98), rgba(248, 251, 255, 0.9));
+    background: transparent;
   }
 
   .home-showcase::after {
     content: "";
-    display: block;
+    position: absolute;
+    top: 0;
+    left: -20px;
     width: calc(100% + 40px);
-    height: 250px;
-    margin: 0 -20px;
+    height: 100%;
     background:
-      linear-gradient(180deg, rgba(248, 251, 255, 0.2), rgba(248, 251, 255, 0.04)),
-      url("/assets/home.png") center bottom / min(100vw, 470px) auto no-repeat;
+      linear-gradient(180deg, rgba(248, 251, 255, 0.8), rgba(248, 251, 255, 0.3)),
+      url("/assets/home.png") center bottom / cover no-repeat;
     pointer-events: none;
+    z-index: 0;
   }
 
   .home-showcase-panel,
@@ -8444,23 +8446,25 @@ h2,
   .home-audience {
     position: relative;
     min-height: auto;
-    padding: 36px 20px 0;
+    padding: 36px 20px 60px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    background: linear-gradient(180deg, rgba(246, 247, 250, 0.98), rgba(246, 247, 250, 0.9));
+    background: transparent;
   }
 
   .home-audience::after {
     content: "";
-    display: block;
+    position: absolute;
+    top: 0;
+    left: -20px;
     width: calc(100% + 40px);
-    height: 250px;
-    margin: 0 -20px;
+    height: 100%;
     background:
-      linear-gradient(180deg, rgba(246, 247, 250, 0.2), rgba(246, 247, 250, 0.04)),
-      url("/assets/loveMOCO.png") center bottom / min(100vw, 470px) auto no-repeat;
+      linear-gradient(180deg, rgba(246, 247, 250, 0.8), rgba(246, 247, 250, 0.3)),
+      url("/assets/loveMOCO.png") center bottom / cover no-repeat;
     pointer-events: none;
+    z-index: 0;
   }
 
   .home-audience-heading {
