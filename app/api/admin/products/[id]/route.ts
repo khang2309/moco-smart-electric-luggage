@@ -19,7 +19,7 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const { slug, name, description, price, oldPrice, image, stock, store, subtitle } = await request.json();
+    const { slug, name, description, price, oldPrice, image, stock, store, subtitle, status } = await request.json();
 
     if (!name || !price) {
       return NextResponse.json(
@@ -45,6 +45,7 @@ export async function PUT(
           stock: Number(stock) || 0,
           store: store || "MOCO Official",
           subtitle: subtitle || description || "",
+          status: status || "active",
           updatedAt: new Date(),
         },
       },
@@ -83,19 +84,25 @@ export async function DELETE(
     const db = await getDb();
     const products = db.collection("products");
 
-    const result = await products.deleteOne({ _id: new ObjectId(id) });
+    // Soft delete: update status to "deleted"
+    const result = await products.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { status: "deleted", updatedAt: new Date() } }
+    );
 
-    if (result.deletedCount === 0) {
+    if (result.matchedCount === 0) {
       return NextResponse.json(
         { error: "Product not found." },
         { status: 404 }
       );
     }
+    
+    // Xóa trong kho (hoặc có thể giữ lại, tuỳ nghiệp vụ. Ở đây xoá khỏi bảng kho để ko hiện lên tồn kho)
     await deleteInventoryForProduct(db, id);
 
     return NextResponse.json({
       success: true,
-      message: "Product deleted successfully",
+      message: "Product soft deleted successfully",
     });
   } catch (error) {
     console.error("Delete product error:", error);

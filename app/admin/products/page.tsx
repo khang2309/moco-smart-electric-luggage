@@ -15,6 +15,7 @@ type Product = {
   oldPrice?: number;
   image?: string;
   stock: number;
+  status?: "active" | "draft" | "deleted";
   createdAt?: string;
   updatedAt?: string;
 };
@@ -29,6 +30,7 @@ type ProductForm = {
   image: string;
   stock: string;
   store: string;
+  status: string;
 };
 
 const emptyForm: ProductForm = {
@@ -41,6 +43,7 @@ const emptyForm: ProductForm = {
   image: "",
   stock: "",
   store: "MOCO Official",
+  status: "active",
 };
 
 const text = {
@@ -88,6 +91,9 @@ const text = {
     deleteError: "Lỗi khi xóa sản phẩm.",
     requiredError: "Vui lòng nhập tên sản phẩm và giá bán.",
     noImage: "Không có ảnh",
+    activeStatus: "Đang kích hoạt",
+    draftStatus: "Đã ẩn",
+    deletedStatus: "Đã xóa",
   },
   en: {
     title: "Product & Inventory Management",
@@ -133,6 +139,9 @@ const text = {
     deleteError: "Could not delete product.",
     requiredError: "Please enter product name and sale price.",
     noImage: "No image",
+    activeStatus: "Active",
+    draftStatus: "Hidden",
+    deletedStatus: "Deleted",
   },
 } as const;
 
@@ -181,6 +190,7 @@ function productToForm(product: Product): ProductForm {
     image: product.image || "",
     stock: String(product.stock || 0),
     store: product.store || "MOCO Official",
+    status: product.status || "active",
   };
 }
 
@@ -274,6 +284,7 @@ export default function AdminProducts() {
       price: Number(formData.price),
       oldPrice: Number(formData.oldPrice) || 0,
       stock: Number(formData.stock) || 0,
+      status: formData.status,
     };
     const url = editingId ? `/api/admin/products/${editingId}` : "/api/admin/products";
     const method = editingId ? "PUT" : "POST";
@@ -322,7 +333,7 @@ export default function AdminProducts() {
         throw new Error(data.error || labels.deleteError);
       }
 
-      setProducts((current) => current.filter((item) => item._id !== product._id));
+      setProducts((current) => current.map((item) => item._id === product._id ? { ...item, status: "deleted" as const } : item));
       if (editingId === product._id) {
         resetForm();
       }
@@ -467,6 +478,18 @@ export default function AdminProducts() {
                   className="rounded-lg border border-gray-200 px-3 py-2 font-semibold outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 />
               </label>
+              <label className="grid gap-1 text-sm font-bold text-gray-700">
+                {labels.status}
+                <select
+                  value={formData.status}
+                  onChange={(event) => handleChange("status", event.target.value)}
+                  className="rounded-lg border border-gray-200 px-3 py-2 font-semibold outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                >
+                  <option value="active">{labels.activeStatus}</option>
+                  <option value="draft">{labels.draftStatus}</option>
+                  <option value="deleted">{labels.deletedStatus}</option>
+                </select>
+              </label>
               <label className="grid gap-1 text-sm font-bold text-gray-700 lg:col-span-4">
                 {labels.description}
                 <textarea
@@ -561,9 +584,16 @@ export default function AdminProducts() {
                             <div className={`h-full ${stockStatus.bar}`} style={{ width: `${stockPercent}%` }} />
                           </div>
                         </td>
-                        <td className="px-4 py-4">
-                          <span className={`inline-flex rounded-full px-3 py-1 text-xs font-black ring-1 ${stockStatus.className}`}>
+                        <td className="px-4 py-4 space-y-2">
+                          <span className={`block w-max rounded-full px-3 py-1 text-xs font-black ring-1 ${stockStatus.className}`}>
                             {stockStatus.label}
+                          </span>
+                          <span className={`block w-max rounded-full px-3 py-1 text-xs font-black ring-1 ${
+                            product.status === "deleted" ? "bg-gray-50 text-gray-700 ring-gray-200" :
+                            product.status === "draft" ? "bg-amber-50 text-amber-700 ring-amber-200" :
+                            "bg-blue-50 text-blue-700 ring-blue-200"
+                          }`}>
+                            {product.status === "deleted" ? labels.deletedStatus : product.status === "draft" ? labels.draftStatus : labels.activeStatus}
                           </span>
                         </td>
                         <td className="px-4 py-4 font-semibold text-gray-500">
@@ -580,13 +610,15 @@ export default function AdminProducts() {
                             >
                               {labels.edit}
                             </button>
-                            <button
-                              type="button"
-                              onClick={() => handleDelete(product)}
-                              className="rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-xs font-black text-red-700 transition hover:bg-red-100"
-                            >
-                              {labels.delete}
-                            </button>
+                            {product.status !== "deleted" && (
+                              <button
+                                type="button"
+                                onClick={() => handleDelete(product)}
+                                className="rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-xs font-black text-red-700 transition hover:bg-red-100"
+                              >
+                                {labels.delete}
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>

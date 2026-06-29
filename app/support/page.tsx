@@ -16,7 +16,7 @@ const copy = {
     tip: "Mẹo: Hãy chuẩn bị số serial hoặc tên model để được hỗ trợ nhanh hơn.",
     quickInfo: "Thông tin nhanh",
     supportTime: "Thời gian hỗ trợ: 8:00 - 21:00",
-    hotline: "Hotline: 1900 6868",
+    hotline: "Hotline: 1900 9999",
     email: "Email hỗ trợ: mocoluggage@gmail.com",
     directTitle: "Cần hỗ trợ trực tiếp?",
     directDescription: "Đội ngũ MOCO sẵn sàng hỗ trợ bạn về bảo hành, app và kỹ thuật.",

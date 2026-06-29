@@ -100,7 +100,8 @@ export async function GET() {
   try {
     const db = await getDb();
     const products = db.collection("products");
-    const seededCount = await seedMissingCatalogProducts(products);
+    
+    // Removed seedMissingCatalogProducts to prevent deleted products from reappearing
 
     const productsList = await products
       .find({})
@@ -112,8 +113,8 @@ export async function GET() {
       success: true,
       products: productsList,
       total: productsList.length,
-      seeded: seededCount,
-      source: seededCount > 0 ? "seeded" : "database",
+      seeded: 0,
+      source: "database",
     });
   } catch (error) {
     console.error("Get products error:", error);
@@ -153,6 +154,7 @@ export async function POST(request: Request) {
       stock: Number(stock) || 0,
       store: store || "MOCO Official",
       subtitle: subtitle || description || "",
+      status: "active", // default status
       createdAt: new Date(),
       updatedAt: new Date(),
     };

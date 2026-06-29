@@ -697,9 +697,33 @@ export default function ProductDetailPage() {
   const [showAddedFeedback, setShowAddedFeedback] = useState(false);
   const [showCartFlyer, setShowCartFlyer] = useState(false);
   const [favoriteProducts, setFavoriteProducts] = useState<string[]>([]);
+  const [liveStatus, setLiveStatus] = useState<"active" | "draft" | "deleted" | null>(null);
+  const [liveStock, setLiveStock] = useState<number | null>(null);
+  const [isFetchingStatus, setIsFetchingStatus] = useState(true);
 
   const product = products.find((item) => item.slug === params?.slug) ?? products[0];
   const details = product[language];
+
+  useEffect(() => {
+    const fetchStatus = async () => {
+      try {
+        const res = await fetch("/api/admin/products");
+        const data = await res.json();
+        const dbProduct = data.products?.find((p: any) => p.slug === product.slug);
+        if (dbProduct) {
+          setLiveStatus(dbProduct.status || "active");
+          setLiveStock(dbProduct.stock ?? 0);
+        } else {
+          setLiveStatus("deleted");
+        }
+      } catch {
+        // Fallback silently
+      } finally {
+        setIsFetchingStatus(false);
+      }
+    };
+    fetchStatus();
+  }, [product.slug]);
 
   const copy = useMemo(
     () => ({
@@ -805,29 +829,45 @@ export default function ProductDetailPage() {
           <span className="product-title-line" aria-hidden="true" />
           <p>{details.description}</p>
 
-          <div className="product-buy-row">
-            <strong>{t.quantity}</strong>
-            <div className="quantity-control" aria-label={t.quantity}>
-              <button type="button" onClick={() => setQuantity((value) => Math.max(1, value - 1))}>
-                -
-              </button>
-              <span>{quantity}</span>
-              <button type="button" onClick={() => setQuantity((value) => value + 1)}>
-                +
-              </button>
-            </div>
-          </div>
+          {isFetchingStatus ? (
+             <div className="rounded-lg bg-gray-50 p-4 text-center text-sm font-semibold text-gray-500">
+               {language === "vi" ? "Đang kiểm tra tình trạng kho..." : "Checking availability..."}
+             </div>
+          ) : liveStatus === "deleted" || liveStatus === "draft" ? (
+             <div className="rounded-lg border border-red-100 bg-red-50 p-4 text-center text-sm font-bold text-red-700">
+               {language === "vi" ? "Sản phẩm này đã ngừng bán." : "This product is no longer available."}
+             </div>
+          ) : liveStock !== null && liveStock <= 0 ? (
+             <div className="rounded-lg border border-amber-100 bg-amber-50 p-4 text-center text-sm font-bold text-amber-700">
+               {language === "vi" ? "Sản phẩm đang tạm hết hàng." : "Product is temporarily out of stock."}
+             </div>
+          ) : (
+            <>
+              <div className="product-buy-row">
+                <strong>{t.quantity}</strong>
+                <div className="quantity-control" aria-label={t.quantity}>
+                  <button type="button" onClick={() => setQuantity((value) => Math.max(1, value - 1))}>
+                    -
+                  </button>
+                  <span>{quantity}</span>
+                  <button type="button" onClick={() => setQuantity((value) => value + 1)}>
+                    +
+                  </button>
+                </div>
+              </div>
 
-          <button className={`add-cart-button${showAddedFeedback ? " added" : ""}`} type="button" onClick={handleAddToCart}>
-            <svg className="add-cart-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <circle cx="9" cy="20" r="1.6"></circle>
-              <circle cx="18" cy="20" r="1.6"></circle>
-              <path d="M3.4 4H5l2.2 11.2a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 1.9-1.4L21 8H7"></path>
-              <path d="M12 11h4"></path>
-              <path d="M14 9v4"></path>
-            </svg>
-            {t.add}
-          </button>
+              <button className={`add-cart-button${showAddedFeedback ? " added" : ""}`} type="button" onClick={handleAddToCart}>
+                <svg className="add-cart-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="9" cy="20" r="1.6"></circle>
+                  <circle cx="18" cy="20" r="1.6"></circle>
+                  <path d="M3.4 4H5l2.2 11.2a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 1.9-1.4L21 8H7"></path>
+                  <path d="M12 11h4"></path>
+                  <path d="M14 9v4"></path>
+                </svg>
+                {t.add}
+              </button>
+            </>
+          )}
 
           {showAddedFeedback && (
             <div className="add-cart-feedback">
