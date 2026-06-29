@@ -767,9 +767,6 @@ a {
 
 @media (max-width: 1024px) {
   .new-arrival {
-    background-position: bottom center;
-    background-size: 80% auto;
-    padding-bottom: 300px;
     flex-direction: column;
     text-align: center;
   }
