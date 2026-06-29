@@ -3522,14 +3522,14 @@ textarea {
 
   .home-showcase {
     min-height: 500px;
-    padding: 46px 24px 260px;
+    padding: 46px 24px 60px;
     align-items: flex-start;
     background:
       linear-gradient(
         180deg,
-        rgba(248, 251, 255, 0.98) 0%,
-        rgba(248, 251, 255, 0.94) 45%,
-        rgba(248, 251, 255, 0.42) 100%
+        rgba(248, 251, 255, 0.8) 0%,
+        
+        rgba(248, 251, 255, 0.3) 100%
       ),
       url("/assets/home.png") 68% 62% / cover no-repeat;
   }
@@ -3540,13 +3540,13 @@ textarea {
 
   .home-audience {
     min-height: 590px;
-    padding: 34px 24px 210px;
+    padding: 34px 24px 60px;
     background:
       linear-gradient(
         180deg,
-        rgba(246, 247, 250, 0.98) 0%,
-        rgba(246, 247, 250, 0.94) 58%,
-        rgba(246, 247, 250, 0.34) 100%
+        rgba(246, 247, 250, 0.8) 0%,
+        
+        rgba(246, 247, 250, 0.3) 100%
       ),
       url("/assets/loveMOCO.png") 76% 85% / cover no-repeat;
   }
@@ -3969,13 +3969,13 @@ textarea {
 
   .home-showcase {
     min-height: 520px;
-    padding: 34px 14px 230px;
+    padding: 34px 14px 60px;
     background:
       linear-gradient(
         180deg,
-        rgba(248, 251, 255, 0.96) 0%,
-        rgba(248, 251, 255, 0.9) 58%,
-        rgba(248, 251, 255, 0.45) 100%
+        rgba(248, 251, 255, 0.8) 0%,
+        
+        rgba(248, 251, 255, 0.3) 100%
       ),
       url("/assets/home.png") 73% 62% / cover no-repeat;
   }
@@ -4000,13 +4000,13 @@ textarea {
 
   .home-audience {
     min-height: 610px;
-    padding: 32px 18px 220px;
+    padding: 32px 18px 60px;
     background:
       linear-gradient(
         180deg,
-        rgba(246, 247, 250, 0.98) 0%,
-        rgba(246, 247, 250, 0.94) 64%,
-        rgba(246, 247, 250, 0.38) 100%
+        rgba(246, 247, 250, 0.8) 0%,
+        
+        rgba(246, 247, 250, 0.3) 100%
       ),
       url("/assets/loveMOCO.png") 72% 85% / cover no-repeat;
   }
