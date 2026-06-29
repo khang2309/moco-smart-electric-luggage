@@ -49,7 +49,7 @@ function getLoopOffset(index: number, activeIndex: number) {
 export default function ProductPage() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [favoriteProducts, setFavoriteProducts] = useState<string[]>([]);
-  const [visibleProducts, setVisibleProducts] = useState<typeof products | null>(null);
+  const [visibleProducts, setVisibleProducts] = useState<Array<(typeof products)[number]> | null>(null);
   const { language } = useLanguage();
   const activeProduct = visibleProducts ? visibleProducts[activeIndex] : null;
 
@@ -105,13 +105,13 @@ export default function ProductPage() {
               .map((p: any) => p.slug)
           );
           setVisibleProducts(
-            products.filter(p => activeSlugs.has(p.slug)) as unknown as typeof products
+            products.filter(p => activeSlugs.has(p.slug))
           );
         } else {
-          setVisibleProducts(products); // fallback
+          setVisibleProducts([...products]); // fallback
         }
       } catch {
-        setVisibleProducts(products); // fallback
+        setVisibleProducts([...products]); // fallback
       }
     };
     fetchStatus();
