@@ -169,58 +169,63 @@ export default function AdminUsers() {
           </div>
         ) : (
           <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[760px]">
-                <thead className="bg-gray-50 text-left text-xs font-black uppercase tracking-wide text-gray-500">
-                  <tr>
-                    <th className="px-4 py-3">{t.name}</th>
-                    <th className="px-4 py-3">{t.email}</th>
-                    <th className="px-4 py-3">{t.phone}</th>
-                    <th className="px-4 py-3">{t.role}</th>
-                    <th className="px-4 py-3">{t.createdAt}</th>
-                    <th className="px-4 py-3 text-right">{t.actions}</th>
+            <table className="w-full block md:table">
+              <thead className="bg-gray-50 text-left text-xs font-black uppercase tracking-wide text-gray-500 hidden md:table-header-group">
+                <tr>
+                  <th className="px-4 py-3">{t.name}</th>
+                  <th className="px-4 py-3">{t.email}</th>
+                  <th className="px-4 py-3">{t.phone}</th>
+                  <th className="px-4 py-3">{t.role}</th>
+                  <th className="px-4 py-3">{t.createdAt}</th>
+                  <th className="px-4 py-3 text-right">{t.actions}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100 text-sm block md:table-row-group">
+                {users.map((user) => (
+                  <tr key={user._id} className="hover:bg-gray-50 flex flex-col p-4 gap-2 md:table-row md:p-0 md:gap-0">
+                    <td className="md:px-4 md:py-4 flex justify-between items-center md:table-cell font-black text-gray-950">
+                      <span className="md:hidden text-xs font-bold text-gray-500 uppercase">{t.name}</span>
+                      <span>{user.name || t.unknown}</span>
+                    </td>
+                    <td className="md:px-4 md:py-4 flex justify-between items-center md:table-cell font-semibold text-gray-600">
+                      <span className="md:hidden text-xs font-bold text-gray-500 uppercase">{t.email}</span>
+                      <span className="text-right md:text-left break-all ml-4 md:ml-0">{user.email}</span>
+                    </td>
+                    <td className="md:px-4 md:py-4 flex justify-between items-center md:table-cell font-semibold text-gray-600">
+                      <span className="md:hidden text-xs font-bold text-gray-500 uppercase">{t.phone}</span>
+                      <span>{user.phone || "-"}</span>
+                    </td>
+                    <td className="md:px-4 md:py-4 flex justify-between items-center md:table-cell">
+                      <span className="md:hidden text-xs font-bold text-gray-500 uppercase">{t.role}</span>
+                      <span className={`inline-flex rounded-full px-3 py-1 text-xs font-black ring-1 ${getRoleColor(user.role)}`}>
+                        {getRoleLabel(user.role)}
+                      </span>
+                    </td>
+                    <td className="md:px-4 md:py-4 flex justify-between items-center md:table-cell font-semibold text-gray-500">
+                      <span className="md:hidden text-xs font-bold text-gray-500 uppercase">{t.createdAt}</span>
+                      <span>{user.createdAt ? new Date(user.createdAt).toLocaleDateString(locale) : "-"}</span>
+                    </td>
+                    <td className="md:px-4 md:py-4 flex justify-end items-center md:table-cell md:text-right mt-2 md:mt-0">
+                      <button
+                        onClick={() => toggleRole(user.email, user.role)}
+                        disabled={isUpdating === user.email}
+                        className={`inline-flex items-center justify-center w-full md:w-auto rounded-lg px-4 py-2 text-xs font-bold transition-colors ${
+                          user.role === "admin"
+                            ? "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                            : "bg-blue-50 text-blue-700 hover:bg-blue-100"
+                        } disabled:opacity-50`}
+                      >
+                        {isUpdating === user.email
+                          ? "..."
+                          : user.role === "admin"
+                          ? t.removeAdmin
+                          : t.makeAdmin}
+                      </button>
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100 text-sm">
-                  {users.map((user) => (
-                    <tr key={user._id} className="hover:bg-gray-50">
-                      <td className="px-4 py-4 font-black text-gray-950">
-                        {user.name || t.unknown}
-                      </td>
-                      <td className="px-4 py-4 font-semibold text-gray-600">{user.email}</td>
-                      <td className="px-4 py-4 font-semibold text-gray-600">
-                        {user.phone || "-"}
-                      </td>
-                      <td className="px-4 py-4">
-                        <span className={`inline-flex rounded-full px-3 py-1 text-xs font-black ring-1 ${getRoleColor(user.role)}`}>
-                          {getRoleLabel(user.role)}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4 font-semibold text-gray-500">
-                        {user.createdAt ? new Date(user.createdAt).toLocaleDateString(locale) : "-"}
-                      </td>
-                      <td className="px-4 py-4 text-right">
-                        <button
-                          onClick={() => toggleRole(user.email, user.role)}
-                          disabled={isUpdating === user.email}
-                          className={`inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-bold transition-colors ${
-                            user.role === "admin"
-                              ? "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                              : "bg-blue-50 text-blue-700 hover:bg-blue-100"
-                          } disabled:opacity-50`}
-                        >
-                          {isUpdating === user.email
-                            ? "..."
-                            : user.role === "admin"
-                            ? t.removeAdmin
-                            : t.makeAdmin}
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>

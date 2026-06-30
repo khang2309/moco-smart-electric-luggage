@@ -535,55 +535,62 @@ export default function AdminProducts() {
           ) : filteredProducts.length === 0 ? (
             <div className="p-10 text-center font-semibold text-gray-500">{labels.empty}</div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[920px]">
-                <thead className="bg-gray-50 text-left text-xs font-black uppercase tracking-wide text-gray-500">
-                  <tr>
-                    <th className="px-4 py-3">{labels.product}</th>
-                    <th className="px-4 py-3">{labels.price}</th>
-                    <th className="px-4 py-3">{labels.inventory}</th>
-                    <th className="px-4 py-3">{labels.status}</th>
-                    <th className="px-4 py-3">{labels.updated}</th>
-                    <th className="px-4 py-3 text-right">{labels.actions}</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100 text-sm">
-                  {filteredProducts.map((product) => {
-                    const stockStatus = getStockStatus(Number(product.stock) || 0, labels);
-                    const stockPercent = Math.min(100, Math.max(4, ((Number(product.stock) || 0) / 30) * 100));
+            <table className="w-full block md:table">
+              <thead className="bg-gray-50 text-left text-xs font-black uppercase tracking-wide text-gray-500 hidden md:table-header-group">
+                <tr>
+                  <th className="px-4 py-3">{labels.product}</th>
+                  <th className="px-4 py-3">{labels.price}</th>
+                  <th className="px-4 py-3">{labels.inventory}</th>
+                  <th className="px-4 py-3">{labels.status}</th>
+                  <th className="px-4 py-3">{labels.updated}</th>
+                  <th className="px-4 py-3 text-right">{labels.actions}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100 text-sm block md:table-row-group">
+                {filteredProducts.map((product) => {
+                  const stockStatus = getStockStatus(Number(product.stock) || 0, labels);
+                  const stockPercent = Math.min(100, Math.max(4, ((Number(product.stock) || 0) / 30) * 100));
 
-                    return (
-                      <tr key={product._id} className="hover:bg-gray-50">
-                        <td className="px-4 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-gray-100 text-xs font-black text-gray-400">
-                              {product.image ? (
-                                <img src={product.image} alt={product.name} className="h-full w-full object-contain" />
-                              ) : (
-                                labels.noImage
-                              )}
-                            </div>
-                            <div>
-                              <p className="font-black text-gray-950">{product.name}</p>
-                              <p className="mt-1 text-xs font-semibold text-gray-500">{product.slug || product.subtitle || "-"}</p>
-                            </div>
+                  return (
+                    <tr key={product._id} className="hover:bg-gray-50 flex flex-col p-4 gap-4 md:table-row md:p-0 md:gap-0">
+                      <td className="md:px-4 md:py-4 block md:table-cell">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-16 w-16 md:h-14 md:w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-gray-100 text-xs font-black text-gray-400">
+                            {product.image ? (
+                              <img src={product.image} alt={product.name} className="h-full w-full object-cover md:object-contain" />
+                            ) : (
+                              labels.noImage
+                            )}
                           </div>
-                        </td>
-                        <td className="px-4 py-4">
+                          <div>
+                            <p className="font-black text-gray-950 text-base md:text-sm">{product.name}</p>
+                            <p className="mt-1 text-xs font-semibold text-gray-500 line-clamp-1">{product.slug || product.subtitle || "-"}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="md:px-4 md:py-4 flex justify-between items-center md:items-start md:flex-col md:justify-center md:table-cell">
+                        <span className="md:hidden text-xs font-bold text-gray-500 uppercase">{labels.price}</span>
+                        <div className="text-right md:text-left">
                           <p className="font-black text-gray-950">{currency.format(Number(product.price) || 0)}</p>
                           {Number(product.oldPrice) > 0 && (
                             <p className="text-xs font-semibold text-gray-400 line-through">
                               {currency.format(Number(product.oldPrice))}
                             </p>
                           )}
-                        </td>
-                        <td className="px-4 py-4">
+                        </div>
+                      </td>
+                      <td className="md:px-4 md:py-4 flex justify-between items-center md:table-cell">
+                        <span className="md:hidden text-xs font-bold text-gray-500 uppercase">{labels.inventory}</span>
+                        <div className="flex flex-col items-end md:items-start">
                           <p className="mb-2 font-black text-gray-950">{product.stock}</p>
-                          <div className="h-2 w-28 overflow-hidden rounded-full bg-gray-100">
+                          <div className="h-2 w-24 md:w-28 overflow-hidden rounded-full bg-gray-100">
                             <div className={`h-full ${stockStatus.bar}`} style={{ width: `${stockPercent}%` }} />
                           </div>
-                        </td>
-                        <td className="px-4 py-4 space-y-2">
+                        </div>
+                      </td>
+                      <td className="md:px-4 md:py-4 flex justify-between items-center md:table-cell">
+                        <span className="md:hidden text-xs font-bold text-gray-500 uppercase">{labels.status}</span>
+                        <div className="flex gap-2 flex-wrap justify-end md:justify-start md:space-y-2 md:space-x-0 md:block">
                           <span className={`block w-max rounded-full px-3 py-1 text-xs font-black ring-1 ${stockStatus.className}`}>
                             {stockStatus.label}
                           </span>
@@ -594,38 +601,41 @@ export default function AdminProducts() {
                           }`}>
                             {product.status === "deleted" ? labels.deletedStatus : product.status === "draft" ? labels.draftStatus : labels.activeStatus}
                           </span>
-                        </td>
-                        <td className="px-4 py-4 font-semibold text-gray-500">
+                        </div>
+                      </td>
+                      <td className="md:px-4 md:py-4 flex justify-between items-center md:table-cell font-semibold text-gray-500">
+                        <span className="md:hidden text-xs font-bold text-gray-500 uppercase">{labels.updated}</span>
+                        <span>
                           {product.updatedAt || product.createdAt
                             ? new Date(product.updatedAt || product.createdAt || "").toLocaleDateString(language === "vi" ? "vi-VN" : "en-US")
                             : "-"}
-                        </td>
-                        <td className="px-4 py-4">
-                          <div className="flex justify-end gap-2">
+                        </span>
+                      </td>
+                      <td className="md:px-4 md:py-4 flex justify-end md:table-cell border-t border-gray-100 md:border-0 pt-4 mt-2 md:pt-4 md:mt-0">
+                        <div className="flex justify-end gap-2 w-full md:w-auto">
+                          <button
+                            type="button"
+                            onClick={() => startEdit(product)}
+                            className="flex-1 md:flex-none justify-center rounded-lg border border-blue-100 bg-blue-50 px-4 py-2.5 md:px-3 md:py-2 text-sm md:text-xs font-black text-blue-700 transition hover:bg-blue-100"
+                          >
+                            {labels.edit}
+                          </button>
+                          {product.status !== "deleted" && (
                             <button
                               type="button"
-                              onClick={() => startEdit(product)}
-                              className="rounded-lg border border-blue-100 bg-blue-50 px-3 py-2 text-xs font-black text-blue-700 transition hover:bg-blue-100"
+                              onClick={() => handleDelete(product)}
+                              className="flex-1 md:flex-none justify-center rounded-lg border border-red-100 bg-red-50 px-4 py-2.5 md:px-3 md:py-2 text-sm md:text-xs font-black text-red-700 transition hover:bg-red-100"
                             >
-                              {labels.edit}
+                              {labels.delete}
                             </button>
-                            {product.status !== "deleted" && (
-                              <button
-                                type="button"
-                                onClick={() => handleDelete(product)}
-                                className="rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-xs font-black text-red-700 transition hover:bg-red-100"
-                              >
-                                {labels.delete}
-                              </button>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           )}
         </section>
       </div>

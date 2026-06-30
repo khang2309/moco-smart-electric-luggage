@@ -211,43 +211,51 @@ export default function AdminOrders() {
         ) : (
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.35fr_0.65fr]">
             <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[760px]">
-                  <thead className="bg-gray-50 text-left text-xs font-black uppercase tracking-wide text-gray-500">
-                    <tr>
-                      <th className="px-4 py-3">{t.orderCode}</th>
-                      <th className="px-4 py-3">{t.customer}</th>
-                      <th className="px-4 py-3">{t.total}</th>
-                      <th className="px-4 py-3">{t.status}</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100 text-sm">
-                    {orders.map((order) => {
-                      const status = getOrderStatus(order);
-                      return (
-                        <tr
-                          key={order._id}
-                          className="cursor-pointer hover:bg-gray-50"
-                          onClick={() => setSelectedOrder(order)}
-                        >
-                          <td className="px-4 py-4 font-black text-blue-700">{order.code}</td>
-                          <td className="px-4 py-4 font-semibold text-gray-700">
+              <table className="w-full block md:table">
+                <thead className="bg-gray-50 text-left text-xs font-black uppercase tracking-wide text-gray-500 hidden md:table-header-group">
+                  <tr>
+                    <th className="px-4 py-3">{t.orderCode}</th>
+                    <th className="px-4 py-3">{t.customer}</th>
+                    <th className="px-4 py-3">{t.total}</th>
+                    <th className="px-4 py-3">{t.status}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 text-sm block md:table-row-group">
+                  {orders.map((order) => {
+                    const status = getOrderStatus(order);
+                    return (
+                      <tr
+                        key={order._id}
+                        className="cursor-pointer hover:bg-gray-50 flex flex-col p-4 gap-2 md:table-row md:p-0 md:gap-0"
+                        onClick={() => setSelectedOrder(order)}
+                      >
+                        <td className="md:px-4 md:py-4 flex justify-between items-center md:table-cell">
+                          <span className="md:hidden text-xs font-bold text-gray-500 uppercase">{t.orderCode}</span>
+                          <span className="font-black text-blue-700">{order.code}</span>
+                        </td>
+                        <td className="md:px-4 md:py-4 flex justify-between items-center md:table-cell">
+                          <span className="md:hidden text-xs font-bold text-gray-500 uppercase">{t.customer}</span>
+                          <span className="font-semibold text-gray-700">
                             {order.fullName || order.email || t.retailCustomer}
-                          </td>
-                          <td className="px-4 py-4 font-black text-gray-950">
+                          </span>
+                        </td>
+                        <td className="md:px-4 md:py-4 flex justify-between items-center md:table-cell">
+                          <span className="md:hidden text-xs font-bold text-gray-500 uppercase">{t.total}</span>
+                          <span className="font-black text-gray-950">
                             {currency.format(Number(order.total) || 0)}
-                          </td>
-                          <td className="px-4 py-4">
-                            <span className={`inline-flex rounded-full px-3 py-1 text-xs font-black ring-1 ${getStatusColor(status)}`}>
-                              {getStatusLabel(status)}
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                          </span>
+                        </td>
+                        <td className="md:px-4 md:py-4 flex justify-between items-center md:table-cell">
+                          <span className="md:hidden text-xs font-bold text-gray-500 uppercase">{t.status}</span>
+                          <span className={`inline-flex rounded-full px-3 py-1 text-xs font-black ring-1 ${getStatusColor(status)}`}>
+                            {getStatusLabel(status)}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
 
             <aside className="h-fit rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
