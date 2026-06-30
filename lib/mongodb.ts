@@ -27,15 +27,19 @@ function getClientPromise() {
   }
 
   const uri = getMongoUri();
+  const options = {
+    maxPoolSize: 10,
+    minPoolSize: 5,
+  };
 
   if (process.env.NODE_ENV === "development") {
     if (!globalWithMongo._mongoClientPromise) {
-      const client = new MongoClient(uri);
+      const client = new MongoClient(uri, options);
       globalWithMongo._mongoClientPromise = client.connect();
     }
     clientPromise = globalWithMongo._mongoClientPromise;
   } else {
-    const client = new MongoClient(uri);
+    const client = new MongoClient(uri, options);
     clientPromise = client.connect();
   }
 

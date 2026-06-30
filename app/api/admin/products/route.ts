@@ -107,7 +107,6 @@ export async function GET() {
       .find({})
       .sort({ createdAt: 1, name: 1 })
       .toArray();
-    await syncInventoryForProducts(db, productsList as WithId<Document>[]);
 
     return NextResponse.json({
       success: true,
