@@ -27,6 +27,8 @@ function AccountContent() {
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [resetToken, setResetToken] = useState("");
+  const [registeredProducts, setRegisteredProducts] = useState<any[]>([]);
+  const [isFetchingProducts, setIsFetchingProducts] = useState(false);
 
   useEffect(() => {
     const user = readCurrentUser();
@@ -66,6 +68,20 @@ function AccountContent() {
       setShowPasswordForm(true);
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    if (userInfo?.email) {
+      setIsFetchingProducts(true);
+      fetch(`/api/user/products?email=${encodeURIComponent(userInfo.email)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            setRegisteredProducts(data.products || []);
+          }
+        })
+        .finally(() => setIsFetchingProducts(false));
+    }
+  }, [userInfo?.email]);
 
   const handleSaveProfile = async () => {
     if (!userInfo?.email) return;
@@ -239,27 +255,49 @@ function AccountContent() {
 
           <article className="account-card account-products">
             <h2>{language === "vi" ? "Sản phẩm của tôi" : "My products"}</h2>
-            <div className="registered-product">
-              <Image src="/assets/Product/mocoGO.png" alt="" width={72} height={96} />
-              <div>
-                <span>Model</span>
-                <strong>MOCO Go</strong>
-                <Link href="/product/moco-go">{language === "vi" ? "Xem chi tiết" : "View details"}</Link>
+            {isFetchingProducts ? (
+              <p className="text-sm text-gray-500 py-4">{language === "vi" ? "Đang tải..." : "Loading..."}</p>
+            ) : registeredProducts.length > 0 ? (
+              <div className="space-y-4">
+                {registeredProducts.map((prod, idx) => (
+                  <div key={idx} className="registered-product relative">
+                    <Image src="/assets/Product/mocoGO.png" alt="" width={72} height={96} />
+                    <div>
+                      <span>Model</span>
+                      <strong>{prod.model}</strong>
+                      <Link href={`/product`}>{language === "vi" ? "Xem chi tiết" : "View details"}</Link>
+                    </div>
+                    <div>
+                      <span>{language === "vi" ? "Số serial" : "Serial"}</span>
+                      <strong>{prod.serial || (language === "vi" ? "Không có" : "None")}</strong>
+                    </div>
+                    <div>
+                      <span>{language === "vi" ? "Ngày mua" : "Purchase date"}</span>
+                      <strong>{prod.purchaseDate}</strong>
+                    </div>
+                    <div>
+                      <span>{language === "vi" ? "Bảo hành" : "Warranty"}</span>
+                      {prod.status === "pending" ? (
+                        <strong className="text-amber-500">{language === "vi" ? "Đang chờ duyệt" : "Pending"}</strong>
+                      ) : prod.status === "rejected" ? (
+                        <strong className="text-red-500">{language === "vi" ? "Bị từ chối" : "Rejected"}</strong>
+                      ) : prod.status === "expired" ? (
+                        <strong className="text-gray-500">{language === "vi" ? "Hết hạn" : "Expired"}</strong>
+                      ) : (
+                        <strong className="warranty-active">{prod.warrantyExpiry}</strong>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div>
-                <span>{language === "vi" ? "Số serial" : "Serial"}</span>
-                <strong>MOCO-GO-000123</strong>
+            ) : (
+              <div className="py-8 text-center text-sm text-gray-500">
+                <p className="mb-3">{language === "vi" ? "Bạn chưa đăng ký sản phẩm nào." : "You have not registered any products."}</p>
+                <Link href="/register-product" className="inline-block bg-black text-white px-5 py-2.5 rounded-full font-bold hover:bg-gray-800 transition">
+                  {language === "vi" ? "Đăng ký ngay" : "Register now"}
+                </Link>
               </div>
-              <div>
-                <span>{language === "vi" ? "Ngày mua" : "Purchase date"}</span>
-                <strong>12/06/2026</strong>
-              </div>
-              <div>
-                <span>{language === "vi" ? "Bảo hành" : "Warranty"}</span>
-                <strong className="warranty-active">{language === "vi" ? "Còn hạn" : "Active"}</strong>
-              </div>
-              <Link className="registered-arrow" href="/product/moco-go">›</Link>
-            </div>
+            )}
           </article>
 
           <aside className="account-side">

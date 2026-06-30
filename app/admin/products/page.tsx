@@ -1,6 +1,6 @@
 "use client";
 
-import { AdminLayout } from "../AdminLayout";
+
 import { useLanguage } from "@/app/providers";
 import { useEffect, useMemo, useState } from "react";
 
@@ -366,8 +366,7 @@ export default function AdminProducts() {
   ];
 
   return (
-    <AdminLayout>
-      <div className="space-y-6">
+    <div className="space-y-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-sm font-black uppercase tracking-[0.16em] text-blue-600">
@@ -731,6 +730,5 @@ export default function AdminProducts() {
           )}
         </section>
       </div>
-    </AdminLayout>
   );
 }

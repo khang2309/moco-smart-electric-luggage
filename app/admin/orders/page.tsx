@@ -1,6 +1,6 @@
 "use client";
 
-import { AdminLayout } from "../AdminLayout";
+
 import { useLanguage } from "@/app/providers";
 import { useEffect, useMemo, useState } from "react";
 
@@ -128,6 +128,31 @@ export default function AdminOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+
+  const handleStatusChange = async (newStatus: string) => {
+    if (!selectedOrder) return;
+    setIsUpdatingStatus(true);
+    try {
+      const res = await fetch(`/api/admin/orders/${selectedOrder._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setOrders(orders.map(o => o._id === selectedOrder._id ? { ...o, status: newStatus, fulfillmentStatus: newStatus } : o));
+        setSelectedOrder({ ...selectedOrder, status: newStatus, fulfillmentStatus: newStatus });
+      } else {
+        alert(language === "vi" ? "Lỗi cập nhật trạng thái." : "Error updating status.");
+      }
+    } catch (error) {
+      console.error(error);
+      alert(language === "vi" ? "Đã có lỗi xảy ra." : "An error occurred.");
+    } finally {
+      setIsUpdatingStatus(false);
+    }
+  };
 
   const fetchOrders = async () => {
     try {
@@ -174,8 +199,7 @@ export default function AdminOrders() {
   };
 
   return (
-    <AdminLayout>
-      <div className="space-y-6">
+    <div className="space-y-6">
         <div>
           <p className="text-sm font-black uppercase tracking-[0.16em] text-blue-600">
             MOCO Orders
@@ -274,6 +298,23 @@ export default function AdminOrders() {
                       </dd>
                     </div>
                     <div>
+                      <dt className="font-bold text-gray-500">{t.status}</dt>
+                      <dd className="mt-1">
+                        <select
+                          value={getOrderStatus(selectedOrder)}
+                          onChange={(e) => handleStatusChange(e.target.value)}
+                          disabled={isUpdatingStatus}
+                          className={`w-full rounded-lg border px-3 py-2 text-sm font-semibold outline-none focus:ring-2 disabled:opacity-50 appearance-none cursor-pointer ${getStatusColor(getOrderStatus(selectedOrder))}`}
+                        >
+                          <option value="pending" className="bg-white text-gray-900">{t.pending}</option>
+                          <option value="processing" className="bg-white text-gray-900">{t.processing}</option>
+                          <option value="shipped" className="bg-white text-gray-900">{t.shipped}</option>
+                          <option value="delivered" className="bg-white text-gray-900">{t.delivered}</option>
+                          <option value="cancelled" className="bg-white text-gray-900">{t.cancelled}</option>
+                        </select>
+                      </dd>
+                    </div>
+                    <div>
                       <dt className="font-bold text-gray-500">{t.email}</dt>
                       <dd className="mt-1 font-semibold text-gray-900">{selectedOrder.email || "-"}</dd>
                     </div>
@@ -332,6 +373,5 @@ export default function AdminOrders() {
           </div>
         )}
       </div>
-    </AdminLayout>
   );
 }

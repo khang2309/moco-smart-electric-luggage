@@ -4,6 +4,7 @@ import { readCurrentUser } from "@/app/auth-storage";
 import { useLanguage } from "@/app/providers";
 import { ReactNode, useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import Link from "next/link";
 
 const labels = {
   vi: {
@@ -11,6 +12,7 @@ const labels = {
     dashboard: "Dashboard",
     products: "Quản lý sản phẩm",
     orders: "Quản lý đơn hàng",
+    warranties: "Quản lý bảo hành",
     users: "Quản lý người dùng",
   },
   en: {
@@ -18,11 +20,12 @@ const labels = {
     dashboard: "Dashboard",
     products: "Product management",
     orders: "Order management",
+    warranties: "Warranty management",
     users: "User management",
   },
 } as const;
 
-export function AdminLayout({ children }: { children: ReactNode }) {
+export default function AdminLayout({ children }: { children: ReactNode }) {
   const { language } = useLanguage();
   const t = labels[language];
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -78,18 +81,21 @@ export function AdminLayout({ children }: { children: ReactNode }) {
           </button>
         </div>
         <nav className="space-y-2 px-4">
-          <a href="/admin" className="block rounded px-4 py-2 transition hover:bg-gray-700">
+          <Link href="/admin" className="block rounded px-4 py-2 transition hover:bg-gray-700">
             {t.dashboard}
-          </a>
-          <a href="/admin/products" className="block rounded px-4 py-2 transition hover:bg-gray-700">
+          </Link>
+          <Link href="/admin/products" className="block rounded px-4 py-2 transition hover:bg-gray-700">
             {t.products}
-          </a>
-          <a href="/admin/orders" className="block rounded px-4 py-2 transition hover:bg-gray-700">
+          </Link>
+          <Link href="/admin/orders" className="block rounded px-4 py-2 transition hover:bg-gray-700">
             {t.orders}
-          </a>
-          <a href="/admin/users" className="block rounded px-4 py-2 transition hover:bg-gray-700">
+          </Link>
+          <Link href="/admin/warranties" className="block rounded px-4 py-2 transition hover:bg-gray-700">
+            {t.warranties}
+          </Link>
+          <Link href="/admin/users" className="block rounded px-4 py-2 transition hover:bg-gray-700">
             {t.users}
-          </a>
+          </Link>
         </nav>
       </aside>
 

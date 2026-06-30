@@ -1,6 +1,6 @@
 "use client";
 
-import { AdminLayout } from "../AdminLayout";
+
 import { useLanguage } from "@/app/providers";
 import { useEffect, useMemo, useState } from "react";
 
@@ -134,8 +134,7 @@ export default function AdminUsers() {
   };
 
   return (
-    <AdminLayout>
-      <div className="space-y-6">
+    <div className="space-y-6">
         <div>
           <p className="text-sm font-black uppercase tracking-[0.16em] text-blue-600">
             MOCO Users
@@ -229,6 +228,5 @@ export default function AdminUsers() {
           </div>
         )}
       </div>
-    </AdminLayout>
   );
 }

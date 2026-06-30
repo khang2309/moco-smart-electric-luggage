@@ -1,6 +1,6 @@
 "use client";
 
-import { AdminLayout } from "./AdminLayout";
+
 import { useLanguage } from "@/app/providers";
 import { useEffect, useMemo, useState } from "react";
 
@@ -297,9 +297,8 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <AdminLayout>
-      <div className="space-y-8">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+    <div className="space-y-8">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-sm font-bold uppercase tracking-[0.18em] text-blue-600">{labels.analytics}</p>
             <h1 className="mt-2 text-3xl font-black text-gray-950 sm:text-4xl">{labels.title}</h1>
@@ -452,6 +451,5 @@ export default function AdminDashboard() {
           </>
         )}
       </div>
-    </AdminLayout>
   );
 }
