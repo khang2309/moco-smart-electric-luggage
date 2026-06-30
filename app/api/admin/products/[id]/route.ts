@@ -19,7 +19,7 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const { slug, name, description, price, oldPrice, image, stock, store, subtitle, status } = await request.json();
+    const { slug, name, description, price, oldPrice, image, stock, store, subtitle, status, colors } = await request.json();
 
     if (!name || !price) {
       return NextResponse.json(
@@ -46,6 +46,7 @@ export async function PUT(
           store: store || "MOCO Official",
           subtitle: subtitle || description || "",
           status: status || "active",
+          colors: Array.isArray(colors) ? colors : [],
           updatedAt: new Date(),
         },
       },

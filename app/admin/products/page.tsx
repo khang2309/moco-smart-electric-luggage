@@ -16,6 +16,7 @@ type Product = {
   image?: string;
   stock: number;
   status?: "active" | "draft" | "deleted";
+  colors?: { name: string; hex: string; image: string }[];
   createdAt?: string;
   updatedAt?: string;
 };
@@ -31,6 +32,7 @@ type ProductForm = {
   stock: string;
   store: string;
   status: string;
+  colors: { name: string; hex: string; image: string }[];
 };
 
 const emptyForm: ProductForm = {
@@ -44,6 +46,7 @@ const emptyForm: ProductForm = {
   stock: "",
   store: "MOCO Official",
   status: "active",
+  colors: [],
 };
 
 const text = {
@@ -94,6 +97,11 @@ const text = {
     activeStatus: "Đang kích hoạt",
     draftStatus: "Đã ẩn",
     deletedStatus: "Đã xóa",
+    colors: "Màu sắc",
+    addColor: "Thêm màu",
+    colorName: "Tên màu",
+    colorHex: "Mã màu (Hex)",
+    colorImage: "URL ảnh màu",
   },
   en: {
     title: "Product & Inventory Management",
@@ -142,6 +150,11 @@ const text = {
     activeStatus: "Active",
     draftStatus: "Hidden",
     deletedStatus: "Deleted",
+    colors: "Colors",
+    addColor: "Add color",
+    colorName: "Color name",
+    colorHex: "Color hex",
+    colorImage: "Color image URL",
   },
 } as const;
 
@@ -191,6 +204,7 @@ function productToForm(product: Product): ProductForm {
     stock: String(product.stock || 0),
     store: product.store || "MOCO Official",
     status: product.status || "active",
+    colors: product.colors || [],
   };
 }
 
@@ -498,7 +512,85 @@ export default function AdminProducts() {
                   className="rounded-lg border border-gray-200 px-3 py-2 font-semibold outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 />
               </label>
-              <div className="flex flex-wrap gap-2 lg:col-span-4">
+              <div className="lg:col-span-4 border-t border-gray-100 pt-4 mt-2">
+                <div className="flex items-center justify-between mb-3">
+                  <label className="text-sm font-bold text-gray-700">{labels.colors}</label>
+                  <button
+                    type="button"
+                    onClick={() => setFormData(cur => ({ ...cur, colors: [...cur.colors, { name: "", hex: "#000000", image: "" }] }))}
+                    className="text-xs font-black text-blue-600 bg-blue-50 px-3 py-1 rounded-full hover:bg-blue-100"
+                  >
+                    + {labels.addColor}
+                  </button>
+                </div>
+                <div className="space-y-3">
+                  {formData.colors.map((color, index) => (
+                    <div key={index} className="flex flex-col gap-3 rounded-xl border border-gray-100 bg-gray-50/50 p-4 md:flex-row md:items-center">
+                      <div className="flex flex-1 items-center gap-3">
+                        <label className="relative flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-white shadow-sm ring-1 ring-gray-200 hover:ring-blue-400" title="Chọn màu">
+                          <input
+                            type="color"
+                            value={color.hex}
+                            onChange={(e) => {
+                              const newColors = [...formData.colors];
+                              newColors[index].hex = e.target.value;
+                              setFormData(cur => ({ ...cur, colors: newColors }));
+                            }}
+                            className="absolute -left-4 -top-4 h-20 w-20 cursor-pointer"
+                          />
+                        </label>
+                        <div className="flex-1">
+                          <input
+                            type="text"
+                            placeholder={labels.colorName}
+                            required
+                            value={color.name}
+                            onChange={(e) => {
+                              const newColors = [...formData.colors];
+                              newColors[index].name = e.target.value;
+                              setFormData(cur => ({ ...cur, colors: newColors }));
+                            }}
+                            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm font-semibold outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex flex-[1.5] items-center gap-3">
+                        <div className="flex-1">
+                          <input
+                            type="text"
+                            placeholder={labels.colorImage}
+                            required
+                            value={color.image}
+                            onChange={(e) => {
+                              const newColors = [...formData.colors];
+                              newColors[index].image = e.target.value;
+                              setFormData(cur => ({ ...cur, colors: newColors }));
+                            }}
+                            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm font-semibold outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                          />
+                        </div>
+                        {color.image && (
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white p-1">
+                            <img src={color.image} alt="" className="h-full w-full object-contain" />
+                          </div>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newColors = formData.colors.filter((_, i) => i !== index);
+                            setFormData(cur => ({ ...cur, colors: newColors }));
+                          }}
+                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-red-50 text-red-600 transition hover:bg-red-100"
+                          title="Xóa màu này"
+                        >
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2 lg:col-span-4 mt-2">
                 <button
                   type="submit"
                   disabled={isSaving}

@@ -700,6 +700,8 @@ export default function ProductDetailPage() {
   const [liveStatus, setLiveStatus] = useState<"active" | "draft" | "deleted" | null>(null);
   const [liveStock, setLiveStock] = useState<number | null>(null);
   const [isFetchingStatus, setIsFetchingStatus] = useState(true);
+  const [colors, setColors] = useState<{ name: string; hex: string; image: string }[]>([]);
+  const [selectedColor, setSelectedColor] = useState<{ name: string; hex: string; image: string } | null>(null);
 
   const product = products.find((item) => item.slug === params?.slug) ?? products[0];
   const details = product[language];
@@ -713,6 +715,10 @@ export default function ProductDetailPage() {
         if (dbProduct) {
           setLiveStatus(dbProduct.status || "active");
           setLiveStock(dbProduct.stock ?? 0);
+          if (dbProduct.colors && dbProduct.colors.length > 0) {
+            setColors(dbProduct.colors);
+            setSelectedColor(dbProduct.colors[0]);
+          }
         } else {
           setLiveStatus("deleted");
         }
@@ -767,14 +773,14 @@ export default function ProductDetailPage() {
 
   const handleAddToCart = () => {
     const cartItem = {
-      slug: product.slug,
-      name: "MOCO Smart Electric Luggage",
-      image: product.image,
+      slug: selectedColor ? `${product.slug}-${selectedColor.name}` : product.slug,
+      name: product.name,
+      image: selectedColor?.image || product.image,
       quantity,
       price: 8990000,
       oldPrice: 9490000,
       store: "MOCO Store",
-      subtitle: "Smart Mobility Carry-on",
+      subtitle: selectedColor ? (language === "vi" ? `Màu: ${selectedColor.name}` : `Color: ${selectedColor.name}`) : "Smart Mobility Carry-on",
     };
 
     try {
@@ -816,7 +822,7 @@ export default function ProductDetailPage() {
             </svg>
           </button>
           <Image
-            src={product.image}
+            src={selectedColor?.image || product.image}
             alt={t.imageAlt}
             fill
             sizes="(max-width: 920px) 100vw, 56vw"
@@ -841,8 +847,32 @@ export default function ProductDetailPage() {
              <div className="rounded-lg border border-amber-100 bg-amber-50 p-4 text-center text-sm font-bold text-amber-700">
                {language === "vi" ? "Sản phẩm đang tạm hết hàng." : "Product is temporarily out of stock."}
              </div>
-          ) : (
+           ) : (
             <>
+              {colors.length > 0 && (
+                <div className="product-color-selector mb-6">
+                  <strong className="block mb-2 text-sm font-bold text-gray-950">
+                    {language === "vi" ? "Màu sắc: " : "Color: "} 
+                    <span className="font-normal text-gray-600">{selectedColor?.name}</span>
+                  </strong>
+                  <div className="flex gap-3">
+                    {colors.map((color) => (
+                      <button
+                        key={color.name}
+                        type="button"
+                        onClick={() => setSelectedColor(color)}
+                        className={`h-8 w-8 rounded-full border-2 transition-all ${
+                          selectedColor?.name === color.name ? "border-gray-950 scale-110" : "border-gray-200 hover:border-gray-400"
+                        }`}
+                        style={{ backgroundColor: color.hex }}
+                        aria-label={color.name}
+                        aria-pressed={selectedColor?.name === color.name}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+              
               <div className="product-buy-row">
                 <strong>{t.quantity}</strong>
                 <div className="quantity-control" aria-label={t.quantity}>
@@ -877,7 +907,7 @@ export default function ProductDetailPage() {
           {showCartFlyer && (
             <Image
               className="cart-flyer"
-              src={product.image}
+              src={selectedColor?.image || product.image}
               alt=""
               width={74}
               height={74}
