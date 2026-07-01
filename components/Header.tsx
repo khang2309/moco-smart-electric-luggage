@@ -113,6 +113,7 @@ export default function Header() {
   const [isCartPulsing, setIsCartPulsing] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [userInfo, setUserInfo] = useState<{
     name: string;
     email: string;
@@ -319,6 +320,11 @@ export default function Header() {
     const selectedItems = cartItems.filter((item) => selectedCartSlugs.includes(item.slug));
 
     if (selectedItems.length === 0) return;
+
+    if (!isLoggedIn) {
+      setShowLoginPrompt(true);
+      return;
+    }
 
     window.localStorage.setItem("moco-checkout-items", JSON.stringify(selectedItems));
     setIsCartOpen(false);
@@ -883,6 +889,46 @@ export default function Header() {
               </>
             )}
           </aside>
+        </div>
+      )}
+      {showLoginPrompt && (
+        <div
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[10000] p-4"
+          onClick={() => setShowLoginPrompt(false)}
+        >
+          <div
+            className="bg-white rounded-2xl p-6 md:p-8 max-w-[420px] w-full shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h3 className="text-[22px] font-black text-gray-900 mb-3">
+              {language === "vi" ? "Yêu cầu đăng nhập" : "Login Required"}
+            </h3>
+            <p className="text-gray-600 font-bold leading-relaxed mb-8">
+              {language === "vi"
+                ? "Bạn cần đăng nhập tài khoản MOCO để có thể tiến hành thanh toán."
+                : "You need to log in to your MOCO account to proceed to checkout."}
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                type="button"
+                className="px-5 py-2.5 rounded-xl font-bold text-gray-500 hover:bg-gray-100 transition-colors"
+                onClick={() => setShowLoginPrompt(false)}
+              >
+                {language === "vi" ? "Hủy" : "Cancel"}
+              </button>
+              <button
+                type="button"
+                className="px-5 py-2.5 rounded-xl font-bold text-white bg-gray-900 hover:bg-black transition-colors shadow-lg shadow-gray-900/20"
+                onClick={() => {
+                  setShowLoginPrompt(false);
+                  setIsCartOpen(false);
+                  router.push("/login?callbackUrl=/checkout");
+                }}
+              >
+                {language === "vi" ? "Đăng nhập ngay" : "Login Now"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </>

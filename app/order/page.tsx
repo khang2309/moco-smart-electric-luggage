@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useLanguage } from "../providers";
+import { readCurrentUser } from "../auth-storage";
 
 type OrderItem = {
   quantity: number;
@@ -18,13 +20,14 @@ type MocoOrder = {
   payment: string;
   createdAt?: string;
   estimatedDelivery?: string;
+  customer?: { email?: string; fullName?: string; phone?: string; address?: string };
 };
 
 const copy = {
   vi: {
     kicker: "Qu\u1ea3n l\u00fd \u0111\u01a1n h\u00e0ng",
     title: "Danh s\u00e1ch \u0111\u01a1n h\u00e0ng",
-    intro: "Xem l\u1ea1i c\u00e1c \u0111\u01a1n MOCO \u0111\u00e3 \u0111\u1eb7t tr\u00ean thi\u1ebft b\u1ecb n\u00e0y. Ch\u1ecdn m\u1ed9t \u0111\u01a1n \u0111\u1ec3 xem chi ti\u1ebft tr\u1ea1ng th\u00e1i, thanh to\u00e1n v\u00e0 s\u1ea3n ph\u1ea9m.",
+    intro: "Xem lại các đơn hàng MOCO đã đặt trên thiết bị này.\nChọn một đơn hàng để xem chi tiết trạng thái, thông tin thanh toán và các sản phẩm đã đặt.",
     searchPlaceholder: "Nh\u1eadp m\u00e3 \u0111\u01a1n h\u00e0ng",
     search: "T\u00ecm \u0111\u01a1n",
     clear: "Xem t\u1ea5t c\u1ea3",
@@ -113,16 +116,31 @@ export default function OrderPage() {
   const [orders, setOrders] = useState<MocoOrder[]>([]);
   const [query, setQuery] = useState("");
   const [submittedQuery, setSubmittedQuery] = useState("");
+  const [isChecking, setIsChecking] = useState(true);
+  const router = useRouter();
   const { language } = useLanguage();
   const labels = copy[language];
   const currency = new Intl.NumberFormat("vi-VN").format;
 
   useEffect(() => {
+    const user = readCurrentUser();
+
     try {
       const rawOrders = window.localStorage.getItem("moco-orders");
       const rawLastOrder = window.localStorage.getItem("moco-last-order");
-      const parsedOrders: MocoOrder[] = rawOrders ? JSON.parse(rawOrders) : [];
-      const lastOrder: MocoOrder | null = rawLastOrder ? JSON.parse(rawLastOrder) : null;
+      let parsedOrders: MocoOrder[] = rawOrders ? JSON.parse(rawOrders) : [];
+      let lastOrder: MocoOrder | null = rawLastOrder ? JSON.parse(rawLastOrder) : null;
+
+      if (user) {
+        parsedOrders = parsedOrders.filter((o) => o.customer?.email === user.email);
+        if (lastOrder && lastOrder.customer?.email !== user.email) {
+          lastOrder = null;
+        }
+      } else {
+        parsedOrders = [];
+        lastOrder = null;
+      }
+
       const mergedOrders =
         lastOrder && !parsedOrders.some((order) => order.code === lastOrder.code)
           ? [lastOrder, ...parsedOrders]
@@ -131,8 +149,10 @@ export default function OrderPage() {
       setOrders(mergedOrders);
     } catch {
       setOrders([]);
+    } finally {
+      setIsChecking(false);
     }
-  }, []);
+  }, [router]);
 
   const visibleOrders = useMemo(() => {
     const normalizedQuery = submittedQuery.trim().toUpperCase();
@@ -148,13 +168,22 @@ export default function OrderPage() {
     setSubmittedQuery(query);
   };
 
+  if (isChecking) return null;
+
   return (
     <main className="order-page">
       <section className="order-hero">
         <div className="order-hero-copy">
           <p className="order-kicker">{labels.kicker}</p>
           <h1>{labels.title}</h1>
-          <p>{labels.intro}</p>
+          <p>
+            {labels.intro.split('\n').map((line, index) => (
+              <span key={index}>
+                {line}
+                {index === 0 && <br />}
+              </span>
+            ))}
+          </p>
         </div>
         <form className="order-search" onSubmit={handleSearch}>
           <input
@@ -228,31 +257,31 @@ export default function OrderPage() {
             <span>{visibleOrders.length} / {orders.length}</span>
           </div>
           <div className="order-list-grid">
-          {visibleOrders.map((order) => {
-            const status = getFulfillmentStatus(order);
-            const itemCount = order.items?.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
+            {visibleOrders.map((order) => {
+              const status = getFulfillmentStatus(order);
+              const itemCount = order.items?.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
 
-            return (
-              <article className="order-list-card" data-status={status} key={order.code}>
-                <div className="order-list-card-top">
-                  <span>{labels[status]}</span>
-                  <strong>{order.code}</strong>
-                </div>
-                <dl>
-                  <div><dt>{labels.orderDate}</dt><dd>{formatDate(order.createdAt, language)}</dd></div>
-                  <div><dt>{labels.estimate}</dt><dd>{formatDate(order.estimatedDelivery, language)}</dd></div>
-                  <div><dt>{labels.total}</dt><dd>{currency(order.total)} VND</dd></div>
-                </dl>
-                <div className="order-list-card-footer">
-                  <div>
-                    <span>{itemCount} {labels.itemCount}</span>
-                    <small>{order.paymentStatus === "paid" ? labels.paid : labels.pending}</small>
+              return (
+                <article className="order-list-card" data-status={status} key={order.code}>
+                  <div className="order-list-card-top">
+                    <span>{labels[status]}</span>
+                    <strong>{order.code}</strong>
                   </div>
-                  <Link href={`/order/${encodeURIComponent(order.code)}`}>{labels.details}</Link>
-                </div>
-              </article>
-            );
-          })}
+                  <dl>
+                    <div><dt>{labels.orderDate}</dt><dd>{formatDate(order.createdAt, language)}</dd></div>
+                    <div><dt>{labels.estimate}</dt><dd>{formatDate(order.estimatedDelivery, language)}</dd></div>
+                    <div><dt>{labels.total}</dt><dd>{currency(order.total)} VND</dd></div>
+                  </dl>
+                  <div className="order-list-card-footer">
+                    <div>
+                      <span>{itemCount} {labels.itemCount}</span>
+                      <small>{order.paymentStatus === "paid" ? labels.paid : labels.pending}</small>
+                    </div>
+                    <Link href={`/order/${encodeURIComponent(order.code)}`}>{labels.details}</Link>
+                  </div>
+                </article>
+              );
+            })}
           </div>
         </section>
       )}

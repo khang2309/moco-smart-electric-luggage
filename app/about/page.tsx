@@ -47,13 +47,6 @@ export default function AboutPage() {
 
   return (
     <main className="about-page">
-      <section className="about-hero-page">
-        <div>
-          <strong>{copy.brand}</strong>
-          <p>{copy.subtitle}</p>
-        </div>
-      </section>
-
       <section className="about-team-photo-wrapper">
         <Image
           src="/assets/about-team.png"
@@ -66,6 +59,7 @@ export default function AboutPage() {
       </section>
 
       <h1 className="about-title-below-photo">{copy.title}</h1>
+      <p className="about-subtitle-below-photo">{copy.subtitle}</p>
 
       <section className="about-page-content">
         <article>

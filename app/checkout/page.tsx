@@ -56,6 +56,12 @@ export default function CheckoutPage() {
   const currency = new Intl.NumberFormat("vi-VN").format;
 
   useEffect(() => {
+    const isAuth = window.localStorage.getItem("moco-auth") === "true";
+    if (!isAuth) {
+      router.push("/login?callbackUrl=/checkout");
+      return;
+    }
+
     try {
       const rawCheckout = window.localStorage.getItem("moco-checkout-items");
       const rawCart = window.localStorage.getItem("moco-cart");

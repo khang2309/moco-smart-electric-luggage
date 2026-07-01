@@ -2,9 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useLanguage } from "../../providers";
+import { readCurrentUser } from "../../auth-storage";
 
 type OrderItem = {
   slug: string;
@@ -24,6 +25,7 @@ type MocoOrder = {
   payment: string;
   createdAt?: string;
   estimatedDelivery?: string;
+  customer?: { email?: string; fullName?: string; phone?: string; address?: string };
 };
 
 const copy = {
@@ -108,17 +110,32 @@ function getActiveStep(order: MocoOrder) {
 export default function OrderDetailPage() {
   const params = useParams<{ code: string }>();
   const [orders, setOrders] = useState<MocoOrder[]>([]);
+  const [isChecking, setIsChecking] = useState(true);
+  const router = useRouter();
   const { language } = useLanguage();
   const labels = copy[language];
   const currency = new Intl.NumberFormat("vi-VN").format;
   const orderCode = decodeURIComponent(params?.code ?? "");
 
   useEffect(() => {
+    const user = readCurrentUser();
+
     try {
       const rawOrders = window.localStorage.getItem("moco-orders");
       const rawLastOrder = window.localStorage.getItem("moco-last-order");
-      const parsedOrders: MocoOrder[] = rawOrders ? JSON.parse(rawOrders) : [];
-      const lastOrder: MocoOrder | null = rawLastOrder ? JSON.parse(rawLastOrder) : null;
+      let parsedOrders: MocoOrder[] = rawOrders ? JSON.parse(rawOrders) : [];
+      let lastOrder: MocoOrder | null = rawLastOrder ? JSON.parse(rawLastOrder) : null;
+
+      if (user) {
+        parsedOrders = parsedOrders.filter((o) => o.customer?.email === user.email);
+        if (lastOrder && lastOrder.customer?.email !== user.email) {
+          lastOrder = null;
+        }
+      } else {
+        parsedOrders = [];
+        lastOrder = null;
+      }
+
       const mergedOrders =
         lastOrder && !parsedOrders.some((order) => order.code === lastOrder.code)
           ? [lastOrder, ...parsedOrders]
@@ -127,13 +144,17 @@ export default function OrderDetailPage() {
       setOrders(mergedOrders);
     } catch {
       setOrders([]);
+    } finally {
+      setIsChecking(false);
     }
-  }, []);
+  }, [router]);
 
   const order = useMemo(
     () => orders.find((item) => item.code.toUpperCase() === orderCode.toUpperCase()) ?? null,
     [orders, orderCode],
   );
+
+  if (isChecking) return null;
 
   if (!order) {
     return (
