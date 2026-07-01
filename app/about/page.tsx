@@ -11,7 +11,7 @@ const aboutCopy = {
       "Vali điện thông minh cho những chuyến đi hiện đại và trải nghiệm di chuyển tiện lợi",
     storyTitle: "OUR STORY",
     story:
-      "MOCO ra đời từ một câu hỏi đơn giản: tại sao việc mang hành lý lại luôn nặng nề và bất tiện? Chúng tôi nhận thấy việc di chuyển tại sân bay, nhà ga hay trong các chuyến đi xa luôn tốn nhiều sức lực, đặc biệt với hành lý cồng kềnh. Từ đó, MOCO được tạo ra với mục tiêu biến hành lý thành một phương tiện di chuyển thông minh.",
+      "MOCO ra đời từ một câu hỏi đơn giản: tại sao việc mang hành lý lại luôn nặng nề và bất tiện? Chúng tôi nhận thấy việc di chuyển tại sân bay, nhà ga hay\ntrong các chuyến đi xa luôn tốn nhiều sức lực, đặc biệt với hành lý cồng kềnh. Từ đó, MOCO được tạo ra với mục tiêu biến hành lý thành một phương tiện di chuyển thông minh.",
     visionTitle: "OUR VISION",
     vision:
       "Trở thành một trong những giải pháp dẫn đầu trong lĩnh vực hành lý thông minh và di chuyển cá nhân.",
@@ -29,7 +29,7 @@ const aboutCopy = {
       "Smart electric luggage for modern journeys and convenient mobility experiences",
     storyTitle: "OUR STORY",
     story:
-      "MOCO began with a simple question: why does carrying luggage always feel heavy and inconvenient? We saw that moving through airports, stations, and long trips often consumes too much energy, especially with bulky luggage. MOCO was created to turn luggage into a smart personal mobility solution.",
+      "MOCO began with a simple question: why does carrying luggage always feel heavy and inconvenient? We saw that moving through airports, stations, and\nlong trips often consumes too much energy, especially with bulky luggage. MOCO was created to turn luggage into a smart personal mobility solution.",
     visionTitle: "OUR VISION",
     vision: "Become a leading solution in smart luggage and personal mobility.",
     missionTitle: "OUR MISSION",
@@ -59,6 +59,7 @@ export default function AboutPage() {
       </section>
 
       <h1 className="about-title-below-photo">{copy.title}</h1>
+      <h2 style={{ textAlign: "center", fontSize: "22px", fontWeight: "900", fontFamily: "var(--font-title)", color: "#111827", margin: "10px auto 0" }}>{copy.brand}</h2>
       <p className="about-subtitle-below-photo">{copy.subtitle}</p>
 
       <section className="about-page-content">

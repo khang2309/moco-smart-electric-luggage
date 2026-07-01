@@ -5743,10 +5743,11 @@ textarea {
   font-size: 13px;
   font-weight: 600;
   line-height: 1.6;
+  white-space: pre-line;
 }
 
 .about-page-content {
-  width: min(960px, calc(100% - 36px));
+  width: min(1180px, calc(100% - 36px));
   display: grid;
   gap: 26px;
   margin: 0 auto;
