@@ -42,6 +42,9 @@ body {
   font-family: var(--font-body);
   font-size: 13px;
   overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
   background:
     radial-gradient(
       circle at 22% 8%,
@@ -49,6 +52,10 @@ body {
       transparent 28rem
     ),
     linear-gradient(145deg, #f9fbff 0%, #eef5ff 48%, #f8fbff 100%);
+}
+
+main {
+  flex: 1;
 }
 
 main,
@@ -5698,7 +5705,7 @@ textarea {
 }
 
 .about-title-below-photo {
-  width: min(960px, calc(100% - 36px));
+  width: min(1440px, calc(100% - 36px));
   margin: 28px auto 0;
   color: #050505;
   font-family: var(--font-title);
@@ -5710,7 +5717,7 @@ textarea {
 }
 
 .about-subtitle-below-photo {
-  width: min(760px, calc(100% - 36px));
+  width: min(1080px, calc(100% - 36px));
   margin: 12px auto 0;
   color: var(--muted);
   font-family: var(--font-body);
@@ -5747,8 +5754,9 @@ textarea {
 }
 
 .about-page-content {
-  width: min(1180px, calc(100% - 36px));
+  width: min(1440px, calc(100% - 36px));
   display: grid;
+  grid-template-columns: 1fr;
   gap: 26px;
   margin: 0 auto;
   padding: 42px 0 72px;
@@ -5756,7 +5764,7 @@ textarea {
 }
 
 .about-team-photo-wrapper {
-  width: min(1180px, calc(100% - 32px));
+  width: min(1440px, calc(100% - 32px));
   margin: 34px auto 0;
   border-radius: 8px;
   background: linear-gradient(90deg, #eeeeee, #ffffff 46%, #d8d8d8);
@@ -8908,3 +8916,15 @@ html[lang="vi"] .home-featured-title {
     min-height: 0;
   }
 }
+
+@media (min-width: 1600px) {
+  .hero,
+  .new-arrival,
+  .home-showcase,
+  .home-audience {
+    min-height: 56.25vw !important;
+    background-position: center center !important;
+  }
+}
+
+
