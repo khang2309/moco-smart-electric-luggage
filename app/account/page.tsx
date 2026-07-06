@@ -261,7 +261,7 @@ function AccountContent() {
               <div className="space-y-4">
                 {registeredProducts.map((prod, idx) => (
                   <div key={idx} className="registered-product relative">
-                    <Image src="/assets/Product/mocoGO.png" alt="" width={72} height={96} />
+                    <Image src="/assets/Product/mocoGO.png" alt="" width={72} height={96} style={{ width: "auto", height: "auto" }} />
                     <div>
                       <span>Model</span>
                       <strong>{prod.model}</strong>
