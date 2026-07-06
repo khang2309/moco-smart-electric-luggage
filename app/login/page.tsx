@@ -12,6 +12,8 @@ const copy = {
     title: "Đăng nhập MOCO Account",
     noAccount: "Bạn chưa có tài khoản?",
     signup: "Tạo tài khoản mới",
+    google: "Tiếp tục với Google",
+    or: "Hoặc đăng nhập với email",
     email: "Email *",
     password: "Mật khẩu *",
     forgot: "Quên mật khẩu?",
@@ -27,6 +29,8 @@ const copy = {
     title: "Log in to your MOCO account",
     noAccount: "Do not have an account?",
     signup: "Create a new account",
+    google: "Continue with Google",
+    or: "Or log in with email",
     email: "Email *",
     password: "Password *",
     forgot: "Forgot password?",
@@ -89,6 +93,13 @@ export default function LoginPage() {
           <p>
             {currentCopy.noAccount} <Link href="/signup">{currentCopy.signup}</Link>
           </p>
+          <a href="/api/auth/google" className="google-login-btn">
+            <Image src="/assets/google-icon.svg" alt="Google" width={20} height={20} />
+            {currentCopy.google}
+          </a>
+          <div className="login-divider">
+            <span>{currentCopy.or}</span>
+          </div>
           <label>
             <span>{currentCopy.email}</span>
             <input type="email" name="email" autoComplete="email" required />

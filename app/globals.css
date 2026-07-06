@@ -5430,6 +5430,49 @@ textarea {
   font-weight: 800;
 }
 
+.google-login-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 46px;
+  border-radius: 8px;
+  border: 1px solid #d8dbe2;
+  background: #ffffff;
+  color: #111827;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.google-login-btn:hover {
+  background: #f9fafb;
+  border-color: #cbd5e1;
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 4px 0;
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.login-divider span {
+  padding: 0 10px;
+  color: #9ca3af;
+  font-size: 12px;
+  font-weight: 500;
+}
+
 @media (max-width: 720px) {
   .login-hero {
     justify-items: center;
