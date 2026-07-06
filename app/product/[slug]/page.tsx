@@ -613,7 +613,7 @@ function ProductFeatureShowcase({
         <p>{labels.intro}</p>
       </div>
 
-      <div className="product-feature-stage">
+      <div className="product-feature-stage" onClick={() => setSelectedFeatureId(null)}>
         <div className="feature-product-cluster">
           <div className="feature-product-image">
             <Image src={product.image} alt={labels.productAlt} fill sizes="(max-width: 760px) 78vw, 34vw" />
@@ -635,7 +635,10 @@ function ProductFeatureShowcase({
                   type="button"
                   key={feature.id}
                   aria-pressed={isSelected}
-                  onClick={() => setSelectedFeatureId(feature.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedFeatureId(isSelected ? null : feature.id);
+                  }}
                 >
                   <span className="feature-orbit-icon">
                     <ShowcaseFeatureIcon type={feature.icon} />
@@ -647,7 +650,7 @@ function ProductFeatureShowcase({
           </div>
         </div>
 
-        <div className="feature-detail-panel" aria-live="polite">
+        <div className="feature-detail-panel" aria-live="polite" onClick={(e) => e.stopPropagation()}>
           {selectedFeature && selectedCopy ? (
             <>
               <button className="feature-reset-button" type="button" onClick={() => setSelectedFeatureId(null)}>
