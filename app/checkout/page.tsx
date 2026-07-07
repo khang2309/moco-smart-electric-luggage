@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useLanguage } from "../providers";
+import { showToast } from "../toast";
 
 type CartItem = {
   slug: string;
@@ -116,10 +117,11 @@ export default function CheckoutPage() {
     }
   };
 
-  const completeOrder = async (status: "paid" | "pending", customer = checkoutCustomer) => {
+  const handleCreateOrder = async (status: "paid" | "pending", customer = checkoutCustomer) => {
     const createdAt = new Date();
     const estimatedDelivery = new Date(createdAt);
     estimatedDelivery.setDate(createdAt.getDate() + (shipping === "express" ? 2 : shipping === "pickup" ? 1 : 5));
+    const orderState = status === "paid" ? "CONFIRMED" : "PENDING";
 
     const order = {
       code: `MOCO-${Date.now().toString().slice(-6)}`,
@@ -127,6 +129,7 @@ export default function CheckoutPage() {
       total,
       paymentStatus: status,
       fulfillmentStatus: "processing",
+      status: orderState,
       shipping: shippingOptions[shipping][language],
       payment: paymentOptions[payment][language],
       createdAt: createdAt.toISOString(),
@@ -150,6 +153,7 @@ export default function CheckoutPage() {
     );
     window.localStorage.removeItem("moco-checkout-items");
     window.dispatchEvent(new Event("moco-cart-updated"));
+    showToast(`\u0110\u1eb7t h\u00e0ng th\u00e0nh c\u00f4ng! M\u00e3 \u0111\u01a1n h\u00e0ng c\u1ee7a b\u1ea1n l\u00e0 #${order.code}`, "success");
     router.push("/checkout/success");
   };
 
@@ -169,7 +173,7 @@ export default function CheckoutPage() {
       return;
     }
 
-    completeOrder("pending", customer);
+    handleCreateOrder("pending", customer);
   };
 
   if (items.length === 0) {
@@ -268,7 +272,7 @@ export default function CheckoutPage() {
               <h2>{language === "vi" ? "C\u1ed5ng thanh to\u00e1n m\u00f4 ph\u1ecfng" : "Payment gateway simulation"}</h2>
               <p>{language === "vi" ? "X\u00e1c th\u1ef1c OTP ho\u1eb7c x\u00e1c nh\u1eadn tr\u00ean \u1ee9ng d\u1ee5ng ng\u00e2n h\u00e0ng/v\u00ed \u0111i\u1ec7n t\u1eed." : "Confirm OTP or approve the payment in your banking/e-wallet app."}</p>
               <div>
-                <button type="button" onClick={() => completeOrder("paid")}>{language === "vi" ? "Thanh to\u00e1n th\u00e0nh c\u00f4ng" : "Payment success"}</button>
+                <button type="button" onClick={() => handleCreateOrder("paid")}>{language === "vi" ? "Thanh to\u00e1n th\u00e0nh c\u00f4ng" : "Payment success"}</button>
                 <button type="button" onClick={() => setPaymentStep("failed")}>{language === "vi" ? "Thanh to\u00e1n th\u1ea5t b\u1ea1i" : "Payment failed"}</button>
               </div>
             </div>

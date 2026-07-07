@@ -7450,6 +7450,10 @@ h2,
   background: #16a34a;
 }
 
+.order-list-card[data-status="cancelled"]::before {
+  background: #dc2626;
+}
+
 .order-list-card:hover {
   border-color: rgba(22, 129, 245, 0.44);
   box-shadow: 0 22px 58px rgba(20, 31, 50, 0.11);
@@ -7767,6 +7771,165 @@ h2,
 .order-total dd {
   color: #1681f5;
   font-size: 24px;
+}
+
+.order-recipient-block {
+  display: grid;
+  gap: 6px;
+  margin-top: 18px;
+  border-top: 1px solid #edf2f7;
+  padding-top: 18px;
+}
+
+.order-recipient-block h3,
+.order-recipient-block p {
+  margin: 0;
+}
+
+.order-recipient-block h3 {
+  color: #0f172a;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.order-recipient-block p {
+  color: #4b5563;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.order-action-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.order-action-row button,
+.order-modal-actions button {
+  min-height: 44px;
+  border: 0;
+  border-radius: 8px;
+  padding: 0 14px;
+  background: #111827;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.order-action-row button:hover,
+.order-modal-actions button:hover {
+  background: #05070b;
+  transform: translateY(-1px);
+}
+
+.order-action-row button.danger,
+.order-modal-actions button.danger {
+  background: #dc2626;
+}
+
+.order-action-row button.danger:hover,
+.order-modal-actions button.danger:hover {
+  background: #b91c1c;
+}
+
+.order-modal-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+  transform: none;
+}
+
+.order-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(15, 23, 42, 0.56);
+}
+
+.order-modal {
+  width: min(520px, 100%);
+  display: grid;
+  gap: 14px;
+  border-radius: 8px;
+  padding: clamp(20px, 4vw, 30px);
+  background: #ffffff;
+  box-shadow: 0 28px 80px rgba(15, 23, 42, 0.28);
+}
+
+.order-modal h2,
+.order-confirm-dialog p {
+  margin: 0;
+}
+
+.order-modal h2 {
+  color: #0f172a;
+  font-family: var(--font-title);
+  font-size: 26px;
+  font-weight: 900;
+}
+
+.order-modal label {
+  display: grid;
+  gap: 7px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.order-modal input,
+.order-modal textarea {
+  width: 100%;
+  border: 1px solid #dbe4ef;
+  border-radius: 8px;
+  padding: 12px 13px;
+  color: #111827;
+  background: #fbfdff;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  outline: none;
+}
+
+.order-modal textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+.order-modal input:focus,
+.order-modal textarea:focus {
+  border-color: #1681f5;
+  box-shadow: 0 0 0 3px rgba(22, 129, 245, 0.12);
+}
+
+.order-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.order-modal-actions button:first-child {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.order-modal-actions button:first-child:hover {
+  background: #d1d5db;
+}
+
+.order-confirm-dialog p {
+  color: #4b5563;
+  font-weight: 800;
+  line-height: 1.55;
 }
 
 .order-items {

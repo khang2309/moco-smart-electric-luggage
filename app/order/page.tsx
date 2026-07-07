@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useLanguage } from "../providers";
 import { readCurrentUser } from "../auth-storage";
+import { normalizeOrderState, type OrderState } from "@/lib/order-state";
 
 type OrderItem = {
   quantity: number;
@@ -14,8 +15,9 @@ type MocoOrder = {
   code: string;
   items?: OrderItem[];
   total: number;
+  status?: string;
   paymentStatus: "paid" | "pending";
-  fulfillmentStatus?: "processing" | "shipping" | "delivered";
+  fulfillmentStatus?: "pending" | "processing" | "shipping" | "shipped" | "delivered" | "cancelled";
   shipping: string;
   payment: string;
   createdAt?: string;
@@ -52,9 +54,12 @@ const copy = {
     itemCount: "s\u1ea3n ph\u1ea9m",
     paid: "\u0110\u00e3 thanh to\u00e1n",
     pending: "Thanh to\u00e1n khi nh\u1eadn h\u00e0ng",
+    pendingState: "Ch\u1edd x\u00e1c nh\u1eadn",
+    confirmedState: "\u0110\u00e3 x\u00e1c nh\u1eadn",
     processing: "\u0110ang chu\u1ea9n b\u1ecb",
     shipping: "\u0110ang giao h\u00e0ng",
     delivered: "\u0110\u00e3 giao th\u00e0nh c\u00f4ng",
+    cancelled: "\u0110\u00e3 h\u1ee7y",
   },
   en: {
     kicker: "Order management",
@@ -84,9 +89,12 @@ const copy = {
     itemCount: "items",
     paid: "Paid",
     pending: "Cash on delivery",
+    pendingState: "Pending",
+    confirmedState: "Confirmed",
     processing: "Preparing",
     shipping: "Out for delivery",
     delivered: "Delivered",
+    cancelled: "Cancelled",
   },
 } as const;
 
@@ -100,16 +108,18 @@ function formatDate(value: string | undefined, language: "vi" | "en") {
   }).format(new Date(value));
 }
 
-function getFulfillmentStatus(order: MocoOrder): "processing" | "shipping" | "delivered" {
-  if (order.fulfillmentStatus) return order.fulfillmentStatus;
-  if (!order.createdAt) return "processing";
+function getDisplayStatus(order: MocoOrder): "pendingState" | "confirmedState" | "shipping" | "delivered" | "cancelled" {
+  const state = normalizeOrderState(order);
 
-  const orderTime = new Date(order.createdAt).getTime();
-  const ageInDays = (Date.now() - orderTime) / 86400000;
+  if (state === "PENDING") return "pendingState";
+  if (state === "CONFIRMED") return "confirmedState";
+  if (state === "SHIPPING") return "shipping";
+  if (state === "DELIVERED") return "delivered";
+  return "cancelled";
+}
 
-  if (ageInDays >= 4) return "delivered";
-  if (ageInDays >= 1) return "shipping";
-  return "processing";
+function getOrderState(order: MocoOrder): OrderState {
+  return normalizeOrderState(order);
 }
 
 export default function OrderPage() {
@@ -160,8 +170,8 @@ export default function OrderPage() {
 
     return orders.filter((order) => order.code.toUpperCase().includes(normalizedQuery));
   }, [orders, submittedQuery]);
-  const completedOrders = orders.filter((order) => getFulfillmentStatus(order) === "delivered").length;
-  const activeOrders = orders.length - completedOrders;
+  const completedOrders = orders.filter((order) => getOrderState(order) === "DELIVERED").length;
+  const activeOrders = orders.filter((order) => !["DELIVERED", "CANCELLED"].includes(getOrderState(order))).length;
 
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -258,7 +268,7 @@ export default function OrderPage() {
           </div>
           <div className="order-list-grid">
             {visibleOrders.map((order) => {
-              const status = getFulfillmentStatus(order);
+              const status = getDisplayStatus(order);
               const itemCount = order.items?.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
 
               return (

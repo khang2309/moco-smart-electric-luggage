@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/lib/mongodb";
 import { getDatabaseErrorMessage } from "@/lib/api-error";
 import { decreaseInventoryForOrder } from "@/lib/inventory";
+import { toFulfillmentStatus, type OrderState } from "@/lib/order-state";
 
 type OrderItem = {
   slug?: string;
@@ -54,13 +55,19 @@ export async function POST(request: Request) {
       price: Number(item.price) || 0,
     }));
 
+    const orderState: OrderState = paymentStatus === "paid" ? "CONFIRMED" : "PENDING";
+    const legacyFulfillmentStatus =
+      fulfillmentStatus && fulfillmentStatus !== "processing"
+        ? fulfillmentStatus
+        : toFulfillmentStatus(orderState);
+
     const order = {
       code,
       items: normalizedItems,
       total: Number(total),
       paymentStatus: paymentStatus === "paid" ? "paid" : "pending",
-      fulfillmentStatus: fulfillmentStatus || "processing",
-      status: paymentStatus === "paid" ? "processing" : "pending",
+      fulfillmentStatus: legacyFulfillmentStatus,
+      status: orderState,
       shipping: shipping || "",
       payment: payment || "",
       email: customer?.email || email || "",

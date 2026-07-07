@@ -3,9 +3,18 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useLanguage } from "../../providers";
 import { readCurrentUser } from "../../auth-storage";
+import { showToast } from "../../toast";
+import {
+  cancelOrder,
+  canUserManageOrder,
+  getOrderActionBlockedMessage,
+  getOrderState,
+  updateOrderRecipient,
+  type RecipientInfo,
+} from "../order-management";
 
 type OrderItem = {
   slug: string;
@@ -19,13 +28,18 @@ type MocoOrder = {
   code: string;
   items?: OrderItem[];
   total: number;
+  status?: string;
   paymentStatus: "paid" | "pending";
-  fulfillmentStatus?: "processing" | "shipping" | "delivered";
+  fulfillmentStatus?: "pending" | "processing" | "shipping" | "shipped" | "delivered" | "cancelled";
   shipping: string;
   payment: string;
   createdAt?: string;
   estimatedDelivery?: string;
   customer?: { email?: string; fullName?: string; phone?: string; address?: string };
+  email?: string;
+  fullName?: string;
+  phone?: string;
+  address?: string;
 };
 
 const copy = {
@@ -44,13 +58,29 @@ const copy = {
     payment: "Thanh to\u00e1n",
     delivery: "V\u1eadn chuy\u1ec3n",
     total: "T\u1ed5ng thanh to\u00e1n",
+    recipient: "Th\u00f4ng tin nh\u1eadn h\u00e0ng",
+    fullName: "H\u1ecd v\u00e0 t\u00ean",
+    phone: "S\u1ed1 \u0111i\u1ec7n tho\u1ea1i",
+    email: "Email",
+    address: "\u0110\u1ecba ch\u1ec9",
+    update: "C\u1eadp nh\u1eadt th\u00f4ng tin",
+    cancel: "H\u1ee7y \u0111\u01a1n h\u00e0ng",
+    save: "L\u01b0u thay \u0111\u1ed5i",
+    close: "\u0110\u00f3ng",
+    updateTitle: "C\u1eadp nh\u1eadt th\u00f4ng tin nh\u1eadn h\u00e0ng",
+    cancelTitle: "X\u00e1c nh\u1eadn h\u1ee7y \u0111\u01a1n",
+    cancelText: "B\u1ea1n c\u00f3 ch\u1eafc ch\u1eafn mu\u1ed1n h\u1ee7y \u0111\u01a1n h\u00e0ng n\u00e0y?",
+    confirmCancel: "\u0110\u1ed3ng \u00fd h\u1ee7y",
     itemCount: "s\u1ea3n ph\u1ea9m",
     steps: ["\u0110\u00e3 \u0111\u1eb7t h\u00e0ng", "X\u00e1c nh\u1eadn thanh to\u00e1n", "\u0110ang chu\u1ea9n b\u1ecb", "\u0110ang giao h\u00e0ng", "Ho\u00e0n t\u1ea5t"],
     paid: "\u0110\u00e3 thanh to\u00e1n",
     pending: "Thanh to\u00e1n khi nh\u1eadn h\u00e0ng",
+    pendingState: "Ch\u1edd x\u00e1c nh\u1eadn",
+    confirmedState: "\u0110\u00e3 x\u00e1c nh\u1eadn",
     processing: "\u0110ang chu\u1ea9n b\u1ecb \u0111\u01a1n h\u00e0ng",
     shipping: "\u0110ang giao h\u00e0ng",
     delivered: "\u0110\u00e3 giao th\u00e0nh c\u00f4ng",
+    cancelled: "\u0110\u00e3 h\u1ee7y",
   },
   en: {
     back: "Back to orders",
@@ -67,13 +97,29 @@ const copy = {
     payment: "Payment",
     delivery: "Delivery",
     total: "Order total",
+    recipient: "Recipient information",
+    fullName: "Full name",
+    phone: "Phone number",
+    email: "Email",
+    address: "Address",
+    update: "Update information",
+    cancel: "Cancel order",
+    save: "Save changes",
+    close: "Close",
+    updateTitle: "Update recipient information",
+    cancelTitle: "Cancel order",
+    cancelText: "Are you sure you want to cancel this order?",
+    confirmCancel: "Confirm cancel",
     itemCount: "items",
     steps: ["Order placed", "Payment confirmed", "Preparing", "Out for delivery", "Completed"],
     paid: "Paid",
     pending: "Cash on delivery",
+    pendingState: "Pending",
+    confirmedState: "Confirmed",
     processing: "Preparing your order",
     shipping: "Out for delivery",
     delivered: "Delivered",
+    cancelled: "Cancelled",
   },
 } as const;
 
@@ -87,8 +133,10 @@ function formatDate(value: string | undefined, language: "vi" | "en") {
   }).format(new Date(value));
 }
 
-function getFulfillmentStatus(order: MocoOrder): "processing" | "shipping" | "delivered" {
-  if (order.fulfillmentStatus) return order.fulfillmentStatus;
+function getFulfillmentStatus(order: MocoOrder): "processing" | "shipping" | "delivered" | "cancelled" {
+  if (order.fulfillmentStatus === "cancelled" || order.status?.toUpperCase() === "CANCELLED") return "cancelled";
+  if (order.fulfillmentStatus === "shipped") return "shipping";
+  if (order.fulfillmentStatus === "shipping" || order.fulfillmentStatus === "delivered") return order.fulfillmentStatus;
   if (!order.createdAt) return "processing";
 
   const orderTime = new Date(order.createdAt).getTime();
@@ -102,15 +150,34 @@ function getFulfillmentStatus(order: MocoOrder): "processing" | "shipping" | "de
 function getActiveStep(order: MocoOrder) {
   const fulfillmentStatus = getFulfillmentStatus(order);
 
+  if (fulfillmentStatus === "cancelled") return 0;
   if (fulfillmentStatus === "delivered") return 4;
   if (fulfillmentStatus === "shipping") return 3;
   return order.paymentStatus === "paid" ? 2 : 1;
+}
+
+function getRecipientInfo(order: MocoOrder): RecipientInfo {
+  return {
+    fullName: order.customer?.fullName || order.fullName || "",
+    phone: order.customer?.phone || order.phone || "",
+    email: order.customer?.email || order.email || "",
+    address: order.customer?.address || order.address || "",
+  };
 }
 
 export default function OrderDetailPage() {
   const params = useParams<{ code: string }>();
   const [orders, setOrders] = useState<MocoOrder[]>([]);
   const [isChecking, setIsChecking] = useState(true);
+  const [isUpdateOpen, setIsUpdateOpen] = useState(false);
+  const [isCancelOpen, setIsCancelOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [recipientForm, setRecipientForm] = useState<RecipientInfo>({
+    fullName: "",
+    phone: "",
+    email: "",
+    address: "",
+  });
   const router = useRouter();
   const { language } = useLanguage();
   const labels = copy[language];
@@ -154,6 +221,78 @@ export default function OrderDetailPage() {
     [orders, orderCode],
   );
 
+  useEffect(() => {
+    if (order) {
+      setRecipientForm(getRecipientInfo(order));
+    }
+  }, [order]);
+
+  const patchOrderInState = (code: string, patch: Partial<MocoOrder>) => {
+    setOrders((current) =>
+      current.map((item) =>
+        item.code.toUpperCase() === code.toUpperCase()
+          ? {
+              ...item,
+              ...patch,
+              customer: {
+                ...(item.customer || {}),
+                ...(patch.customer || {}),
+              },
+            }
+          : item,
+      ),
+    );
+  };
+
+  const handleUpdate = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!order) return;
+
+    if (!canUserManageOrder(order)) {
+      showToast(getOrderActionBlockedMessage(order), "error");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await updateOrderRecipient(order.code, recipientForm);
+      patchOrderInState(order.code, {
+        ...recipientForm,
+        customer: recipientForm,
+      });
+      setIsUpdateOpen(false);
+      showToast("Th\u00f4ng tin \u0111\u01a1n h\u00e0ng \u0111\u00e3 \u0111\u01b0\u1ee3c c\u1eadp nh\u1eadt.", "success");
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : getOrderActionBlockedMessage(order), "error");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCancel = async () => {
+    if (!order) return;
+
+    if (!canUserManageOrder(order)) {
+      showToast(getOrderActionBlockedMessage(order), "error");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await cancelOrder(order.code);
+      patchOrderInState(order.code, {
+        status: "CANCELLED",
+        fulfillmentStatus: "cancelled",
+      });
+      setIsCancelOpen(false);
+      showToast("\u0110\u01a1n h\u00e0ng \u0111\u00e3 \u0111\u01b0\u1ee3c h\u1ee7y th\u00e0nh c\u00f4ng.", "info");
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : getOrderActionBlockedMessage(order), "error");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   if (isChecking) return null;
 
   if (!order) {
@@ -170,7 +309,20 @@ export default function OrderDetailPage() {
 
   const activeStep = getActiveStep(order);
   const fulfillmentStatus = getFulfillmentStatus(order);
+  const orderState = getOrderState(order);
+  const canManageOrder = canUserManageOrder(order);
+  const recipient = getRecipientInfo(order);
   const itemCount = order.items?.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
+  const statusLabel =
+    orderState === "PENDING"
+      ? labels.pendingState
+      : orderState === "CONFIRMED"
+        ? labels.confirmedState
+        : orderState === "SHIPPING"
+          ? labels.shipping
+          : orderState === "DELIVERED"
+            ? labels.delivered
+            : labels.cancelled;
 
   return (
     <main className="order-page">
@@ -185,7 +337,7 @@ export default function OrderDetailPage() {
           <article className="order-card order-status-card">
             <div className="order-current-status">
               <small>{labels.statusLabel}</small>
-              <span>{labels[fulfillmentStatus]}</span>
+              <span>{statusLabel}</span>
               <strong>{order.paymentStatus === "paid" ? labels.paid : labels.pending}</strong>
             </div>
             <ol className="order-timeline">
@@ -227,8 +379,90 @@ export default function OrderDetailPage() {
             <div><dt>{labels.delivery}</dt><dd>{order.shipping}</dd></div>
             <div className="order-total"><dt>{labels.total}</dt><dd>{currency(order.total)} VND</dd></div>
           </dl>
+          <div className="order-recipient-block">
+            <h3>{labels.recipient}</h3>
+            <p>{recipient.fullName || "-"}</p>
+            <p>{recipient.phone || "-"}</p>
+            <p>{recipient.email || "-"}</p>
+            <p>{recipient.address || "-"}</p>
+          </div>
+          {canManageOrder && (
+            <div className="order-action-row">
+              <button type="button" onClick={() => setIsUpdateOpen(true)}>
+                {labels.update}
+              </button>
+              <button type="button" className="danger" onClick={() => setIsCancelOpen(true)}>
+                {labels.cancel}
+              </button>
+            </div>
+          )}
         </aside>
       </section>
+
+      {isUpdateOpen && (
+        <div className="order-modal-backdrop" role="presentation">
+          <form className="order-modal" onSubmit={handleUpdate}>
+            <h2>{labels.updateTitle}</h2>
+            <label>
+              <span>{labels.fullName}</span>
+              <input
+                required
+                value={recipientForm.fullName}
+                onChange={(event) => setRecipientForm((current) => ({ ...current, fullName: event.target.value }))}
+              />
+            </label>
+            <label>
+              <span>{labels.phone}</span>
+              <input
+                required
+                value={recipientForm.phone}
+                onChange={(event) => setRecipientForm((current) => ({ ...current, phone: event.target.value }))}
+              />
+            </label>
+            <label>
+              <span>{labels.email}</span>
+              <input
+                type="email"
+                value={recipientForm.email}
+                onChange={(event) => setRecipientForm((current) => ({ ...current, email: event.target.value }))}
+              />
+            </label>
+            <label>
+              <span>{labels.address}</span>
+              <textarea
+                required
+                value={recipientForm.address}
+                onChange={(event) => setRecipientForm((current) => ({ ...current, address: event.target.value }))}
+              />
+            </label>
+            <div className="order-modal-actions">
+              <button type="button" onClick={() => setIsUpdateOpen(false)} disabled={isSubmitting}>
+                {labels.close}
+              </button>
+              <button type="submit" disabled={isSubmitting}>
+                {labels.save}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {isCancelOpen && (
+        <div className="order-modal-backdrop" role="presentation">
+          <div className="order-modal order-confirm-dialog" role="dialog" aria-modal="true">
+            <h2>{labels.cancelTitle}</h2>
+            <p>{labels.cancelText}</p>
+            <div className="order-modal-actions">
+              <button type="button" onClick={() => setIsCancelOpen(false)} disabled={isSubmitting}>
+                {labels.close}
+              </button>
+              <button type="button" className="danger" onClick={handleCancel} disabled={isSubmitting}>
+                {labels.confirmCancel}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
