@@ -6,6 +6,7 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { loginUser } from "../auth-storage";
 import { useLanguage } from "../providers";
+import { showToast } from "../toast";
 
 const copy = {
   vi: {
@@ -60,6 +61,7 @@ export default function LoginPage() {
   const currentCopy = copy[language];
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   async function handleLogin(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -78,8 +80,20 @@ export default function LoginPage() {
 
     const result = await loginUser(email, password);
 
-    if (result.success) router.push("/account");
-    else setError(friendlyLoginError(result.error, language));
+    if (result.success) {
+      showToast("Đăng nhập thành công!", "success");
+      
+      // Trường hợp A: Lần đầu đăng nhập -> Giữ ở trang hiện tại hoặc sang onboarding/account
+      if (result.isFirstLogin) {
+        router.push("/account");
+      } 
+      // Trường hợp B: Các lần đăng nhập sau -> Về trang chủ
+      else {
+        router.push("/");
+      }
+    } else {
+      setError(friendlyLoginError(result.error, language));
+    }
 
     setIsLoading(false);
   }
@@ -106,7 +120,29 @@ export default function LoginPage() {
           </label>
           <label>
             <span>{currentCopy.password}</span>
-            <input type="password" name="password" autoComplete="current-password" required />
+            <div style={{ position: "relative", width: "100%", display: "block" }}>
+              <input 
+                type={showPassword ? "text" : "password"} 
+                name="password" 
+                autoComplete="current-password" 
+                required 
+                style={{ width: "100%", paddingRight: "44px" }} 
+              />
+              <button 
+                type="button" 
+                onClick={() => setShowPassword(!showPassword)} 
+                style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", background: "transparent", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: "4px", color: "#666", transition: "color 0.2s" }}
+                aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+                onMouseOver={(e) => e.currentTarget.style.color = "#333"}
+                onMouseOut={(e) => e.currentTarget.style.color = "#666"}
+              >
+                {showPassword ? (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12c0 0 5-8 10-8s10 8 10 8-5 8-10 8-10-8-10-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                ) : (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-5.52 0-10-8-10-8a18.45 18.45 0 0 1 5.06-5.94"></path><path d="M14.12 14.12A3 3 0 1 1 9.88 9.88"></path><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c5.52 0 10 8 10 8a18.5 18.5 0 0 1-2.16 3.19"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                )}
+              </button>
+            </div>
           </label>
           <Link className="login-forgot" href="/forgot-password">
             {currentCopy.forgot}

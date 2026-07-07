@@ -67,7 +67,7 @@ export async function signUpUser(user: {
 export async function loginUser(
   email: string,
   password: string,
-): Promise<{ success: boolean; user?: MocoUser; error?: string }> {
+): Promise<{ success: boolean; user?: MocoUser; error?: string; isFirstLogin?: boolean }> {
   try {
     const res = await fetch("/api/auth/login", {
       method: "POST",
@@ -78,7 +78,7 @@ export async function loginUser(
 
     if (data.success && data.user) {
       setSession(data.user);
-      return { success: true, user: data.user };
+      return { success: true, user: data.user, isFirstLogin: data.isFirstLogin };
     }
 
     return { success: false, error: data.error || "Login failed." };

@@ -36,9 +36,20 @@ export async function POST(request: Request) {
       );
     }
 
+    // Track login count to determine if this is the first login
+    const isFirstLogin = !user.loginCount || user.loginCount === 0;
+
+    await users.updateOne(
+      { _id: user._id },
+      { 
+        $inc: { loginCount: 1 }, 
+        $set: { lastLoginAt: new Date() } 
+      }
+    );
+
     // Return user info without password
     const { password: _, _id, ...userWithoutPassword } = user;
-    return NextResponse.json({ success: true, user: userWithoutPassword });
+    return NextResponse.json({ success: true, user: userWithoutPassword, isFirstLogin });
   } catch (error) {
     console.error("Login error:", error);
     return NextResponse.json(

@@ -41,6 +41,8 @@ export async function POST(request: Request) {
       role: "customer", // Default role
       createdAt: now,
       updatedAt: now,
+      loginCount: 1,
+      lastLoginAt: now,
     };
 
     await users.insertOne(newUser);

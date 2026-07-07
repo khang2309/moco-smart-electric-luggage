@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { signOutUser, readCurrentUser } from "../app/auth-storage";
 import { useLanguage } from "../app/providers";
+import { showToast } from "../app/toast";
 
 type CartItem = {
   slug: string;
@@ -333,9 +334,16 @@ export default function Header() {
 
   const handleLogout = () => {
     signOutUser();
+    
+    // Clear cart on logout for security
+    window.localStorage.removeItem("moco-cart");
+    window.dispatchEvent(new Event("moco-cart-updated"));
+    
     setIsLoggedIn(false);
     setUserInfo(null);
     setIsAccountOpen(false);
+    showToast("Đăng xuất thành công!", "success");
+    router.push("/login");
   };
 
   const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {

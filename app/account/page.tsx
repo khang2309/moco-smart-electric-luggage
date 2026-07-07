@@ -31,32 +31,45 @@ function AccountContent() {
   const [isFetchingProducts, setIsFetchingProducts] = useState(false);
 
   useEffect(() => {
-    const user = readCurrentUser();
+    const checkAuth = () => {
+      const isAuth = window.localStorage.getItem("moco-auth") === "true";
+      const user = readCurrentUser();
+      
+      if (!isAuth || !user) {
+        router.push("/login");
+        return;
+      }
 
-    if (user?.email) {
-      // Fetch latest profile from MongoDB
-      fetchProfile(user.email).then((result) => {
-        if (result.success && result.user) {
-          setUserInfo(result.user);
-          setEditForm({
-            name: result.user.name || "",
-            phone: result.user.phone || "",
-            city: result.user.city || "",
-            address: result.user.address || "",
-          });
-        } else {
-          // Fallback to local session data
-          setUserInfo(user);
-          setEditForm({
-            name: user.name || "",
-            phone: user.phone || "",
-            city: user.city || "",
-            address: user.address || "",
-          });
-        }
-      });
-    }
-  }, []);
+      if (user?.email) {
+        // Fetch latest profile from MongoDB
+        fetchProfile(user.email).then((result) => {
+          if (result.success && result.user) {
+            setUserInfo(result.user);
+            setEditForm({
+              name: result.user.name || "",
+              phone: result.user.phone || "",
+              city: result.user.city || "",
+              address: result.user.address || "",
+            });
+          } else {
+            // Fallback to local session data
+            setUserInfo(user);
+            setEditForm({
+              name: user.name || "",
+              phone: user.phone || "",
+              city: user.city || "",
+              address: user.address || "",
+            });
+          }
+        });
+      }
+    };
+
+    checkAuth();
+    
+    window.addEventListener("moco-auth-updated", checkAuth);
+    return () => window.removeEventListener("moco-auth-updated", checkAuth);
+  }, [router]);
 
   useEffect(() => {
     const email = searchParams?.get("email") || "";

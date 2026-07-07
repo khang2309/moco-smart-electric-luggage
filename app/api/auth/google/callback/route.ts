@@ -63,6 +63,7 @@ export async function GET(request: NextRequest) {
 
     // Find or create user
     let user = await users.findOne({ email: normalizedEmail });
+    let isFirstLogin = false;
 
     if (!user) {
       // Create new user
@@ -81,16 +82,26 @@ export async function GET(request: NextRequest) {
         googleId: googleUser.id,
         createdAt: now,
         updatedAt: now,
+        loginCount: 1,
+        lastLoginAt: now,
       };
 
       const insertResult = await users.insertOne(newUser);
       user = { ...newUser, _id: insertResult.insertedId } as any;
-    } else if (!user.googleId) {
-      // Optionally link Google ID if user already exists
-      await users.updateOne(
-        { _id: user._id },
-        { $set: { googleId: googleUser.id, updatedAt: new Date() } }
-      );
+      isFirstLogin = true;
+    } else {
+      isFirstLogin = !user.loginCount || user.loginCount === 0;
+      
+      // Update googleId if missing, and increment loginCount
+      const updateDoc: any = {
+        $set: { lastLoginAt: new Date(), updatedAt: new Date() },
+        $inc: { loginCount: 1 }
+      };
+      if (!user.googleId) {
+        updateDoc.$set.googleId = googleUser.id;
+      }
+      
+      await users.updateOne({ _id: user._id }, updateDoc);
     }
 
     const { password: _, _id, ...userWithoutPassword } = user as any;
@@ -105,10 +116,11 @@ export async function GET(request: NextRequest) {
       <body>
         <script>
           const user = ${JSON.stringify(userWithoutPassword)};
+          const isFirstLogin = ${isFirstLogin};
           window.localStorage.setItem('moco-user', JSON.stringify(user));
           window.localStorage.setItem('moco-auth', 'true');
           window.dispatchEvent(new Event('moco-auth-updated'));
-          window.location.href = '/account';
+          window.location.href = isFirstLogin ? '/account' : '/';
         </script>
       </body>
       </html>
