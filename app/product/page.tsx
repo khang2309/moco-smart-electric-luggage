@@ -53,10 +53,18 @@ function getLoopOffset(index: number, activeIndex: number) {
   return rawOffset;
 }
 
+export interface MocoProduct {
+  slug: string;
+  name: string;
+  image: string;
+  vi: string;
+  en: string;
+}
+
 export default function ProductPage() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [favoriteProducts, setFavoriteProducts] = useState<string[]>([]);
-  const [visibleProducts, setVisibleProducts] = useState<Array<(typeof products)[number]> | null>(null);
+  const [visibleProducts, setVisibleProducts] = useState<MocoProduct[] | null>(null);
   const { language } = useLanguage();
   const activeProduct = visibleProducts ? visibleProducts[activeIndex] : null;
 
@@ -106,14 +114,18 @@ export default function ProductPage() {
         const data = await res.json();
         
         if (data.products) {
-          const activeSlugs = new Set(
-            data.products
-              .filter((p: any) => p.status !== "deleted" && p.status !== "draft")
-              .map((p: any) => p.slug)
-          );
-          setVisibleProducts(
-            products.filter(p => activeSlugs.has(p.slug))
-          );
+          const activeDbProducts = data.products.filter((p: any) => p.status !== "deleted" && p.status !== "draft");
+          const mappedProducts = activeDbProducts.map((dbProd: any) => {
+            const existing = products.find(p => p.slug === dbProd.slug);
+            return {
+              slug: dbProd.slug,
+              name: dbProd.name,
+              image: dbProd.image || (existing ? existing.image : ""),
+              vi: dbProd.description || dbProd.subtitle || (existing ? existing.vi : ""),
+              en: dbProd.description || dbProd.subtitle || (existing ? existing.en : "")
+            };
+          });
+          setVisibleProducts(mappedProducts);
         } else {
           setVisibleProducts([...products]); // fallback
         }
@@ -216,7 +228,7 @@ export default function ProductPage() {
               <Link href={`/product/${activeProduct.slug}`} className="product-stage-title">
                 {activeProduct.name}
               </Link>
-              <p>{activeProduct[language]}</p>
+              <p>{activeProduct[language as keyof MocoProduct]}</p>
               <span>{t.hint}</span>
             </>
           )}
@@ -234,7 +246,7 @@ export default function ProductPage() {
           {visibleProducts?.map((product) => (
             <Link href={`/product/${product.slug}`} key={product.slug}>
               <h2>{product.name}</h2>
-              <p>{product[language]}</p>
+              <p>{product[language as keyof MocoProduct]}</p>
             </Link>
           ))}
         </div>
