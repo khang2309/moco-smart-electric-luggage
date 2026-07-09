@@ -21,7 +21,7 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const { slug, name, description, price, oldPrice, image, imagePublicId, stock, store, subtitle, status, colors, deletedPublicIds } = await request.json();
+    const { slug, name, description, price, oldPrice, image, imagePublicId, stock, store, subtitle, status, colors, deletedPublicIds, features } = await request.json();
 
     if (!name || !price) {
       return NextResponse.json(
@@ -57,6 +57,7 @@ export async function PUT(
           subtitleEn,
           status: status || "active",
           colors: Array.isArray(colors) ? colors : [],
+          features: Array.isArray(features) ? features : [],
           updatedAt: new Date(),
         },
       },

@@ -18,6 +18,7 @@ type Product = {
   stock: number;
   status?: "active" | "draft" | "deleted";
   colors?: { name: string; hex: string; image: string; imagePublicId?: string }[];
+  features?: string[];
   createdAt?: string;
   updatedAt?: string;
 };
@@ -35,6 +36,7 @@ type ProductForm = {
   store: string;
   status: string;
   colors: { name: string; hex: string; image: string; imagePublicId: string }[];
+  features: string[];
 };
 
 const emptyForm: ProductForm = {
@@ -50,7 +52,23 @@ const emptyForm: ProductForm = {
   store: "MOCO Official",
   status: "active",
   colors: [],
+  features: [],
 };
+
+const AVAILABLE_FEATURES = [
+  { id: "ride", label: "Ngồi lái (Ride-on control)" },
+  { id: "removableBattery", label: "Pin tháo rời (Removable battery)" },
+  { id: "phoneCharge", label: "Sạc điện thoại (Phone charging)" },
+  { id: "airlineBattery", label: "Pin tiêu chuẩn bay (Airline-ready battery)" },
+  { id: "brake", label: "Phanh điện tử (Electronic brake)" },
+  { id: "lock", label: "Khóa thông minh (Smart lock)" },
+  { id: "gps", label: "Định vị GPS (GPS tracking)" },
+  { id: "follow", label: "Tự động đi theo (Auto-follow mode)" },
+  { id: "obstacle", label: "Tránh vật cản (Obstacle avoidance)" },
+  { id: "alarm", label: "Còi cảnh báo (Warning alarm)" },
+  { id: "light", label: "Đèn cảnh báo (Warning light)" },
+  { id: "app", label: "Kết nối App (App control)" }
+];
 
 const text = {
   vi: {
@@ -209,6 +227,7 @@ function productToForm(product: Product): ProductForm {
     store: product.store || "MOCO Official",
     status: product.status || "active",
     colors: product.colors?.map(c => ({...c, imagePublicId: c.imagePublicId || ""})) || [],
+    features: product.features || [],
   };
 }
 
@@ -687,6 +706,33 @@ export default function AdminProducts() {
                   className="rounded-lg border border-gray-200 px-3 py-2 font-semibold outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 />
               </label>
+
+              <div className="lg:col-span-4 border-t border-gray-100 pt-4 mt-2">
+                <label className="text-sm font-bold text-gray-700 mb-3 block">Tính năng (Features)</label>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {AVAILABLE_FEATURES.map((feature) => (
+                    <label key={feature.id} className="flex items-center gap-2 text-sm font-semibold text-gray-700 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        checked={formData.features.includes(feature.id)}
+                        onChange={(e) => {
+                          const isChecked = e.target.checked;
+                          setFormData(cur => ({
+                            ...cur,
+                            features: isChecked 
+                              ? [...cur.features, feature.id] 
+                              : cur.features.filter(f => f !== feature.id)
+                          }));
+                          setIsDirty(true);
+                        }}
+                      />
+                      {feature.label}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
               <div className="lg:col-span-4 border-t border-gray-100 pt-4 mt-2">
                 <div className="flex items-center justify-between mb-3">
                   <label className="text-sm font-bold text-gray-700">{labels.colors}</label>

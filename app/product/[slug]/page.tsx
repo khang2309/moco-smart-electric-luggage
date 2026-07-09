@@ -749,6 +749,11 @@ export default function ProductDetailPage() {
     ? (language === "en" ? (dbData.descriptionEn || dbData.description) : dbData.description)
     : details.description;
 
+  const dbFeatures = dbData?.features && dbData.features.length > 0
+    ? dbData.features.map((key: keyof typeof commonProductFeatures) => commonProductFeatures[key]).filter(Boolean)
+    : undefined;
+  const displayFeatures = dbFeatures || product.features || [];
+
   useEffect(() => {
     const fetchStatus = async () => {
       try {
@@ -959,23 +964,27 @@ export default function ProductDetailPage() {
             />
           )}
 
-          <div className="product-detail-accordions">
-            {details.specs.map(([title, body], index) => (
-              <article key={title}>
-                <button type="button" onClick={() => setOpenIndex(index)}>
-                  <FeatureIcon title={title} />
-                  <span>{title}</span>
-                  <svg className="feature-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d={openIndex === index ? "m18 15-6-6-6 6" : "m6 9 6 6 6-6"}></path>
-                  </svg>
-                </button>
-                {openIndex === index && <p>{body}</p>}
-              </article>
-            ))}
-          </div>
+          {!isCustomProduct && details?.specs && details.specs.length > 0 && (
+            <div className="product-detail-accordions">
+              {details.specs.map(([title, body], index) => (
+                <article key={title}>
+                  <button type="button" onClick={() => setOpenIndex(index)}>
+                    <FeatureIcon title={title} />
+                    <span>{title}</span>
+                    <svg className="feature-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d={openIndex === index ? "m18 15-6-6-6 6" : "m6 9 6 6 6-6"}></path>
+                    </svg>
+                  </button>
+                  {openIndex === index && <p>{body}</p>}
+                </article>
+              ))}
+            </div>
+          )}
         </div>
       </section>
-      <ProductFeatureShowcase product={product} language={language} />
+      {displayFeatures.length > 0 && (
+        <ProductFeatureShowcase product={{ ...product, image: dbData?.image || product.image, features: displayFeatures }} language={language} />
+      )}
     </main>
   );
 }
