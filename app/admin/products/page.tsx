@@ -2,7 +2,7 @@
 
 
 import { useLanguage } from "@/app/providers";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 
 type Product = {
   _id: string;
@@ -219,6 +219,53 @@ export default function AdminProducts() {
   const [query, setQuery] = useState("");
   const [formData, setFormData] = useState<ProductForm>(emptyForm);
 
+  const formSectionRef = useRef<HTMLDivElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
+  useEffect(() => {
+    if (showForm && formSectionRef.current) {
+      formSectionRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [showForm]);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      alert("Chỉ hỗ trợ định dạng ảnh (JPG, PNG, WEBP)");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Dung lượng file không được vượt quá 5MB");
+      return;
+    }
+
+    const uploadFormData = new FormData();
+    uploadFormData.append("file", file);
+
+    try {
+      setIsUploading(true);
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: uploadFormData,
+      });
+      const data = await res.json();
+      
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Lỗi khi upload ảnh");
+      }
+      
+      setFormData((current) => ({ ...current, image: data.url }));
+    } catch (error: any) {
+      console.error("Upload error:", error);
+      alert(error.message);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const fetchProducts = async () => {
     try {
       setIsLoading(true);
@@ -405,7 +452,7 @@ export default function AdminProducts() {
         </section>
 
         {showForm && (
-          <section className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+          <section ref={formSectionRef} className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm scroll-mt-24">
             <div className="mb-5">
               <h2 className="text-xl font-black text-gray-950">
                 {editingId ? labels.editProduct : labels.addProduct}
@@ -472,15 +519,52 @@ export default function AdminProducts() {
                   className="rounded-lg border border-gray-200 px-3 py-2 font-semibold outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 />
               </label>
-              <label className="grid gap-1 text-sm font-bold text-gray-700 lg:col-span-3">
-                {labels.image}
-                <input
-                  type="text"
-                  value={formData.image}
-                  onChange={(event) => handleChange("image", event.target.value)}
-                  className="rounded-lg border border-gray-200 px-3 py-2 font-semibold outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                />
-              </label>
+              <div className="grid gap-1 text-sm font-bold text-gray-700 lg:col-span-3">
+                <label>{labels.image}</label>
+                <div className="flex gap-4 items-end">
+                  {formData.image ? (
+                    <div className="h-[90px] w-[90px] shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+                      <img src={formData.image} alt="Preview" className="h-full w-full object-contain p-1" />
+                    </div>
+                  ) : (
+                    <div className="flex h-[90px] w-[90px] shrink-0 items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 text-gray-400">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                    </div>
+                  )}
+                  <div className="flex-1 space-y-2">
+                    <input
+                      type="text"
+                      placeholder="Hoặc nhập URL ảnh..."
+                      value={formData.image}
+                      onChange={(event) => handleChange("image", event.target.value)}
+                      className="w-full rounded-lg border border-gray-200 px-3 py-2 font-semibold outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                    />
+                    <div className="relative">
+                      <input
+                        type="file"
+                        accept="image/jpeg, image/png, image/webp"
+                        onChange={handleImageUpload}
+                        disabled={isUploading}
+                        className="absolute inset-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
+                      />
+                      <button
+                        type="button"
+                        disabled={isUploading}
+                        className="flex w-full items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-bold text-gray-700 transition hover:bg-gray-50 disabled:opacity-50"
+                      >
+                        {isUploading ? (
+                          <span className="flex items-center gap-2">
+                            <svg className="h-4 w-4 animate-spin text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            Đang tải lên...
+                          </span>
+                        ) : (
+                          "Chọn ảnh từ máy tính (Tối đa 5MB)"
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
               <label className="grid gap-1 text-sm font-bold text-gray-700">
                 {labels.stock}
                 <input
