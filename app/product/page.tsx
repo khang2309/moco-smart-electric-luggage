@@ -121,8 +121,8 @@ export default function ProductPage() {
               slug: dbProd.slug,
               name: dbProd.name,
               image: dbProd.image || (existing ? existing.image : ""),
-              vi: dbProd.description || dbProd.subtitle || (existing ? existing.vi : ""),
-              en: dbProd.description || dbProd.subtitle || (existing ? existing.en : "")
+              vi: dbProd.subtitle || dbProd.description || (existing ? existing.vi : ""),
+              en: dbProd.subtitle || dbProd.description || (existing ? existing.en : "")
             };
           });
           setVisibleProducts(mappedProducts);
