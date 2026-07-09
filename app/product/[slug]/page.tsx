@@ -734,17 +734,29 @@ export default function ProductDetailPage() {
   const [isFetchingStatus, setIsFetchingStatus] = useState(true);
   const [colors, setColors] = useState<{ name: string; hex: string; image: string }[]>([]);
   const [selectedColor, setSelectedColor] = useState<{ name: string; hex: string; image: string } | null>(null);
+  const [dbData, setDbData] = useState<any>(null);
 
-  const product = products.find((item) => item.slug === params?.slug) ?? products[0];
-  const details = product[language];
+  const staticProduct = products.find((item) => item.slug === params?.slug);
+  const isCustomProduct = !staticProduct && dbData;
+  const product = staticProduct ?? products[0];
+  const details = product[language as keyof typeof product] as unknown as { description: string; specs?: any[] };
+
+  const displayName = dbData 
+    ? (language === "en" ? (dbData.nameEn || dbData.name) : dbData.name)
+    : product.name;
+
+  const displayDescription = dbData
+    ? (language === "en" ? (dbData.descriptionEn || dbData.description) : dbData.description)
+    : details.description;
 
   useEffect(() => {
     const fetchStatus = async () => {
       try {
         const res = await fetch("/api/admin/products");
         const data = await res.json();
-        const dbProduct = data.products?.find((p: any) => p.slug === product.slug);
+        const dbProduct = data.products?.find((p: any) => p.slug === params?.slug);
         if (dbProduct) {
+          setDbData(dbProduct);
           setLiveStatus(dbProduct.status || "active");
           setLiveStock(dbProduct.stock ?? 0);
           if (dbProduct.colors && dbProduct.colors.length > 0) {
@@ -805,9 +817,9 @@ export default function ProductDetailPage() {
 
   const handleAddToCart = () => {
     const cartItem = {
-      slug: selectedColor ? `${product.slug}-${selectedColor.name}` : product.slug,
-      name: product.name,
-      image: selectedColor?.image || product.image,
+      slug: selectedColor ? `${params?.slug}-${selectedColor.name}` : String(params?.slug),
+      name: displayName,
+      image: selectedColor?.image || dbData?.image || product.image,
       quantity,
       price: 8990000,
       oldPrice: 9490000,
@@ -844,17 +856,17 @@ export default function ProductDetailPage() {
       <section className="product-detail-shell" aria-label={product.name}>
         <div className="product-detail-visual">
           <button
-            className={`product-favorite-button detail-favorite${favoriteProducts.includes(product.slug) ? " active" : ""}`}
+            className={`product-favorite-button detail-favorite${favoriteProducts.includes(String(params?.slug)) ? " active" : ""}`}
             type="button"
             aria-label={language === "vi" ? "Th\u00eam v\u00e0o y\u00eau th\u00edch" : "Add to favorites"}
-            onClick={() => toggleFavoriteProduct(product.slug)}
+            onClick={() => toggleFavoriteProduct(String(params?.slug))}
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill={favoriteProducts.includes(product.slug) ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill={favoriteProducts.includes(String(params?.slug)) ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"></path>
             </svg>
           </button>
           <Image
-            src={selectedColor?.image || product.image}
+            src={selectedColor?.image || dbData?.image || product.image}
             alt={t.imageAlt}
             fill
             sizes="(max-width: 920px) 100vw, 56vw"
@@ -863,9 +875,9 @@ export default function ProductDetailPage() {
         </div>
 
         <div className="product-detail-info">
-          <h1>{product.name}</h1>
+          <h1>{displayName}</h1>
           <span className="product-title-line" aria-hidden="true" />
-          <p>{details.description}</p>
+          <p>{displayDescription}</p>
 
           {isFetchingStatus ? (
              <div className="rounded-lg bg-gray-50 p-4 text-center text-sm font-semibold text-gray-500">

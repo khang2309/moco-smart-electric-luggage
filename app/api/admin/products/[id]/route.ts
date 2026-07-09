@@ -4,6 +4,7 @@ import { getDatabaseErrorMessage } from "@/lib/api-error";
 import { deleteInventoryForProduct, syncInventoryForProduct } from "@/lib/inventory";
 import { ObjectId } from "mongodb";
 import { deleteImageFromCloudinary } from "@/lib/cloudinary-upload";
+import { translateViToEn } from "@/lib/translate";
 
 function createSlug(value: string) {
   return value
@@ -33,13 +34,19 @@ export async function PUT(
     const products = db.collection("products");
     const normalizedSlug = slug ? createSlug(String(slug)) : createSlug(String(name));
 
+    const nameEn = await translateViToEn(name);
+    const subtitleEn = await translateViToEn(subtitle || description || "");
+    const descriptionEn = await translateViToEn(description || "");
+
     const result = await products.findOneAndUpdate(
       { _id: new ObjectId(id) },
       {
         $set: {
           slug: normalizedSlug,
           name,
+          nameEn,
           description: description || "",
+          descriptionEn,
           price: Number(price),
           oldPrice: Number(oldPrice) || 0,
           image: image || "",
@@ -47,6 +54,7 @@ export async function PUT(
           stock: Number(stock) || 0,
           store: store || "MOCO Official",
           subtitle: subtitle || description || "",
+          subtitleEn,
           status: status || "active",
           colors: Array.isArray(colors) ? colors : [],
           updatedAt: new Date(),

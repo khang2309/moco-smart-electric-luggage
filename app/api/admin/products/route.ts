@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/lib/mongodb";
 import { getDatabaseErrorMessage } from "@/lib/api-error";
 import { syncInventoryForProduct, syncInventoryForProducts } from "@/lib/inventory";
+import { translateViToEn } from "@/lib/translate";
 import type { Collection, Document, WithId } from "mongodb";
 
 type CatalogProduct = {
@@ -143,10 +144,16 @@ export async function POST(request: Request) {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-|-$/g, "");
 
+    const nameEn = await translateViToEn(name);
+    const subtitleEn = await translateViToEn(subtitle || description || "");
+    const descriptionEn = await translateViToEn(description || "");
+
     const newProduct = {
       slug: normalizedSlug,
       name,
+      nameEn,
       description: description || "",
+      descriptionEn,
       price: Number(price),
       oldPrice: Number(oldPrice) || 0,
       image: image || "",
@@ -154,6 +161,7 @@ export async function POST(request: Request) {
       stock: Number(stock) || 0,
       store: store || "MOCO Official",
       subtitle: subtitle || description || "",
+      subtitleEn,
       status: "active", // default status
       colors: Array.isArray(colors) ? colors : [],
       createdAt: new Date(),

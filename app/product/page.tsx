@@ -56,6 +56,7 @@ function getLoopOffset(index: number, activeIndex: number) {
 export interface MocoProduct {
   slug: string;
   name: string;
+  nameEn?: string;
   image: string;
   vi: string;
   en: string;
@@ -120,9 +121,10 @@ export default function ProductPage() {
             return {
               slug: dbProd.slug,
               name: dbProd.name,
+              nameEn: dbProd.nameEn,
               image: dbProd.image || (existing ? existing.image : ""),
               vi: dbProd.subtitle || dbProd.description || (existing ? existing.vi : ""),
-              en: dbProd.subtitle || dbProd.description || (existing ? existing.en : "")
+              en: dbProd.subtitleEn || dbProd.descriptionEn || dbProd.subtitle || (existing ? existing.en : "")
             };
           });
           setVisibleProducts(mappedProducts);
@@ -196,7 +198,7 @@ export default function ProductPage() {
                 <button
                   className="product-3d-card"
                   type="button"
-                  aria-label={product.name}
+                  aria-label={language === "en" ? (product.nameEn || product.name) : product.name}
                   aria-current={isActive}
                   onClick={() => {
                     window.location.href = `/product/${product.slug}`;
@@ -229,7 +231,7 @@ export default function ProductPage() {
           {activeProduct && (
             <>
               <Link href={`/product/${activeProduct.slug}`} className="product-stage-title">
-                {activeProduct.name}
+                {language === "en" ? (activeProduct.nameEn || activeProduct.name) : activeProduct.name}
               </Link>
               <p>{activeProduct[language as keyof MocoProduct]}</p>
               <span>{t.hint}</span>
