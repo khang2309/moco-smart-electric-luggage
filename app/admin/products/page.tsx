@@ -14,9 +14,10 @@ type Product = {
   price: number;
   oldPrice?: number;
   image?: string;
+  imagePublicId?: string;
   stock: number;
   status?: "active" | "draft" | "deleted";
-  colors?: { name: string; hex: string; image: string }[];
+  colors?: { name: string; hex: string; image: string; imagePublicId?: string }[];
   createdAt?: string;
   updatedAt?: string;
 };
@@ -29,10 +30,11 @@ type ProductForm = {
   price: string;
   oldPrice: string;
   image: string;
+  imagePublicId: string;
   stock: string;
   store: string;
   status: string;
-  colors: { name: string; hex: string; image: string }[];
+  colors: { name: string; hex: string; image: string; imagePublicId: string }[];
 };
 
 const emptyForm: ProductForm = {
@@ -43,6 +45,7 @@ const emptyForm: ProductForm = {
   price: "",
   oldPrice: "",
   image: "",
+  imagePublicId: "",
   stock: "",
   store: "MOCO Official",
   status: "active",
@@ -201,10 +204,11 @@ function productToForm(product: Product): ProductForm {
     price: String(product.price || ""),
     oldPrice: String(product.oldPrice || ""),
     image: product.image || "",
+    imagePublicId: product.imagePublicId || "",
     stock: String(product.stock || 0),
     store: product.store || "MOCO Official",
     status: product.status || "active",
-    colors: product.colors || [],
+    colors: product.colors?.map(c => ({...c, imagePublicId: c.imagePublicId || ""})) || [],
   };
 }
 
@@ -218,9 +222,11 @@ export default function AdminProducts() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [formData, setFormData] = useState<ProductForm>(emptyForm);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [colorImageFiles, setColorImageFiles] = useState<Record<number, File>>({});
+  const [isDirty, setIsDirty] = useState(false);
 
   const formSectionRef = useRef<HTMLDivElement>(null);
-  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     if (showForm && formSectionRef.current) {
@@ -228,7 +234,7 @@ export default function AdminProducts() {
     }
   }, [showForm]);
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -242,31 +248,13 @@ export default function AdminProducts() {
       return;
     }
 
-    const uploadFormData = new FormData();
-    uploadFormData.append("file", file);
-
-    try {
-      setIsUploading(true);
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: uploadFormData,
-      });
-      const data = await res.json();
-      
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || "Lỗi khi upload ảnh");
-      }
-      
-      setFormData((current) => ({ ...current, image: data.url }));
-    } catch (error: any) {
-      console.error("Upload error:", error);
-      alert(error.message);
-    } finally {
-      setIsUploading(false);
-    }
+    const previewUrl = URL.createObjectURL(file);
+    setImageFile(file);
+    setFormData((current) => ({ ...current, image: previewUrl }));
+    setIsDirty(true);
   };
 
-  const handleColorImageUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleColorImageUpload = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -280,32 +268,14 @@ export default function AdminProducts() {
       return;
     }
 
-    const uploadFormData = new FormData();
-    uploadFormData.append("file", file);
-
-    try {
-      setIsUploading(true);
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: uploadFormData,
-      });
-      const data = await res.json();
-      
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || "Lỗi khi upload ảnh màu sắc");
-      }
-      
-      setFormData((current) => {
-        const newColors = [...current.colors];
-        newColors[index].image = data.url;
-        return { ...current, colors: newColors };
-      });
-    } catch (error: any) {
-      console.error("Color upload error:", error);
-      alert(error.message);
-    } finally {
-      setIsUploading(false);
-    }
+    const previewUrl = URL.createObjectURL(file);
+    setColorImageFiles((prev) => ({ ...prev, [index]: file }));
+    setFormData((current) => {
+      const newColors = [...current.colors];
+      newColors[index].image = previewUrl;
+      return { ...current, colors: newColors };
+    });
+    setIsDirty(true);
   };
 
 
@@ -353,19 +323,41 @@ export default function AdminProducts() {
     };
   }, [products]);
 
+  const cleanupPreviews = () => {
+    if (formData.image && formData.image.startsWith("blob:")) URL.revokeObjectURL(formData.image);
+    formData.colors.forEach(c => {
+      if (c.image && c.image.startsWith("blob:")) URL.revokeObjectURL(c.image);
+    });
+    setImageFile(null);
+    setColorImageFiles({});
+    setIsDirty(false);
+  };
+
   const resetForm = () => {
+    cleanupPreviews();
     setEditingId(null);
     setFormData(emptyForm);
     setShowForm(false);
   };
+  
+  const handleCancel = () => {
+    if (isDirty) {
+      if (!window.confirm("Bạn có chắc muốn hủy? Dữ liệu chưa lưu sẽ bị mất.")) {
+        return;
+      }
+    }
+    resetForm();
+  };
 
   const startCreate = () => {
+    cleanupPreviews();
     setEditingId(null);
     setFormData(emptyForm);
     setShowForm(true);
   };
 
   const startEdit = (product: Product) => {
+    cleanupPreviews();
     setEditingId(product._id);
     setFormData(productToForm(product));
     setShowForm(true);
@@ -373,6 +365,7 @@ export default function AdminProducts() {
 
   const handleChange = (field: keyof ProductForm, value: string) => {
     setFormData((current) => ({ ...current, [field]: value }));
+    setIsDirty(true);
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -383,18 +376,61 @@ export default function AdminProducts() {
       return;
     }
 
-    const payload = {
-      ...formData,
-      price: Number(formData.price),
-      oldPrice: Number(formData.oldPrice) || 0,
-      stock: Number(formData.stock) || 0,
-      status: formData.status,
+    let uploadedImage = formData.image;
+    let uploadedImagePublicId = formData.imagePublicId;
+    const newDeletedPublicIds: string[] = [];
+    const newlyUploadedPublicIds: string[] = [];
+    const updatedColors = [...formData.colors];
+
+    const uploadFile = async (file: File) => {
+      const uploadFormData = new FormData();
+      uploadFormData.append("file", file);
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: uploadFormData,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Lỗi khi upload ảnh");
+      }
+      return data;
     };
-    const url = editingId ? `/api/admin/products/${editingId}` : "/api/admin/products";
-    const method = editingId ? "PUT" : "POST";
 
     try {
       setIsSaving(true);
+
+      if (imageFile) {
+        const data = await uploadFile(imageFile);
+        uploadedImage = data.url;
+        if (formData.imagePublicId) newDeletedPublicIds.push(formData.imagePublicId);
+        uploadedImagePublicId = data.publicId;
+        newlyUploadedPublicIds.push(data.publicId);
+      }
+
+      for (const [indexStr, file] of Object.entries(colorImageFiles)) {
+        const idx = Number(indexStr);
+        const data = await uploadFile(file);
+        if (updatedColors[idx].imagePublicId) newDeletedPublicIds.push(updatedColors[idx].imagePublicId);
+        updatedColors[idx].image = data.url;
+        updatedColors[idx].imagePublicId = data.publicId;
+        newlyUploadedPublicIds.push(data.publicId);
+      }
+
+      const payload = {
+        ...formData,
+        price: Number(formData.price),
+        oldPrice: Number(formData.oldPrice) || 0,
+        stock: Number(formData.stock) || 0,
+        status: formData.status,
+        image: uploadedImage,
+        imagePublicId: uploadedImagePublicId,
+        colors: updatedColors,
+        deletedPublicIds: newDeletedPublicIds,
+      };
+
+      const url = editingId ? `/api/admin/products/${editingId}` : "/api/admin/products";
+      const method = editingId ? "PUT" : "POST";
+
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
@@ -414,11 +450,24 @@ export default function AdminProducts() {
         setProducts((current) => [data.product, ...current]);
       }
 
-      resetForm();
       alert(labels.saved);
-    } catch (error) {
+      resetForm();
+    } catch (error: any) {
       console.error("Failed to save product:", error);
-      alert(labels.saveError);
+      alert(error.message || labels.saveError);
+      
+      // Rollback any newly uploaded images from Cloudinary
+      for (const pid of newlyUploadedPublicIds) {
+        try {
+          await fetch("/api/upload", { 
+            method: "DELETE", 
+            headers: { "Content-Type": "application/json" }, 
+            body: JSON.stringify({ publicId: pid }) 
+          });
+        } catch (cleanupError) {
+          console.error("Cleanup error:", cleanupError);
+        }
+      }
     } finally {
       setIsSaving(false);
     }
@@ -587,15 +636,15 @@ export default function AdminProducts() {
                         type="file"
                         accept="image/jpeg, image/png, image/webp"
                         onChange={handleImageUpload}
-                        disabled={isUploading}
+                        disabled={isSaving}
                         className="absolute inset-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
                       />
                       <button
                         type="button"
-                        disabled={isUploading}
+                        disabled={isSaving}
                         className="flex w-full items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-bold text-gray-700 transition hover:bg-gray-50 disabled:opacity-50"
                       >
-                        {isUploading ? (
+                        {isSaving ? (
                           <span className="flex items-center gap-2">
                             <svg className="h-4 w-4 animate-spin text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                             Đang tải lên...
@@ -643,7 +692,10 @@ export default function AdminProducts() {
                   <label className="text-sm font-bold text-gray-700">{labels.colors}</label>
                   <button
                     type="button"
-                    onClick={() => setFormData(cur => ({ ...cur, colors: [...cur.colors, { name: "", hex: "#000000", image: "" }] }))}
+                    onClick={() => {
+                      setFormData(cur => ({ ...cur, colors: [...cur.colors, { name: "", hex: "#000000", image: "", imagePublicId: "" }] }));
+                      setIsDirty(true);
+                    }}
                     className="text-xs font-black text-blue-600 bg-blue-50 px-3 py-1 rounded-full hover:bg-blue-100"
                   >
                     + {labels.addColor}
@@ -661,6 +713,7 @@ export default function AdminProducts() {
                               const newColors = [...formData.colors];
                               newColors[index].hex = e.target.value;
                               setFormData(cur => ({ ...cur, colors: newColors }));
+                              setIsDirty(true);
                             }}
                             className="absolute -left-4 -top-4 h-20 w-20 cursor-pointer"
                           />
@@ -675,6 +728,7 @@ export default function AdminProducts() {
                               const newColors = [...formData.colors];
                               newColors[index].name = e.target.value;
                               setFormData(cur => ({ ...cur, colors: newColors }));
+                              setIsDirty(true);
                             }}
                             className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm font-semibold outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                           />
@@ -691,6 +745,7 @@ export default function AdminProducts() {
                               const newColors = [...formData.colors];
                               newColors[index].image = e.target.value;
                               setFormData(cur => ({ ...cur, colors: newColors }));
+                              setIsDirty(true);
                             }}
                             className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm font-semibold outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                           />
@@ -699,12 +754,12 @@ export default function AdminProducts() {
                               type="file"
                               accept="image/jpeg, image/png, image/webp"
                               onChange={(e) => handleColorImageUpload(index, e)}
-                              disabled={isUploading}
+                              disabled={isSaving}
                               className="absolute inset-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
                             />
                             <button
                               type="button"
-                              disabled={isUploading}
+                              disabled={isSaving}
                               className="flex h-full w-full items-center justify-center rounded-lg border border-gray-200 bg-white px-3 text-xs font-bold text-gray-700 transition hover:bg-gray-50 disabled:opacity-50"
                             >
                               Upload ảnh màu sắc
@@ -721,6 +776,13 @@ export default function AdminProducts() {
                           onClick={() => {
                             const newColors = formData.colors.filter((_, i) => i !== index);
                             setFormData(cur => ({ ...cur, colors: newColors }));
+                            setIsDirty(true);
+                            // Cleanup corresponding preview file if any
+                            if (colorImageFiles[index]) {
+                               const newFiles = { ...colorImageFiles };
+                               delete newFiles[index];
+                               setColorImageFiles(newFiles);
+                            }
                           }}
                           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-red-50 text-red-600 transition hover:bg-red-100"
                           title="Xóa màu này"
@@ -742,7 +804,7 @@ export default function AdminProducts() {
                 </button>
                 <button
                   type="button"
-                  onClick={resetForm}
+                  onClick={handleCancel}
                   className="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-black text-gray-700 transition hover:bg-gray-50"
                 >
                   {labels.cancel}

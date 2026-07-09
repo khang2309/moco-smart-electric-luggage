@@ -3,6 +3,7 @@ import { getDb } from "@/lib/mongodb";
 import { getDatabaseErrorMessage } from "@/lib/api-error";
 import { deleteInventoryForProduct, syncInventoryForProduct } from "@/lib/inventory";
 import { ObjectId } from "mongodb";
+import { deleteImageFromCloudinary } from "@/lib/cloudinary-upload";
 
 function createSlug(value: string) {
   return value
@@ -19,7 +20,7 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const { slug, name, description, price, oldPrice, image, stock, store, subtitle, status, colors } = await request.json();
+    const { slug, name, description, price, oldPrice, image, imagePublicId, stock, store, subtitle, status, colors, deletedPublicIds } = await request.json();
 
     if (!name || !price) {
       return NextResponse.json(
@@ -42,6 +43,7 @@ export async function PUT(
           price: Number(price),
           oldPrice: Number(oldPrice) || 0,
           image: image || "",
+          imagePublicId: imagePublicId || "",
           stock: Number(stock) || 0,
           store: store || "MOCO Official",
           subtitle: subtitle || description || "",
@@ -60,6 +62,12 @@ export async function PUT(
       );
     }
     await syncInventoryForProduct(db, result);
+
+    if (Array.isArray(deletedPublicIds) && deletedPublicIds.length > 0) {
+      for (const publicId of deletedPublicIds) {
+        if (publicId) await deleteImageFromCloudinary(publicId);
+      }
+    }
 
     return NextResponse.json({
       success: true,

@@ -126,7 +126,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const { slug, name, description, price, oldPrice, image, stock, store, subtitle, colors } = await request.json();
+    const { slug, name, description, price, oldPrice, image, imagePublicId, stock, store, subtitle, colors } = await request.json();
 
     if (!name || !price) {
       return NextResponse.json(
@@ -150,6 +150,7 @@ export async function POST(request: Request) {
       price: Number(price),
       oldPrice: Number(oldPrice) || 0,
       image: image || "",
+      imagePublicId: imagePublicId || "",
       stock: Number(stock) || 0,
       store: store || "MOCO Official",
       subtitle: subtitle || description || "",
