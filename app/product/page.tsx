@@ -34,6 +34,13 @@ const products = [
     vi: "Phiên bản cao cấp nhất, tích hợp GPS, chế độ tự động đi theo người dùng qua Bluetooth và ứng dụng điện thoại, cùng hệ thống cảm biến tránh vật cản thông minh toàn diện.",
     en: "The most advanced edition with GPS, Bluetooth app follow mode, and a complete intelligent obstacle avoidance system.",
   },
+  {
+    slug: "moco-future",
+    name: "MOCO Future",
+    image: "/assets/Product/mocoFuture.png",
+    vi: "MOCO Future là mẫu vali điện thông minh mang phong cách hiện đại, kết hợp giữa thiết kế trong suốt cao cấp và khả năng di chuyển linh hoạt.",
+    en: "MOCO Future is a modern smart electric luggage combining premium transparent design with flexible mobility.",
+  },
 ] as const;
 
 function getLoopOffset(index: number, activeIndex: number) {

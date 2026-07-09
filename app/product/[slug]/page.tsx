@@ -378,6 +378,35 @@ const products = [
       ],
     },
   },
+  {
+    slug: "moco-future",
+    name: "MOCO Future",
+    image: "/assets/Product/mocoFuture.png",
+    features: [
+      commonProductFeatures.ride,
+      commonProductFeatures.removableBattery,
+      commonProductFeatures.phoneCharge,
+      commonProductFeatures.airlineBattery,
+      commonProductFeatures.brake,
+      commonProductFeatures.lock,
+    ],
+    vi: {
+      description: "MOCO Future là mẫu vali điện thông minh mang phong cách hiện đại, kết hợp giữa thiết kế trong suốt cao cấp và khả năng di chuyển linh hoạt.",
+      specs: [
+        ["Thiết kế trong suốt", "Giúp người dùng dễ dàng nhìn thấy và kiểm soát hành lý bên trong."],
+        ["Vali điện di chuyển", "Tiết kiệm sức lực khi đi trong sân bay, khách sạn, trung tâm thương mại."],
+        ["Tay lái tiện dụng", "Điều hướng dễ dàng, thoải mái khi di chuyển trên quãng đường dài."],
+      ],
+    },
+    en: {
+      description: "MOCO Future is a modern smart electric luggage combining premium transparent design with flexible mobility.",
+      specs: [
+        ["Transparent design", "Helps users easily see and control luggage inside."],
+        ["Rideable electric luggage", "Saves energy when moving in airports, hotels, shopping malls."],
+        ["Convenient handlebar", "Easy navigation, comfortable when moving over long distances."],
+      ],
+    },
+  },
 ] as const;
 
 function FeatureIcon({ title }: { title: string }) {
