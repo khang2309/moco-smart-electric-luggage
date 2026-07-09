@@ -185,6 +185,9 @@ export default function ProductPage() {
             let offset = rawOffset;
             if (rawOffset > half) offset = rawOffset - visibleProducts.length;
             if (rawOffset < -half) offset = rawOffset + visibleProducts.length;
+            
+            if (offset > 2) offset = 2;
+            if (offset < -2) offset = -2;
 
             const isActive = offset === 0;
 
