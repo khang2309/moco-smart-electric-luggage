@@ -293,6 +293,18 @@ export default function AdminProducts() {
   const [translateStatus, setTranslateStatus] = useState<"idle" | "translating" | "translated" | "error">("idle");
   const [originalViData, setOriginalViData] = useState<ProductForm | null>(null);
 
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    message: string;
+    onConfirm: () => void;
+    onCancel?: () => void;
+  }>({ isOpen: false, message: '', onConfirm: () => {} });
+
+  const confirmAction = (message: string, onConfirm: () => void, onCancel?: () => void) => {
+    setConfirmDialog({ isOpen: true, message, onConfirm, onCancel });
+  };
+
+
   const formSectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -411,11 +423,12 @@ export default function AdminProducts() {
   
   const handleCancel = () => {
     if (isDirty) {
-      if (!window.confirm("Bạn có chắc muốn hủy? Dữ liệu chưa lưu sẽ bị mất.")) {
-        return;
-      }
+      confirmAction("Bạn có chắc muốn hủy? Dữ liệu chưa lưu sẽ bị mất.", () => {
+        resetForm();
+      });
+    } else {
+      resetForm();
     }
-    resetForm();
   };
 
   const startCreate = () => {
@@ -457,16 +470,8 @@ export default function AdminProducts() {
       JSON.stringify(formData.colors.map(c => c.name)) !== JSON.stringify(originalViData.colors.map(c => c.name))
     );
 
-    let shouldTranslate = false;
-    if (!editingId) {
-      shouldTranslate = true;
-    } else if (viChanged) {
-      if (window.confirm(labels.translateWarning)) {
-        shouldTranslate = true;
-      }
-    }
-
-    let uploadedImage = formData.image;
+    const executeSubmit = async (shouldTranslate: boolean) => {
+      let uploadedImage = formData.image;
     let uploadedImagePublicId = formData.imagePublicId;
     const newDeletedPublicIds: string[] = [];
     const newlyUploadedPublicIds: string[] = [];
@@ -589,6 +594,15 @@ export default function AdminProducts() {
     }
   };
 
+  if (!editingId) {
+    executeSubmit(true);
+  } else if (viChanged) {
+    confirmAction(labels.translateWarning, () => executeSubmit(true), () => executeSubmit(false));
+  } else {
+    executeSubmit(false);
+  }
+};
+
   const handleTranslateAgain = async () => {
     if (!editingId) return;
     setTranslateStatus("translating");
@@ -610,9 +624,9 @@ export default function AdminProducts() {
     }
   };
 
-  const handleRestore = async (product: Product) => {
-    if (!window.confirm(labels.confirmRestore)) return;
-    try {
+  const handleRestore = (product: Product) => {
+    confirmAction(labels.confirmRestore, async () => {
+      try {
       const res = await fetch(`/api/admin/products/${product._id}/restore`, { method: "POST" });
       const data = await res.json();
       if (!res.ok || !data.success) throw new Error(data.error || labels.restoreError);
@@ -621,15 +635,13 @@ export default function AdminProducts() {
     } catch (error) {
       console.error("Failed to restore product:", error);
       showToast(labels.restoreError, "error");
-    }
+      }
+    });
   };
 
-  const handleDelete = async (product: Product) => {
-    if (!window.confirm(labels.confirmDelete)) {
-      return;
-    }
-
-    try {
+  const handleDelete = (product: Product) => {
+    confirmAction(labels.confirmDelete, async () => {
+      try {
       const res = await fetch(`/api/admin/products/${product._id}`, { method: "DELETE" });
       const data = await res.json();
 
@@ -645,7 +657,8 @@ export default function AdminProducts() {
     } catch (error) {
       console.error("Failed to delete product:", error);
       showToast(labels.deleteError, "error");
-    }
+      }
+    });
   };
 
   const cards = [
@@ -1218,6 +1231,37 @@ export default function AdminProducts() {
             </table>
           )}
         </section>
-      </div>
+  
+      {confirmDialog.isOpen && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-xl text-center">
+            <h3 className="mb-4 text-lg font-bold text-gray-900">Xác nhận</h3>
+            <p className="mb-6 text-sm text-gray-600 font-medium">{confirmDialog.message}</p>
+            <div className="flex justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  if (confirmDialog.onCancel) confirmDialog.onCancel();
+                  setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+                }}
+                className="rounded-lg border border-gray-200 px-6 py-2 text-sm font-bold text-gray-700 hover:bg-gray-50 transition"
+              >
+                Hủy
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  confirmDialog.onConfirm();
+                  setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+                }}
+                className="rounded-lg bg-blue-600 px-6 py-2 text-sm font-bold text-white hover:bg-blue-700 transition"
+              >
+                Xác nhận
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
