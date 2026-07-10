@@ -458,9 +458,15 @@ export default function AdminProducts() {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    if (!formData.name.trim() || !formData.price) {
+    const activeName = language === "vi" ? formData.name : formData.nameEn;
+    if (!activeName?.trim() || !formData.price) {
       showToast(labels.requiredError, "error");
       return;
+    }
+    
+    // Ensure fallback for backend
+    if (!formData.name.trim() && formData.nameEn.trim()) {
+       formData.name = formData.nameEn;
     }
 
     const viChanged = originalViData && (
