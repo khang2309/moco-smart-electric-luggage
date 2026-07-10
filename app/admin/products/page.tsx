@@ -1,5 +1,5 @@
 "use client";
-import { toast } from "react-hot-toast";
+import { showToast } from "@/app/toast";
 
 
 import { useLanguage } from "@/app/providers";
@@ -306,12 +306,12 @@ export default function AdminProducts() {
     if (!file) return;
 
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-      toast.error("Chỉ hỗ trợ định dạng ảnh (JPG, PNG, WEBP)");
+      showToast("Chỉ hỗ trợ định dạng ảnh (JPG, PNG, WEBP)", "error");
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      toast.error("Dung lượng file không được vượt quá 5MB");
+      showToast("Dung lượng file không được vượt quá 5MB", "error");
       return;
     }
 
@@ -326,12 +326,12 @@ export default function AdminProducts() {
     if (!file) return;
 
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-      toast.error("Chỉ hỗ trợ định dạng ảnh (JPG, PNG, WEBP)");
+      showToast("Chỉ hỗ trợ định dạng ảnh (JPG, PNG, WEBP)", "error");
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      toast.error("Dung lượng file không được vượt quá 5MB");
+      showToast("Dung lượng file không được vượt quá 5MB", "error");
       return;
     }
 
@@ -356,7 +356,7 @@ export default function AdminProducts() {
       }
     } catch (error) {
       console.error("Failed to fetch products:", error);
-      toast.error(labels.loadError);
+      showToast(labels.loadError, "error");
     } finally {
       setIsLoading(false);
     }
@@ -446,7 +446,7 @@ export default function AdminProducts() {
     event.preventDefault();
 
     if (!formData.name.trim() || !formData.price) {
-      toast.error(labels.requiredError);
+      showToast(labels.requiredError, "error");
       return;
     }
 
@@ -554,23 +554,23 @@ export default function AdminProducts() {
           if (translateRes.ok && translateData.success) {
             setTranslateStatus("translated");
             setProducts((current) => current.map((product) => (product._id === savedProduct._id ? translateData.product : product)));
-            toast.success(labels.translateSuccess);
+            showToast(labels.translateSuccess, "success");
             resetForm();
           } else {
             setTranslateStatus("error");
-            toast.error(labels.translateError);
+            showToast(labels.translateError, "error");
           }
         } catch (err) {
           setTranslateStatus("error");
-          toast.error(labels.translateError);
+          showToast(labels.translateError, "error");
         }
       } else {
-        toast.success(labels.saved);
+        showToast(labels.saved, "success");
         resetForm();
       }
     } catch (error: any) {
       console.error("Failed to save product:", error);
-      toast.error(error.message || labels.saveError);
+      showToast(error.message || labels.saveError, "error");
       
       // Rollback any newly uploaded images from Cloudinary
       for (const pid of newlyUploadedPublicIds) {
@@ -598,15 +598,15 @@ export default function AdminProducts() {
       if (translateRes.ok && translateData.success) {
         setTranslateStatus("translated");
         setProducts((current) => current.map((product) => (product._id === editingId ? translateData.product : product)));
-        toast.success(labels.translateSuccess);
+        showToast(labels.translateSuccess, "success");
         resetForm();
       } else {
         setTranslateStatus("error");
-        toast.error(labels.translateError);
+        showToast(labels.translateError, "error");
       }
     } catch (err) {
       setTranslateStatus("error");
-      toast.error(labels.translateError);
+      showToast(labels.translateError, "error");
     }
   };
 
@@ -617,10 +617,10 @@ export default function AdminProducts() {
       const data = await res.json();
       if (!res.ok || !data.success) throw new Error(data.error || labels.restoreError);
       setProducts((current) => current.map((item) => item._id === product._id ? data.product : item));
-      toast.success(labels.restored);
+      showToast(labels.restored, "success");
     } catch (error) {
       console.error("Failed to restore product:", error);
-      toast.error(labels.restoreError);
+      showToast(labels.restoreError, "error");
     }
   };
 
@@ -641,10 +641,10 @@ export default function AdminProducts() {
       if (editingId === product._id) {
         resetForm();
       }
-      toast.success(labels.deleted);
+      showToast(labels.deleted, "success");
     } catch (error) {
       console.error("Failed to delete product:", error);
-      toast.error(labels.deleteError);
+      showToast(labels.deleteError, "error");
     }
   };
 

@@ -1,5 +1,5 @@
 "use client";
-import { toast } from "react-hot-toast";
+import { showToast } from "@/app/toast";
 
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/app/providers";
@@ -96,11 +96,11 @@ export default function WarrantiesAdminPage() {
       if (data.success) {
         setWarranties(warranties.filter(w => w._id !== id));
       } else {
-        toast(t.error);
+        showToast(t.error);
       }
     } catch (err) {
       console.error(err);
-      toast(t.error);
+      showToast(t.error);
     }
   };
 
@@ -120,11 +120,11 @@ export default function WarrantiesAdminPage() {
         setWarranties(warranties.map(w => w._id === editingItem._id ? { ...w, status: editStatus, warrantyExpiry: editExpiry } : w));
         setEditingItem(null);
       } else {
-        toast(t.error);
+        showToast(t.error);
       }
     } catch (err) {
       console.error(err);
-      toast(t.error);
+      showToast(t.error);
     }
   };
 
