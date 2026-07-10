@@ -21,7 +21,7 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const { slug, name, description, price, oldPrice, image, imagePublicId, stock, store, subtitle, status, colors, deletedPublicIds, features } = await request.json();
+    const { slug, name, description, price, oldPrice, image, imagePublicId, stock, store, subtitle, status, colors, deletedPublicIds, features, active, hidden } = await request.json();
 
     if (!name || !price) {
       return NextResponse.json(
@@ -32,6 +32,23 @@ export async function PUT(
 
     const db = await getDb();
     const products = db.collection("products");
+
+    const existingProduct = await products.findOne({ _id: new ObjectId(id) });
+    
+    if (!existingProduct) {
+      return NextResponse.json(
+        { error: "Product not found." },
+        { status: 404 }
+      );
+    }
+    
+    if (existingProduct.status === "deleted" || existingProduct.deletedAt != null) {
+      return NextResponse.json(
+        { error: "Sản phẩm đã bị xóa. Vui lòng khôi phục sản phẩm trước khi chỉnh sửa." },
+        { status: 403 }
+      );
+    }
+
     const normalizedSlug = slug ? createSlug(String(slug)) : createSlug(String(name));
 
     const nameEn = await translateViToEn(name);
@@ -55,7 +72,8 @@ export async function PUT(
           store: store || "MOCO Official",
           subtitle: subtitle || description || "",
           subtitleEn,
-          status: status || "active",
+          active: active !== undefined ? active : true,
+          hidden: hidden !== undefined ? hidden : false,
           colors: Array.isArray(colors) ? colors : [],
           features: Array.isArray(features) ? features : [],
           updatedAt: new Date(),

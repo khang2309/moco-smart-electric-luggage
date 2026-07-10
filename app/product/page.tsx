@@ -115,7 +115,7 @@ export default function ProductPage() {
         const data = await res.json();
         
         if (data.products) {
-          const activeDbProducts = data.products.filter((p: any) => p.status !== "deleted" && p.status !== "draft");
+          const activeDbProducts = data.products.filter((p: any) => p.status !== "deleted" && !p.hidden && p.status !== "draft");
           const mappedProducts = activeDbProducts.map((dbProd: any) => {
             const existing = products.find(p => p.slug === dbProd.slug);
             return {

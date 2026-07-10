@@ -762,7 +762,7 @@ export default function ProductDetailPage() {
         const dbProduct = data.products?.find((p: any) => p.slug === params?.slug);
         if (dbProduct) {
           setDbData(dbProduct);
-          setLiveStatus(dbProduct.status || "active");
+          setLiveStatus(dbProduct.hidden ? "draft" : (dbProduct.status || "active"));
           setLiveStock(dbProduct.stock ?? 0);
           if (dbProduct.colors && dbProduct.colors.length > 0) {
             setColors(dbProduct.colors);

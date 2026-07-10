@@ -8,8 +8,11 @@ type Product = {
   _id: string;
   slug?: string;
   name: string;
+  nameEn?: string;
   description?: string;
+  descriptionEn?: string;
   subtitle?: string;
+  subtitleEn?: string;
   store?: string;
   price: number;
   oldPrice?: number;
@@ -17,7 +20,9 @@ type Product = {
   imagePublicId?: string;
   stock: number;
   status?: "active" | "draft" | "deleted";
-  colors?: { name: string; hex: string; image: string; imagePublicId?: string }[];
+  active?: boolean;
+  hidden?: boolean;
+  colors?: { name: string; nameEn?: string; hex: string; image: string; imagePublicId?: string }[];
   features?: string[];
   createdAt?: string;
   updatedAt?: string;
@@ -26,31 +31,39 @@ type Product = {
 type ProductForm = {
   slug: string;
   name: string;
+  nameEn: string;
   subtitle: string;
+  subtitleEn: string;
   description: string;
+  descriptionEn: string;
   price: string;
   oldPrice: string;
   image: string;
   imagePublicId: string;
   stock: string;
   store: string;
-  status: string;
-  colors: { name: string; hex: string; image: string; imagePublicId: string }[];
+  active: boolean;
+  hidden: boolean;
+  colors: { name: string; nameEn: string; hex: string; image: string; imagePublicId: string }[];
   features: string[];
 };
 
 const emptyForm: ProductForm = {
   slug: "",
   name: "",
+  nameEn: "",
   subtitle: "",
+  subtitleEn: "",
   description: "",
+  descriptionEn: "",
   price: "",
   oldPrice: "",
   image: "",
   imagePublicId: "",
   stock: "",
   store: "MOCO Official",
-  status: "active",
+  active: true,
+  hidden: false,
   colors: [],
   features: [],
 };
@@ -123,6 +136,20 @@ const text = {
     colorName: "Tên màu",
     colorHex: "Mã màu (Hex)",
     colorImage: "URL ảnh màu",
+    productImageUpload: "Chọn ảnh để tải lên (tối đa 5 MB)",
+    restore: "Khôi phục",
+    confirmRestore: "Bạn có chắc muốn khôi phục sản phẩm này?",
+    restored: "Khôi phục sản phẩm thành công.",
+    restoreError: "Lỗi khi khôi phục sản phẩm.",
+    translating: "Đang dịch...",
+    translateSuccess: "Đã tạo và dịch nội dung sản phẩm thành công.",
+    translateError: "Sản phẩm đã được lưu nhưng chưa thể tạo bản dịch tiếng Anh.",
+    translateAgain: "Dịch lại",
+    translateWarning: "Nội dung tiếng Việt đã thay đổi. Bạn có muốn cập nhật lại bản dịch tiếng Anh không?",
+    productNameEn: "Tên sản phẩm (English)",
+    subtitleFieldEn: "Mô tả ngắn (English)",
+    descriptionEnField: "Mô tả chi tiết (English)",
+    colorNameEn: "Tên màu (English)",
   },
   en: {
     title: "Product & Inventory Management",
@@ -176,6 +203,20 @@ const text = {
     colorName: "Color name",
     colorHex: "Color hex",
     colorImage: "Color image URL",
+    productImageUpload: "Choose an image from your computer (Maximum 5MB)",
+    restore: "Restore",
+    confirmRestore: "Are you sure you want to restore this product?",
+    restored: "Product restored successfully.",
+    restoreError: "Could not restore product.",
+    translating: "Translating...",
+    translateSuccess: "Product created and translated successfully.",
+    translateError: "Product saved but could not generate English translation.",
+    translateAgain: "Translate again",
+    translateWarning: "Vietnamese content has changed. Do you want to update the English translation?",
+    productNameEn: "Product name (English)",
+    subtitleFieldEn: "Short description (English)",
+    descriptionEnField: "Full description (English)",
+    colorNameEn: "Color name (English)",
   },
 } as const;
 
@@ -217,16 +258,20 @@ function productToForm(product: Product): ProductForm {
   return {
     slug: product.slug || "",
     name: product.name || "",
+    nameEn: product.nameEn || "",
     subtitle: product.subtitle || "",
+    subtitleEn: product.subtitleEn || "",
     description: product.description || "",
+    descriptionEn: product.descriptionEn || "",
     price: String(product.price || ""),
     oldPrice: String(product.oldPrice || ""),
     image: product.image || "",
     imagePublicId: product.imagePublicId || "",
     stock: String(product.stock || 0),
     store: product.store || "MOCO Official",
-    status: product.status || "active",
-    colors: product.colors?.map(c => ({...c, imagePublicId: c.imagePublicId || ""})) || [],
+    active: product.active !== undefined ? product.active : (product.status !== "draft" && product.status !== "deleted"),
+    hidden: product.hidden !== undefined ? product.hidden : (product.status === "draft"),
+    colors: product.colors?.map(c => ({...c, nameEn: c.nameEn || "", imagePublicId: c.imagePublicId || ""})) || [],
     features: product.features || [],
   };
 }
@@ -244,6 +289,8 @@ export default function AdminProducts() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [colorImageFiles, setColorImageFiles] = useState<Record<number, File>>({});
   const [isDirty, setIsDirty] = useState(false);
+  const [translateStatus, setTranslateStatus] = useState<"idle" | "translating" | "translated" | "error">("idle");
+  const [originalViData, setOriginalViData] = useState<ProductForm | null>(null);
 
   const formSectionRef = useRef<HTMLDivElement>(null);
 
@@ -356,6 +403,8 @@ export default function AdminProducts() {
     cleanupPreviews();
     setEditingId(null);
     setFormData(emptyForm);
+    setOriginalViData(null);
+    setTranslateStatus("idle");
     setShowForm(false);
   };
   
@@ -372,13 +421,18 @@ export default function AdminProducts() {
     cleanupPreviews();
     setEditingId(null);
     setFormData(emptyForm);
+    setOriginalViData(emptyForm);
+    setTranslateStatus("idle");
     setShowForm(true);
   };
 
   const startEdit = (product: Product) => {
     cleanupPreviews();
     setEditingId(product._id);
-    setFormData(productToForm(product));
+    const mapped = productToForm(product);
+    setFormData(mapped);
+    setOriginalViData(mapped);
+    setTranslateStatus("idle");
     setShowForm(true);
   };
 
@@ -393,6 +447,22 @@ export default function AdminProducts() {
     if (!formData.name.trim() || !formData.price) {
       alert(labels.requiredError);
       return;
+    }
+
+    const viChanged = originalViData && (
+      formData.name !== originalViData.name ||
+      formData.subtitle !== originalViData.subtitle ||
+      formData.description !== originalViData.description ||
+      JSON.stringify(formData.colors.map(c => c.name)) !== JSON.stringify(originalViData.colors.map(c => c.name))
+    );
+
+    let shouldTranslate = false;
+    if (!editingId) {
+      shouldTranslate = true;
+    } else if (viChanged) {
+      if (window.confirm(labels.translateWarning)) {
+        shouldTranslate = true;
+      }
     }
 
     let uploadedImage = formData.image;
@@ -440,7 +510,8 @@ export default function AdminProducts() {
         price: Number(formData.price),
         oldPrice: Number(formData.oldPrice) || 0,
         stock: Number(formData.stock) || 0,
-        status: formData.status,
+        active: formData.active,
+        hidden: formData.hidden,
         image: uploadedImage,
         imagePublicId: uploadedImagePublicId,
         colors: updatedColors,
@@ -461,16 +532,41 @@ export default function AdminProducts() {
         throw new Error(data.error || labels.saveError);
       }
 
-      if (editingId) {
+      let savedProduct = data.product;
+      const isEditing = !!editingId;
+
+      if (isEditing) {
         setProducts((current) =>
-          current.map((product) => (product._id === editingId ? data.product : product)),
+          current.map((product) => (product._id === editingId ? savedProduct : product)),
         );
       } else {
-        setProducts((current) => [data.product, ...current]);
+        setProducts((current) => [savedProduct, ...current]);
+        setEditingId(savedProduct._id);
+        setFormData(productToForm(savedProduct));
       }
 
-      alert(labels.saved);
-      resetForm();
+      if (shouldTranslate) {
+        setTranslateStatus("translating");
+        try {
+          const translateRes = await fetch(`/api/admin/products/${savedProduct._id}/translate`, { method: "POST" });
+          const translateData = await translateRes.json();
+          if (translateRes.ok && translateData.success) {
+            setTranslateStatus("translated");
+            setProducts((current) => current.map((product) => (product._id === savedProduct._id ? translateData.product : product)));
+            alert(labels.translateSuccess);
+            resetForm();
+          } else {
+            setTranslateStatus("error");
+            alert(labels.translateError);
+          }
+        } catch (err) {
+          setTranslateStatus("error");
+          alert(labels.translateError);
+        }
+      } else {
+        alert(labels.saved);
+        resetForm();
+      }
     } catch (error: any) {
       console.error("Failed to save product:", error);
       alert(error.message || labels.saveError);
@@ -489,6 +585,41 @@ export default function AdminProducts() {
       }
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleTranslateAgain = async () => {
+    if (!editingId) return;
+    setTranslateStatus("translating");
+    try {
+      const translateRes = await fetch(`/api/admin/products/${editingId}/translate`, { method: "POST" });
+      const translateData = await translateRes.json();
+      if (translateRes.ok && translateData.success) {
+        setTranslateStatus("translated");
+        setProducts((current) => current.map((product) => (product._id === editingId ? translateData.product : product)));
+        alert(labels.translateSuccess);
+        resetForm();
+      } else {
+        setTranslateStatus("error");
+        alert(labels.translateError);
+      }
+    } catch (err) {
+      setTranslateStatus("error");
+      alert(labels.translateError);
+    }
+  };
+
+  const handleRestore = async (product: Product) => {
+    if (!window.confirm(labels.confirmRestore)) return;
+    try {
+      const res = await fetch(`/api/admin/products/${product._id}/restore`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error || labels.restoreError);
+      setProducts((current) => current.map((item) => item._id === product._id ? data.product : item));
+      alert(labels.restored);
+    } catch (error) {
+      console.error("Failed to restore product:", error);
+      alert(labels.restoreError);
     }
   };
 
@@ -564,24 +695,46 @@ export default function AdminProducts() {
 
         {showForm && (
           <section ref={formSectionRef} className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm scroll-mt-24">
-            <div className="mb-5">
-              <h2 className="text-xl font-black text-gray-950">
-                {editingId ? labels.editProduct : labels.addProduct}
-              </h2>
-              <p className="mt-1 text-sm font-semibold text-gray-500">{labels.productInfo}</p>
+            <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-black text-gray-950 flex items-center gap-2">
+                  {editingId ? labels.editProduct : labels.addProduct}
+                  {translateStatus === "translating" && (
+                     <span className="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded-full">{labels.translating}</span>
+                  )}
+                  {translateStatus === "error" && (
+                     <span className="text-xs font-bold bg-red-100 text-red-700 px-2 py-1 rounded-full">{labels.translateError}</span>
+                  )}
+                </h2>
+                <p className="mt-1 text-sm font-semibold text-gray-500">{labels.productInfo}</p>
+              </div>
             </div>
 
             <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 lg:grid-cols-4">
-              <label className="grid gap-1 text-sm font-bold text-gray-700 lg:col-span-2">
-                {labels.productName}
-                <input
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={(event) => handleChange("name", event.target.value)}
-                  className="rounded-lg border border-gray-200 px-3 py-2 font-semibold outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                />
-              </label>
+              <div className="lg:col-span-2">
+                {language === 'vi' ? (
+                  <label className="grid gap-1 text-sm font-bold text-gray-700">
+                    {labels.productName}
+                    <input
+                      type="text"
+                      required
+                      value={formData.name}
+                      onChange={(event) => handleChange("name", event.target.value)}
+                      className="rounded-lg border border-gray-200 px-3 py-2 font-semibold outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                    />
+                  </label>
+                ) : (
+                  <label className="grid gap-1 text-sm font-bold text-gray-700">
+                    {labels.productNameEn}
+                    <input
+                      type="text"
+                      value={formData.nameEn}
+                      onChange={(event) => handleChange("nameEn", event.target.value)}
+                      className="rounded-lg border border-gray-200 px-3 py-2 font-semibold outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-blue-50/30"
+                    />
+                  </label>
+                )}
+              </div>
               <label className="grid gap-1 text-sm font-bold text-gray-700">
                 {labels.slug}
                 <input
@@ -600,15 +753,29 @@ export default function AdminProducts() {
                   className="rounded-lg border border-gray-200 px-3 py-2 font-semibold outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 />
               </label>
-              <label className="grid gap-1 text-sm font-bold text-gray-700 lg:col-span-2">
-                {labels.subtitleField}
-                <input
-                  type="text"
-                  value={formData.subtitle}
-                  onChange={(event) => handleChange("subtitle", event.target.value)}
-                  className="rounded-lg border border-gray-200 px-3 py-2 font-semibold outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                />
-              </label>
+              <div className="lg:col-span-2">
+                {language === 'vi' ? (
+                  <label className="grid gap-1 text-sm font-bold text-gray-700">
+                    {labels.subtitleField}
+                    <input
+                      type="text"
+                      value={formData.subtitle}
+                      onChange={(event) => handleChange("subtitle", event.target.value)}
+                      className="rounded-lg border border-gray-200 px-3 py-2 font-semibold outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                    />
+                  </label>
+                ) : (
+                  <label className="grid gap-1 text-sm font-bold text-gray-700">
+                    {labels.subtitleFieldEn}
+                    <input
+                      type="text"
+                      value={formData.subtitleEn}
+                      onChange={(event) => handleChange("subtitleEn", event.target.value)}
+                      className="rounded-lg border border-gray-200 px-3 py-2 font-semibold outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-blue-50/30"
+                    />
+                  </label>
+                )}
+              </div>
               <label className="grid gap-1 text-sm font-bold text-gray-700">
                 {labels.price}
                 <input
@@ -630,7 +797,7 @@ export default function AdminProducts() {
                   className="rounded-lg border border-gray-200 px-3 py-2 font-semibold outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 />
               </label>
-              <div className="grid gap-1 text-sm font-bold text-gray-700 lg:col-span-3">
+              <div className="grid gap-1 text-sm font-bold text-gray-700 lg:col-span-2">
                 <label>{labels.image}</label>
                 <div className="flex gap-4 items-end">
                   {formData.image ? (
@@ -669,7 +836,7 @@ export default function AdminProducts() {
                             Đang tải lên...
                           </span>
                         ) : (
-                          "Chọn ảnh từ máy tính (Tối đa 5MB)"
+                          labels.productImageUpload
                         )}
                       </button>
                     </div>
@@ -686,26 +853,60 @@ export default function AdminProducts() {
                   className="rounded-lg border border-gray-200 px-3 py-2 font-semibold outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 />
               </label>
-              <label className="grid gap-1 text-sm font-bold text-gray-700">
-                {labels.status}
-                <select
-                  value={formData.status}
-                  onChange={(event) => handleChange("status", event.target.value)}
-                  className="rounded-lg border border-gray-200 px-3 py-2 font-semibold outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                >
-                  <option value="active">{labels.activeStatus}</option>
-                  <option value="draft">{labels.draftStatus}</option>
-                </select>
-              </label>
-              <label className="grid gap-1 text-sm font-bold text-gray-700 lg:col-span-4">
-                {labels.description}
-                <textarea
-                  value={formData.description}
-                  onChange={(event) => handleChange("description", event.target.value)}
-                  rows={3}
-                  className="rounded-lg border border-gray-200 px-3 py-2 font-semibold outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                />
-              </label>
+              <div className="grid gap-2 text-sm font-bold text-gray-700">
+                <label>{labels.status}</label>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2 cursor-pointer font-semibold whitespace-nowrap">
+                    <input
+                      type="checkbox"
+                      checked={formData.active}
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        setFormData(cur => ({ ...cur, active: checked, hidden: !checked }));
+                        setIsDirty(true);
+                      }}
+                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    {labels.activeStatus}
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer font-semibold whitespace-nowrap">
+                    <input
+                      type="checkbox"
+                      checked={formData.hidden}
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        setFormData(cur => ({ ...cur, hidden: checked, active: !checked }));
+                        setIsDirty(true);
+                      }}
+                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    {labels.draftStatus}
+                  </label>
+                </div>
+              </div>
+              <div className="lg:col-span-4">
+                {language === 'vi' ? (
+                  <label className="grid gap-1 text-sm font-bold text-gray-700">
+                    {labels.description}
+                    <textarea
+                      value={formData.description}
+                      onChange={(event) => handleChange("description", event.target.value)}
+                      rows={3}
+                      className="rounded-lg border border-gray-200 px-3 py-2 font-semibold outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                    />
+                  </label>
+                ) : (
+                  <label className="grid gap-1 text-sm font-bold text-gray-700">
+                    {labels.descriptionEnField}
+                    <textarea
+                      value={formData.descriptionEn}
+                      onChange={(event) => handleChange("descriptionEn", event.target.value)}
+                      rows={3}
+                      className="rounded-lg border border-gray-200 px-3 py-2 font-semibold outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-blue-50/30"
+                    />
+                  </label>
+                )}
+              </div>
 
               <div className="lg:col-span-4 border-t border-gray-100 pt-4 mt-2">
                 <label className="text-sm font-bold text-gray-700 mb-3 block">Tính năng (Features)</label>
@@ -765,19 +966,34 @@ export default function AdminProducts() {
                           />
                         </label>
                         <div className="flex-1">
-                          <input
-                            type="text"
-                            placeholder={labels.colorName}
-                            required
-                            value={color.name}
-                            onChange={(e) => {
-                              const newColors = [...formData.colors];
-                              newColors[index].name = e.target.value;
-                              setFormData(cur => ({ ...cur, colors: newColors }));
-                              setIsDirty(true);
-                            }}
-                            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm font-semibold outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                          />
+                          {language === 'vi' ? (
+                            <input
+                              type="text"
+                              placeholder={labels.colorName}
+                              required
+                              value={color.name}
+                              onChange={(e) => {
+                                const newColors = [...formData.colors];
+                                newColors[index].name = e.target.value;
+                                setFormData(cur => ({ ...cur, colors: newColors }));
+                                setIsDirty(true);
+                              }}
+                              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm font-semibold outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                            />
+                          ) : (
+                            <input
+                              type="text"
+                              placeholder={labels.colorNameEn}
+                              value={color.nameEn}
+                              onChange={(e) => {
+                                const newColors = [...formData.colors];
+                                newColors[index].nameEn = e.target.value;
+                                setFormData(cur => ({ ...cur, colors: newColors }));
+                                setIsDirty(true);
+                              }}
+                              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm font-semibold outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-blue-50/30"
+                            />
+                          )}
                         </div>
                       </div>
                       <div className="flex flex-[1.5] items-center gap-3">
@@ -840,21 +1056,32 @@ export default function AdminProducts() {
                   ))}
                 </div>
               </div>
-              <div className="flex flex-wrap gap-2 lg:col-span-4 mt-2">
-                <button
-                  type="submit"
-                  disabled={isSaving}
-                  className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-black text-white shadow-sm transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {isSaving ? labels.loading : editingId ? labels.save : labels.create}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCancel}
-                  className="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-black text-gray-700 transition hover:bg-gray-50"
-                >
-                  {labels.cancel}
-                </button>
+              <div className="flex flex-wrap items-center justify-between gap-4 lg:col-span-4 mt-2">
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="submit"
+                    disabled={isSaving}
+                    className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-black text-white shadow-sm transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {isSaving ? labels.loading : editingId ? labels.save : labels.create}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleCancel}
+                    className="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-black text-gray-700 transition hover:bg-gray-50"
+                  >
+                    {labels.cancel}
+                  </button>
+                </div>
+                {translateStatus === "error" && (
+                  <button
+                    type="button"
+                    onClick={handleTranslateAgain}
+                    className="rounded-lg border border-red-200 bg-red-50 text-red-600 px-5 py-2.5 text-sm font-black transition hover:bg-red-100"
+                  >
+                    {labels.translateAgain}
+                  </button>
+                )}
               </div>
             </form>
           </section>
@@ -938,10 +1165,10 @@ export default function AdminProducts() {
                           </span>
                           <span className={`block w-max rounded-full px-3 py-1 text-xs font-black ring-1 ${
                             product.status === "deleted" ? "bg-gray-50 text-gray-700 ring-gray-200" :
-                            product.status === "draft" ? "bg-amber-50 text-amber-700 ring-amber-200" :
+                            product.hidden ? "bg-amber-50 text-amber-700 ring-amber-200" :
                             "bg-blue-50 text-blue-700 ring-blue-200"
                           }`}>
-                            {product.status === "deleted" ? labels.deletedStatus : product.status === "draft" ? labels.draftStatus : labels.activeStatus}
+                            {product.status === "deleted" ? labels.deletedStatus : product.hidden ? labels.draftStatus : labels.activeStatus}
                           </span>
                         </div>
                       </td>
@@ -955,21 +1182,31 @@ export default function AdminProducts() {
                       </td>
                       <td className="md:px-4 md:py-4 flex justify-end md:table-cell border-t border-gray-100 md:border-0 pt-4 mt-2 md:pt-4 md:mt-0">
                         <div className="flex justify-end gap-2 w-full md:w-auto">
-                          <button
-                            type="button"
-                            onClick={() => startEdit(product)}
-                            className="flex-1 md:flex-none justify-center rounded-lg border border-blue-100 bg-blue-50 px-4 py-2.5 md:px-3 md:py-2 text-sm md:text-xs font-black text-blue-700 transition hover:bg-blue-100"
-                          >
-                            {labels.edit}
-                          </button>
-                          {product.status !== "deleted" && (
+                          {product.status === "deleted" ? (
                             <button
                               type="button"
-                              onClick={() => handleDelete(product)}
-                              className="flex-1 md:flex-none justify-center rounded-lg border border-red-100 bg-red-50 px-4 py-2.5 md:px-3 md:py-2 text-sm md:text-xs font-black text-red-700 transition hover:bg-red-100"
+                              onClick={() => handleRestore(product)}
+                              className="flex-1 md:flex-none justify-center rounded-lg border border-emerald-100 bg-emerald-50 px-4 py-2.5 md:px-3 md:py-2 text-sm md:text-xs font-black text-emerald-700 transition hover:bg-emerald-100"
                             >
-                              {labels.delete}
+                              {labels.restore}
                             </button>
+                          ) : (
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => startEdit(product)}
+                                className="flex-1 md:flex-none justify-center rounded-lg border border-blue-100 bg-blue-50 px-4 py-2.5 md:px-3 md:py-2 text-sm md:text-xs font-black text-blue-700 transition hover:bg-blue-100"
+                              >
+                                {labels.edit}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleDelete(product)}
+                                className="flex-1 md:flex-none justify-center rounded-lg border border-red-100 bg-red-50 px-4 py-2.5 md:px-3 md:py-2 text-sm md:text-xs font-black text-red-700 transition hover:bg-red-100"
+                              >
+                                {labels.delete}
+                              </button>
+                            </>
                           )}
                         </div>
                       </td>

@@ -95,8 +95,8 @@ export default function HomePage() {
         
         if (data.products) {
           const dbFeatured = data.products.find((p: any) => p.slug === featuredProduct.slug);
-          if (!dbFeatured || dbFeatured.status === "deleted" || dbFeatured.status === "draft") {
-            const firstActive = data.products.find((p: any) => p.status !== "deleted" && p.status !== "draft");
+          if (!dbFeatured || dbFeatured.status === "deleted" || dbFeatured.hidden || dbFeatured.status === "draft") {
+            const firstActive = data.products.find((p: any) => p.status !== "deleted" && !p.hidden && p.status !== "draft");
             if (firstActive) {
               setActiveFeatured({
                 ...featuredProduct,

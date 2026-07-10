@@ -127,7 +127,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const { slug, name, description, price, oldPrice, image, imagePublicId, stock, store, subtitle, colors, features } = await request.json();
+    const { slug, name, description, price, oldPrice, image, imagePublicId, stock, store, subtitle, colors, features, active, hidden } = await request.json();
 
     if (!name || !price) {
       return NextResponse.json(
@@ -163,6 +163,8 @@ export async function POST(request: Request) {
       subtitle: subtitle || description || "",
       subtitleEn,
       status: "active", // default status
+      active: active !== undefined ? active : true,
+      hidden: hidden !== undefined ? hidden : false,
       colors: Array.isArray(colors) ? colors : [],
       features: Array.isArray(features) ? features : [],
       createdAt: new Date(),
