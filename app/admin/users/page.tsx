@@ -1,4 +1,5 @@
 "use client";
+import { toast } from "react-hot-toast";
 
 
 import { useLanguage } from "@/app/providers";
@@ -84,11 +85,11 @@ export default function AdminUsers() {
       if (data.success) {
         fetchUsers();
       } else {
-        alert(data.error || "Error");
+        toast(data.error || "Error");
       }
     } catch (error) {
       console.error(error);
-      alert("Error updating role");
+      toast("Error updating role");
     } finally {
       setIsUpdating(null);
     }
@@ -104,7 +105,7 @@ export default function AdminUsers() {
       }
     } catch (error) {
       console.error("Failed to fetch users:", error);
-      alert(t.loadError);
+      toast(t.loadError);
     } finally {
       setIsLoading(false);
     }

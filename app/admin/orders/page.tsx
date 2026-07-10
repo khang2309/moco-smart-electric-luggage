@@ -1,4 +1,5 @@
 "use client";
+import { toast } from "react-hot-toast";
 
 
 import { useLanguage } from "@/app/providers";
@@ -144,11 +145,11 @@ export default function AdminOrders() {
         setOrders(orders.map(o => o._id === selectedOrder._id ? { ...o, status: newStatus, fulfillmentStatus: newStatus } : o));
         setSelectedOrder({ ...selectedOrder, status: newStatus, fulfillmentStatus: newStatus });
       } else {
-        alert(language === "vi" ? "Lỗi cập nhật trạng thái." : "Error updating status.");
+        toast(language === "vi" ? "Lỗi cập nhật trạng thái." : "Error updating status.");
       }
     } catch (error) {
       console.error(error);
-      alert(language === "vi" ? "Đã có lỗi xảy ra." : "An error occurred.");
+      toast(language === "vi" ? "Đã có lỗi xảy ra." : "An error occurred.");
     } finally {
       setIsUpdatingStatus(false);
     }
@@ -164,7 +165,7 @@ export default function AdminOrders() {
       }
     } catch (error) {
       console.error("Failed to fetch orders:", error);
-      alert(t.loadError);
+      toast(t.loadError);
     } finally {
       setIsLoading(false);
     }
