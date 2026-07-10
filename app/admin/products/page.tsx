@@ -940,7 +940,7 @@ export default function AdminProducts() {
                   <button
                     type="button"
                     onClick={() => {
-                      setFormData(cur => ({ ...cur, colors: [...cur.colors, { name: "", hex: "#000000", image: "", imagePublicId: "" }] }));
+                      setFormData(cur => ({ ...cur, colors: [...cur.colors, { name: "", nameEn: "", hex: "#000000", image: "", imagePublicId: "" }] }));
                       setIsDirty(true);
                     }}
                     className="text-xs font-black text-blue-600 bg-blue-50 px-3 py-1 rounded-full hover:bg-blue-100"
