@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
-import { useLanguage } from "../app/providers";
+import { useLanguage } from '../app/LanguageProvider';
 
 const footerCopy = {
   vi: {

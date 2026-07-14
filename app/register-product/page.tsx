@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useLanguage } from "../providers";
+import { useLanguage } from '../LanguageProvider';
 import { readCurrentUser } from "../auth-storage";
 
 export default function RegisterProductPage() {

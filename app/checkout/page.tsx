@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { useLanguage } from "../providers";
+import { useLanguage } from '../LanguageProvider';
 import { showToast } from "../toast";
 
 type CartItem = {

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useLanguage } from "../providers";
+import { useLanguage } from '../LanguageProvider';
 
 const aboutCopy = {
   vi: {

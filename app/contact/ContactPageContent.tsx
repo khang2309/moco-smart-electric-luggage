@@ -1,6 +1,6 @@
 "use client";
 
-import { useLanguage } from "../providers";
+import { useLanguage } from '../LanguageProvider';
 import ContactForm from "./ContactForm";
 
 const copy = {

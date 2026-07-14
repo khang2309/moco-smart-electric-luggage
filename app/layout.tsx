@@ -5,7 +5,6 @@ import Footer from "../components/Footer";
 import Header from "../components/Header";
 import ToastContainer from "../components/ToastContainer";
 import { Providers } from "./providers";
-import NextTopLoader from 'nextjs-toploader';
 
 export const metadata: Metadata = {
   title: "MOCO - Smart Electric Luggage",
@@ -24,7 +23,6 @@ export default function RootLayout({
   return (
     <html lang="vi">
       <body>
-        <NextTopLoader color="#0d5bff" showSpinner={false} speed={300} />
         <Providers>
           <Header />
           {children}

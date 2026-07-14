@@ -12,7 +12,7 @@ import {
   updateProfile,
   type MocoUser,
 } from "../auth-storage";
-import { useLanguage } from "../providers";
+import { useLanguage } from '../LanguageProvider';
 
 function AccountContent() {
   const { language } = useLanguage();

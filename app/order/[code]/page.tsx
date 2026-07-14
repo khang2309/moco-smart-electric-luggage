@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { useLanguage } from "../../providers";
+import { useLanguage } from '../../LanguageProvider';
 import { readCurrentUser } from "../../auth-storage";
 import { showToast } from "../../toast";
 import {

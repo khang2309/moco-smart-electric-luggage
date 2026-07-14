@@ -1,7 +1,7 @@
 "use client";
 
 import { QueryProvider } from "./QueryProvider";
-import { LanguageProvider, useLanguage, type Language } from "./LanguageProvider";
+import { LanguageProvider } from "./LanguageProvider";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -12,5 +12,3 @@ export function Providers({ children }: { children: React.ReactNode }) {
     </QueryProvider>
   );
 }
-
-export { useLanguage, type Language };

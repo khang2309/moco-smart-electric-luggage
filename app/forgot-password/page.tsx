@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { createPasswordReset } from "../auth-storage";
-import { useLanguage } from "../providers";
+import { useLanguage } from '../LanguageProvider';
 
 const copy = {
   vi: {

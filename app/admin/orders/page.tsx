@@ -1,7 +1,7 @@
 "use client";
 
 import { showToast } from "@/app/toast";
-import { useLanguage } from "@/app/providers";
+import { useLanguage } from '@/app/LanguageProvider';
 import { useEffect, useMemo, useState } from "react";
 
 type OrderItem = { name?: string; quantity?: number; price?: number };

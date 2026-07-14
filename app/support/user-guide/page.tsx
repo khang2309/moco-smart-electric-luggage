@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useLanguage, type Language } from "../../providers";
+import { useLanguage, type Language } from '../../LanguageProvider';
 
 const copy = {
   vi: {

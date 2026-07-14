@@ -5,7 +5,7 @@ import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { loginUser } from "../auth-storage";
-import { useLanguage } from "../providers";
+import { useLanguage } from '../LanguageProvider';
 import { showToast } from "../toast";
 
 const copy = {

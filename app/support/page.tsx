@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useLanguage } from "../providers";
+import { useLanguage } from '../LanguageProvider';
 
 const copy = {
   vi: {

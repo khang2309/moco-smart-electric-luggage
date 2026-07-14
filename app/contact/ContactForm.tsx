@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { useLanguage } from "../providers";
+import { useLanguage } from '../LanguageProvider';
 
 type FormState = {
   pending: boolean;

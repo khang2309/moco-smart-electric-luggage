@@ -3,7 +3,14 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useLanguage } from "@/app/providers";
+import { useLanguage } from '@/app/LanguageProvider';
+import { 
+  TrendingUp, TrendingDown, DollarSign, Wallet, Percent, 
+  ShoppingCart, Package, Users, UserPlus, AlertCircle, 
+  Heart, CreditCard, Box, Calendar, Download, RefreshCw,
+  Search, Eye, Printer, ChevronLeft, ChevronRight, CheckCircle2,
+  Clock, XCircle, RotateCcw
+} from "lucide-react";
 
 const DashboardCharts = dynamic(() => import("@/components/admin/dashboard-charts"), {
   loading: () => <div className="h-96 animate-pulse rounded-2xl bg-slate-200" />,
@@ -69,13 +76,39 @@ function StatusBadge({ status }: { status: string }) {
   return <span className={`inline-flex whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset ${colors[status] || "bg-slate-50 text-slate-700 ring-slate-200"}`}>{localizedLabels[status] || status}</span>;
 }
 
-function MetricCard({ label, value, detail, tone = "blue" }: { label: string; value: string; detail?: string; tone?: "blue" | "emerald" | "violet" | "amber" | "slate" | "rose" }) {
-  const tones = { blue: "border-blue-100 bg-blue-50 text-blue-700", emerald: "border-emerald-100 bg-emerald-50 text-emerald-700", violet: "border-violet-100 bg-violet-50 text-violet-700", amber: "border-amber-100 bg-amber-50 text-amber-700", slate: "border-slate-200 bg-white text-slate-700", rose: "border-rose-100 bg-rose-50 text-rose-700" };
-  return <section className={`min-w-0 rounded-2xl border p-5 shadow-sm ${tones[tone]}`}>
-    <p className="text-xs font-bold uppercase tracking-[0.14em] opacity-75">{label}</p>
-    <p className="mt-3 truncate text-2xl font-bold tracking-tight sm:text-3xl">{value}</p>
-    {detail && <p className="mt-2 text-xs opacity-75">{detail}</p>}
-  </section>;
+function MetricCard({ label, value, detail, tone = "blue", icon: Icon }: { label: string; value: string; detail?: string; tone?: "blue" | "emerald" | "violet" | "amber" | "slate" | "rose", icon?: React.ElementType }) {
+  const tones = { 
+    blue: "from-blue-50 to-blue-100 border-blue-200 text-blue-700 icon-blue-600 bg-blue-500/10", 
+    emerald: "from-emerald-50 to-emerald-100 border-emerald-200 text-emerald-700 icon-emerald-600 bg-emerald-500/10", 
+    violet: "from-violet-50 to-violet-100 border-violet-200 text-violet-700 icon-violet-600 bg-violet-500/10", 
+    amber: "from-amber-50 to-amber-100 border-amber-200 text-amber-700 icon-amber-600 bg-amber-500/10", 
+    slate: "from-slate-50 to-slate-100 border-slate-200 text-slate-700 icon-slate-600 bg-slate-500/10", 
+    rose: "from-rose-50 to-rose-100 border-rose-200 text-rose-700 icon-rose-600 bg-rose-500/10" 
+  };
+  
+  const selectedTone = tones[tone];
+  const [gradient, border, text, iconColor, bgIcon] = selectedTone.split(" ");
+
+  return (
+    <section className={`group relative min-w-0 overflow-hidden rounded-2xl border ${border} bg-gradient-to-br ${gradient} p-5 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1`}>
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-bold uppercase tracking-[0.14em] opacity-75">{label}</p>
+          <p className="mt-3 truncate text-2xl font-bold tracking-tight sm:text-3xl text-slate-900">{value}</p>
+        </div>
+        {Icon && (
+          <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${bgIcon}`}>
+            <Icon className={`h-6 w-6 ${iconColor}`} />
+          </div>
+        )}
+      </div>
+      {detail && (
+        <div className="mt-4 flex items-center gap-2">
+          <p className="text-xs font-medium text-slate-600 opacity-90 line-clamp-1">{detail}</p>
+        </div>
+      )}
+    </section>
+  );
 }
 
 export default function AdminDashboard() {
@@ -128,14 +161,20 @@ export default function AdminDashboard() {
   const muted = "text-slate-500";
 
   return <div className="min-h-full bg-slate-50 text-slate-900">
-    <div className="space-y-6 p-1 sm:p-2">
-      <header className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+    <div className="space-y-6 p-2 sm:p-4 lg:p-6">
+      <header className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between rounded-2xl bg-white p-6 shadow-sm border border-slate-200">
         <div>
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-blue-600">{t.analytics}</p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">{t.title}</h1>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-blue-600 flex items-center gap-2">
+             <TrendingUp className="w-4 h-4" /> {t.analytics}
+          </p>
+          <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl text-slate-900">{t.title}</h1>
           <p className={`mt-2 max-w-2xl text-sm sm:text-base ${muted}`}>{t.subtitle}</p>
         </div>
-        <button type="button" onClick={() => void loadDashboard()} className="min-h-11 rounded-xl bg-slate-900 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-700">↻ {t.refresh}</button>
+        <div className="flex items-center gap-3">
+          <button type="button" onClick={() => void loadDashboard()} className="group flex min-h-11 items-center gap-2 rounded-xl bg-slate-900 px-5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-slate-800 hover:shadow-md">
+            <RefreshCw className="w-4 h-4 transition-transform group-hover:rotate-180 duration-500" /> {t.refresh}
+          </button>
+        </div>
       </header>
 
       <section className={`rounded-2xl border p-4 shadow-sm sm:p-5 ${panel}`} aria-label="Dashboard filters">
@@ -157,35 +196,69 @@ export default function AdminDashboard() {
       {loading && !data ? <DashboardSkeleton /> : error && !data ? <section className={`rounded-2xl border p-8 text-center shadow-sm ${panel}`}><h2 className="text-lg font-bold">{t.errorTitle}</h2><p className={`mt-2 text-sm ${muted}`}>{error}</p><button type="button" onClick={() => void loadDashboard()} className="mt-4 min-h-11 rounded-xl bg-blue-600 px-4 text-sm font-semibold text-white">{t.tryAgain}</button></section> : data && <>
         {!data.financialDataComplete && <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">{t.unavailableProfit}</div>}
         <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <MetricCard label={t.totalRevenue} value={displayMoney(data.kpis.totalRevenue)} detail={t.completedLessRefunds} tone="blue" />
-          <MetricCard label={t.grossProfit} value={displayMoney(data.kpis.grossProfit)} detail={t.grossDetail} tone="emerald" />
-          <MetricCard label={t.netProfit} value={displayMoney(data.kpis.netProfit)} detail={t.netDetail} tone="violet" />
-          <MetricCard label={t.averageOrder} value={displayMoney(data.kpis.averageOrderValue)} detail={t.completedOnly} tone="slate" />
+          <MetricCard label={t.totalRevenue} value={displayMoney(data.kpis.totalRevenue)} detail={t.completedLessRefunds} tone="blue" icon={DollarSign} />
+          <MetricCard label={t.grossProfit} value={displayMoney(data.kpis.grossProfit)} detail={t.grossDetail} tone="emerald" icon={Wallet} />
+          <MetricCard label={t.netProfit} value={displayMoney(data.kpis.netProfit)} detail={t.netDetail} tone="violet" icon={Percent} />
+          <MetricCard label={t.averageOrder} value={displayMoney(data.kpis.averageOrderValue)} detail={t.completedOnly} tone="slate" icon={CreditCard} />
         </section>
-        <section className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-2 xl:grid-cols-5">
-          <MetricCard label={t.completedOrders} value={String(data.kpis.completedOrders || 0)} tone="emerald" />
-          <MetricCard label={t.processingOrders} value={String(data.kpis.processingOrders || 0)} detail={t.processingDetail} tone="blue" />
-          <MetricCard label={t.pendingOrders} value={String(data.kpis.pendingOrders || 0)} tone="amber" />
-          <MetricCard label={t.cancelledOrders} value={String(data.kpis.cancelledOrders || 0)} tone="rose" />
-          <MetricCard label={t.refundedOrders} value={String(data.kpis.refundedOrders || 0)} detail={displayMoney(data.kpis.refunds)} tone="violet" />
-          <MetricCard label={t.customers} value={String(data.kpis.totalCustomers || 0)} tone="slate" />
-          <MetricCard label={t.newCustomers} value={String(data.kpis.newCustomersToday || 0)} tone="blue" />
-          <MetricCard label={t.lowStock} value={String(data.kpis.lowStockProducts || 0)} detail={`${data.kpis.totalProducts || 0} ${t.catalogue}`} tone="amber" />
-          <MetricCard label={t.savedProducts} value={String(data.kpis.totalWishlistItems || 0)} detail={t.wishlistDetail} tone="rose" />
+        
+        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          <MetricCard label={t.completedOrders} value={String(data.kpis.completedOrders || 0)} tone="emerald" icon={CheckCircle2} />
+          <MetricCard label={t.processingOrders} value={String(data.kpis.processingOrders || 0)} detail={t.processingDetail} tone="blue" icon={Clock} />
+          <MetricCard label={t.pendingOrders} value={String(data.kpis.pendingOrders || 0)} tone="amber" icon={AlertCircle} />
+          <MetricCard label={t.cancelledOrders} value={String(data.kpis.cancelledOrders || 0)} tone="rose" icon={XCircle} />
+          <MetricCard label={t.refundedOrders} value={String(data.kpis.refundedOrders || 0)} detail={displayMoney(data.kpis.refunds)} tone="violet" icon={RotateCcw} />
+          <MetricCard label={t.customers} value={String(data.kpis.totalCustomers || 0)} tone="slate" icon={Users} />
+          <MetricCard label={t.newCustomers} value={String(data.kpis.newCustomersToday || 0)} tone="blue" icon={UserPlus} />
+          <MetricCard label={t.lowStock} value={String(data.kpis.lowStockProducts || 0)} detail={`${data.kpis.totalProducts || 0} ${t.catalogue}`} tone="amber" icon={Box} />
+          <MetricCard label={t.savedProducts} value={String(data.kpis.totalWishlistItems || 0)} detail={t.wishlistDetail} tone="rose" icon={Heart} />
         </section>
 
         <DashboardCharts trend={data.revenueTrend} statuses={data.statuses} />
 
         <section className="grid gap-6 xl:grid-cols-2">
-          <article className={`rounded-2xl border p-5 shadow-sm ${panel}`}><div className="flex items-center justify-between gap-3"><div><h2 className="text-lg font-semibold">{t.topProducts}</h2><p className={`mt-1 text-sm ${muted}`}>{t.topProductDetail}</p></div><Link href="/admin/products" className="text-sm font-semibold text-blue-600 hover:text-blue-800">{t.manageProducts}</Link></div>{data.topProducts.length ? <div className="mt-5 divide-y divide-slate-100">{data.topProducts.map((product, index) => <div key={product.name} className="flex items-center justify-between gap-4 py-3"><div className="min-w-0"><p className="truncate font-semibold">{index + 1}. {product.name}</p><p className={`mt-1 text-sm ${muted}`}>{product.quantity} {t.sold}</p></div><strong className="shrink-0 text-sm">{currency.format(product.revenue)}</strong></div>)}</div> : <EmptyState text={t.noSales} />}</article>
-          <article className={`rounded-2xl border p-5 shadow-sm ${panel}`}><div className="flex items-center justify-between gap-3"><div><h2 className="text-lg font-semibold">{t.lowInventory}</h2><p className={`mt-1 text-sm ${muted}`}>{t.lowInventoryDetail}</p></div><Link href="/admin/products" className="text-sm font-semibold text-blue-600 hover:text-blue-800">{t.restock}</Link></div>{data.lowStock.length ? <div className="mt-5 divide-y divide-slate-100">{data.lowStock.map((product) => <div key={product.name} className="flex items-center justify-between gap-4 py-3"><p className="min-w-0 truncate font-semibold">{product.name}</p><span className="shrink-0 rounded-full bg-amber-50 px-3 py-1 text-sm font-bold text-amber-700">{product.stock} {t.left}</span></div>)}</div> : <EmptyState text={t.noLowStock} />}</article>
+          <article className={`rounded-2xl border bg-white p-6 shadow-sm transition-shadow hover:shadow-md ${panel}`}>
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                 <h2 className="text-lg font-semibold flex items-center gap-2"><ShoppingCart className="w-5 h-5 text-blue-500"/>{t.topProducts}</h2>
+                 <p className={`mt-1 text-sm ${muted}`}>{t.topProductDetail}</p>
+              </div>
+              <Link href="/admin/products" className="text-sm font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 px-3 py-1.5 rounded-lg transition-colors">{t.manageProducts}</Link>
+            </div>
+            {data.topProducts.length ? <div className="mt-6 divide-y divide-slate-100">{data.topProducts.map((product, index) => <div key={product.name} className="group flex items-center justify-between gap-4 py-4 transition-colors hover:bg-slate-50 -mx-4 px-4 rounded-lg"><div className="min-w-0 flex items-center gap-3"><span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-sm font-bold text-slate-600 group-hover:bg-white">{index + 1}</span><div className="min-w-0"><p className="truncate font-semibold text-slate-900">{product.name}</p><p className={`mt-1 text-sm ${muted}`}>{product.quantity} {t.sold}</p></div></div><strong className="shrink-0 text-sm">{currency.format(product.revenue)}</strong></div>)}</div> : <EmptyState text={t.noSales} />}
+          </article>
+          
+          <article className={`rounded-2xl border bg-white p-6 shadow-sm transition-shadow hover:shadow-md ${panel}`}>
+            <div className="flex items-center justify-between gap-3">
+               <div>
+                  <h2 className="text-lg font-semibold flex items-center gap-2"><AlertCircle className="w-5 h-5 text-amber-500"/>{t.lowInventory}</h2>
+                  <p className={`mt-1 text-sm ${muted}`}>{t.lowInventoryDetail}</p>
+               </div>
+               <Link href="/admin/products" className="text-sm font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 px-3 py-1.5 rounded-lg transition-colors">{t.restock}</Link>
+            </div>
+            {data.lowStock.length ? <div className="mt-6 divide-y divide-slate-100">{data.lowStock.map((product) => <div key={product.name} className="flex items-center justify-between gap-4 py-4 transition-colors hover:bg-slate-50 -mx-4 px-4 rounded-lg"><div className="flex items-center gap-3 min-w-0"><Package className="w-8 h-8 p-1.5 rounded-lg bg-amber-50 text-amber-600 shrink-0"/><p className="min-w-0 truncate font-semibold text-slate-900">{product.name}</p></div><span className="shrink-0 rounded-full bg-amber-100 px-3 py-1 text-sm font-bold text-amber-700">{product.stock} {t.left}</span></div>)}</div> : <EmptyState text={t.noLowStock} />}
+          </article>
         </section>
 
-        <section className={`rounded-2xl border p-5 shadow-sm ${panel}`}><div><h2 className="text-lg font-semibold">{t.mostWishlisted}</h2><p className={`mt-1 text-sm ${muted}`}>{t.wishlistInsight}</p></div>{data.wishlistInsights.length ? <div className="mt-5 overflow-x-auto"><table className="min-w-[580px] w-full text-left text-sm"><thead className="text-slate-500"><tr><th className="pb-3 font-semibold">{t.product}</th><th className="pb-3 font-semibold">{t.category}</th><th className="pb-3 font-semibold">{t.brand}</th><th className="pb-3 font-semibold">{t.wishlists}</th><th className="pb-3 font-semibold">{t.stock}</th></tr></thead><tbody>{data.wishlistInsights.map((item) => <tr key={item.slug} className="border-t border-slate-100"><td className="py-3 font-semibold">{item.name}</td><td className="py-3">{item.category}</td><td className="py-3">{item.brand}</td><td className="py-3 font-bold text-rose-600">{item.count}</td><td className="py-3">{item.stock}</td></tr>)}</tbody></table></div> : <EmptyState text={t.noWishlistData} />}</section>
+        <section className={`rounded-2xl border bg-white p-6 shadow-sm transition-shadow hover:shadow-md ${panel}`}>
+          <div className="mb-6">
+             <h2 className="text-lg font-semibold flex items-center gap-2"><Heart className="w-5 h-5 text-rose-500"/>{t.mostWishlisted}</h2>
+             <p className={`mt-1 text-sm ${muted}`}>{t.wishlistInsight}</p>
+          </div>
+          {data.wishlistInsights.length ? <div className="mt-5 overflow-x-auto"><table className="min-w-[580px] w-full text-left text-sm"><thead className="text-slate-500 bg-slate-50"><tr><th className="px-4 py-3 font-semibold rounded-l-lg">{t.product}</th><th className="px-4 py-3 font-semibold">{t.category}</th><th className="px-4 py-3 font-semibold">{t.brand}</th><th className="px-4 py-3 font-semibold">{t.wishlists}</th><th className="px-4 py-3 font-semibold rounded-r-lg">{t.stock}</th></tr></thead><tbody className="divide-y divide-slate-100">{data.wishlistInsights.map((item) => <tr key={item.slug} className="hover:bg-slate-50 transition-colors"><td className="px-4 py-4 font-semibold text-slate-900">{item.name}</td><td className="px-4 py-4 text-slate-600">{item.category}</td><td className="px-4 py-4 text-slate-600">{item.brand}</td><td className="px-4 py-4 font-bold text-rose-600 flex items-center gap-1"><Heart className="w-4 h-4 fill-current"/> {item.count}</td><td className="px-4 py-4"><span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${item.stock > 10 ? 'bg-emerald-50 text-emerald-700' : item.stock > 0 ? 'bg-amber-50 text-amber-700' : 'bg-rose-50 text-rose-700'}`}>{item.stock}</span></td></tr>)}</tbody></table></div> : <EmptyState text={t.noWishlistData} />}
+        </section>
 
-        <section className={`overflow-hidden rounded-2xl border shadow-sm ${panel}`}>
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 p-5"><div><h2 className="text-lg font-semibold">{t.recentOrders}</h2><p className={`mt-1 text-sm ${muted}`}>{t.recentDetail}</p></div><Link href="/admin/orders" className="inline-flex min-h-11 items-center rounded-xl bg-black px-4 text-sm font-semibold !text-white shadow-sm transition hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">{t.openOrders}</Link></div>
-          {paginatedOrders.length ? <><div className="overflow-x-auto"><table className="min-w-[980px] w-full text-left text-sm"><thead className="bg-slate-50 text-slate-500"><tr><th className="px-5 py-3 font-semibold">{t.orderId}</th><th className="px-5 py-3 font-semibold">{t.customerLabel}</th><th className="px-5 py-3 font-semibold">{t.total}</th><th className="px-5 py-3 font-semibold">{t.paymentLabel}</th><th className="px-5 py-3 font-semibold">{t.shippingLabel}</th><th className="px-5 py-3 font-semibold">{t.status}</th><th className="px-5 py-3 font-semibold">{t.created}</th><th className="min-w-40 whitespace-nowrap px-5 py-3 font-semibold">{t.actions}</th></tr></thead><tbody>{paginatedOrders.map((order) => <tr key={order._id || order.code} className="border-t border-slate-100"><td className="whitespace-nowrap px-5 py-4 font-semibold text-blue-600">{order.code || "—"}</td><td className="px-5 py-4"><p className="font-medium">{order.fullName || t.retail}</p><p className={`mt-0.5 text-xs ${muted}`}>{order.email || "—"}</p></td><td className="whitespace-nowrap px-5 py-4 font-semibold">{currency.format(Number(order.total) || 0)}</td><td className="px-5 py-4">{order.paymentStatus || order.payment || "—"}</td><td className="px-5 py-4">{order.shipping || "—"}</td><td className="px-5 py-4"><StatusBadge status={orderStatus(order)} /></td><td className="whitespace-nowrap px-5 py-4">{order.createdAt ? new Intl.DateTimeFormat(language === "vi" ? "vi-VN" : "en-US", { dateStyle: "medium", timeStyle: "short" }).format(new Date(order.createdAt)) : "—"}</td><td className="min-w-40 whitespace-nowrap px-5 py-4"><div className="flex flex-nowrap items-center gap-1"><Link href="/admin/orders" className="whitespace-nowrap rounded-lg px-2 py-1 font-semibold text-blue-600 hover:bg-blue-50">{t.view}</Link><Link href="/admin/orders" className="whitespace-nowrap rounded-lg px-2 py-1 font-semibold text-blue-600 hover:bg-blue-50">{t.edit}</Link><button type="button" onClick={() => window.print()} className="whitespace-nowrap rounded-lg px-2 py-1 font-semibold text-blue-600 hover:bg-blue-50">{t.printAction}</button></div></td></tr>)}</tbody></table></div><div className="flex items-center justify-between gap-3 p-4"><p className={`text-sm ${muted}`}>{t.page} {page} {t.of} {totalPages}</p><div className="flex gap-2"><button type="button" disabled={page === 1} onClick={() => setPage((value) => value - 1)} className="min-h-11 rounded-lg border border-slate-200 px-3 text-sm font-semibold disabled:opacity-40">{t.previous}</button><button type="button" disabled={page === totalPages} onClick={() => setPage((value) => value + 1)} className="min-h-11 rounded-lg border border-slate-200 px-3 text-sm font-semibold disabled:opacity-40">{t.next}</button></div></div></> : <EmptyState text={t.noMatching} />}
+        <section className={`overflow-hidden rounded-2xl border bg-white shadow-sm transition-shadow hover:shadow-md ${panel}`}>
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 p-6 bg-slate-50/50">
+             <div>
+                <h2 className="text-lg font-semibold flex items-center gap-2"><Clock className="w-5 h-5 text-slate-500"/>{t.recentOrders}</h2>
+                <p className={`mt-1 text-sm ${muted}`}>{t.recentDetail}</p>
+             </div>
+             <Link href="/admin/orders" className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-slate-900 px-5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-slate-800 hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2">
+               {t.openOrders} <ChevronRight className="w-4 h-4" />
+             </Link>
+          </div>
+          {paginatedOrders.length ? <><div className="overflow-x-auto"><table className="min-w-[980px] w-full text-left text-sm"><thead className="bg-slate-50 text-slate-500 border-b border-slate-200"><tr><th className="px-6 py-4 font-semibold">{t.orderId}</th><th className="px-6 py-4 font-semibold">{t.customerLabel}</th><th className="px-6 py-4 font-semibold">{t.total}</th><th className="px-6 py-4 font-semibold">{t.paymentLabel}</th><th className="px-6 py-4 font-semibold">{t.shippingLabel}</th><th className="px-6 py-4 font-semibold">{t.status}</th><th className="px-6 py-4 font-semibold">{t.created}</th><th className="min-w-40 whitespace-nowrap px-6 py-4 font-semibold text-right">{t.actions}</th></tr></thead><tbody className="divide-y divide-slate-100">{paginatedOrders.map((order) => <tr key={order._id || order.code} className="hover:bg-slate-50 transition-colors"><td className="whitespace-nowrap px-6 py-4 font-semibold text-slate-900">{order.code || "—"}</td><td className="px-6 py-4"><p className="font-semibold text-slate-900">{order.fullName || t.retail}</p><p className={`mt-0.5 text-xs text-slate-500 truncate max-w-[150px]`}>{order.email || "—"}</p></td><td className="whitespace-nowrap px-6 py-4 font-semibold text-slate-900">{currency.format(Number(order.total) || 0)}</td><td className="px-6 py-4"><span className="inline-flex items-center gap-1.5 rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600 ring-1 ring-inset ring-slate-500/10">{order.paymentStatus || order.payment || "—"}</span></td><td className="px-6 py-4 text-slate-600">{order.shipping || "—"}</td><td className="px-6 py-4"><StatusBadge status={orderStatus(order)} /></td><td className="whitespace-nowrap px-6 py-4 text-slate-600">{order.createdAt ? new Intl.DateTimeFormat(language === "vi" ? "vi-VN" : "en-US", { dateStyle: "medium", timeStyle: "short" }).format(new Date(order.createdAt)) : "—"}</td><td className="min-w-40 whitespace-nowrap px-6 py-4 text-right"><div className="flex flex-nowrap items-center justify-end gap-2"><Link href="/admin/orders" className="inline-flex items-center justify-center h-8 w-8 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors" title={t.view}><Eye className="w-4 h-4" /></Link><button type="button" onClick={() => window.print()} className="inline-flex items-center justify-center h-8 w-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors" title={t.printAction}><Printer className="w-4 h-4" /></button></div></td></tr>)}</tbody></table></div><div className="flex items-center justify-between gap-3 p-5 border-t border-slate-200 bg-slate-50"><p className={`text-sm font-medium ${muted}`}>{t.page} {page} {t.of} {totalPages}</p><div className="flex gap-2"><button type="button" disabled={page === 1} onClick={() => setPage((value) => value - 1)} className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 transition-colors hover:bg-slate-50 disabled:opacity-40"><ChevronLeft className="w-4 h-4"/></button><button type="button" disabled={page === totalPages} onClick={() => setPage((value) => value + 1)} className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 transition-colors hover:bg-slate-50 disabled:opacity-40"><ChevronRight className="w-4 h-4"/></button></div></div></> : <EmptyState text={t.noMatching} />}
         </section>
         <p className={`text-xs ${muted}`}>{t.lastRefreshed}: {new Intl.DateTimeFormat(language === "vi" ? "vi-VN" : "en-US", { dateStyle: "medium", timeStyle: "medium" }).format(new Date(data.generatedAt))}. {t.autoRefresh}</p>
       </>}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useLanguage } from "@/app/providers";
+import { useLanguage } from '@/app/LanguageProvider';
 import { showToast } from "@/app/toast";
 
 type Warranty = Record<string, any> & { _id: string; status: string; model?: string; serialNumber?: string; customerEmail?: string; invoiceDate?: string; warrantyEnd?: string; remainingDays?: number | null };

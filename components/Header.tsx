@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { signOutUser, readCurrentUser } from "../app/auth-storage";
-import { useLanguage } from "../app/providers";
+import { useLanguage } from '../app/LanguageProvider';
 import { showToast } from "../app/toast";
 
 type CartItem = {

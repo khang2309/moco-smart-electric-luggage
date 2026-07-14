@@ -2,7 +2,7 @@
 import { showToast } from "@/app/toast";
 
 
-import { useLanguage } from "@/app/providers";
+import { useLanguage } from '@/app/LanguageProvider';
 import { useEffect, useMemo, useState, useRef } from "react";
 
 type Product = {

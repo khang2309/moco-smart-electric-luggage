@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useLanguage } from "./providers";
+import { useLanguage } from './LanguageProvider';
 
 const featuredProduct = {
   slug: "moco-go",

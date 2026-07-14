@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { readCurrentUser } from "../auth-storage";
-import { useLanguage } from "../providers";
+import { useLanguage } from '../LanguageProvider';
 import { showToast } from "../toast";
 import { addWishlistItem, fetchWishlist, removeWishlistItem, type WishlistItem, type WishlistProduct } from "@/lib/wishlist-client";
 

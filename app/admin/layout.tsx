@@ -1,7 +1,7 @@
 "use client";
 
 import { readCurrentUser } from "@/app/auth-storage";
-import { useLanguage } from "@/app/providers";
+import { useLanguage } from '@/app/LanguageProvider';
 import { ReactNode, useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
