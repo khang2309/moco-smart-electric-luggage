@@ -82,6 +82,13 @@ export default function LoginPage() {
 
     if (result.success) {
       showToast("Đăng nhập thành công!", "success");
+      const requestedReturn = new URLSearchParams(window.location.search).get("returnTo");
+      const returnTo = requestedReturn?.startsWith("/") ? requestedReturn : "";
+      if (returnTo) {
+        router.push(returnTo);
+        setIsLoading(false);
+        return;
+      }
       
       // Trường hợp A: Lần đầu đăng nhập -> Giữ ở trang hiện tại hoặc sang onboarding/account
       if (result.isFirstLogin) {

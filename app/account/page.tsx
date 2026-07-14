@@ -286,18 +286,18 @@ function AccountContent() {
                     </div>
                     <div>
                       <span>{language === "vi" ? "Ngày mua" : "Purchase date"}</span>
-                      <strong>{prod.purchaseDate}</strong>
+                      <strong>{prod.invoiceDate || prod.purchaseDate}</strong>
                     </div>
                     <div>
                       <span>{language === "vi" ? "Bảo hành" : "Warranty"}</span>
-                      {prod.status === "pending" ? (
+                      {prod.status === "PENDING" ? (
                         <strong className="text-amber-500">{language === "vi" ? "Đang chờ duyệt" : "Pending"}</strong>
-                      ) : prod.status === "rejected" ? (
+                      ) : prod.status === "REJECTED" ? (
                         <strong className="text-red-500">{language === "vi" ? "Bị từ chối" : "Rejected"}</strong>
-                      ) : prod.status === "expired" ? (
+                      ) : prod.status === "EXPIRED" ? (
                         <strong className="text-gray-500">{language === "vi" ? "Hết hạn" : "Expired"}</strong>
                       ) : (
-                        <strong className="warranty-active">{prod.warrantyExpiry}</strong>
+                        <strong className="warranty-active">{prod.warrantyEnd || prod.warrantyExpiry}{prod.remainingDays !== null ? ` (${prod.remainingDays} days)` : ""}</strong>
                       )}
                     </div>
                   </div>

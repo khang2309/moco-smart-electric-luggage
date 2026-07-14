@@ -3,7 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useLanguage } from "../providers";
+import { readCurrentUser } from "../auth-storage";
+import { fetchWishlist, toggleWishlistItem, type WishlistItem } from "@/lib/wishlist-client";
+import { showToast } from "../toast";
 
 const products = [
   {
@@ -64,9 +68,10 @@ export interface MocoProduct {
 
 export default function ProductPage() {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [favoriteProducts, setFavoriteProducts] = useState<string[]>([]);
+  const [favoriteProducts, setFavoriteProducts] = useState<WishlistItem[]>([]);
   const [visibleProducts, setVisibleProducts] = useState<MocoProduct[] | null>(null);
   const { language } = useLanguage();
+  const router = useRouter();
   const activeProduct = visibleProducts ? visibleProducts[activeIndex] : null;
 
   const copy = useMemo(
@@ -139,23 +144,28 @@ export default function ProductPage() {
   }, []);
 
   useEffect(() => {
-    try {
-      const rawFavorites = window.localStorage.getItem("moco-favorites");
-      setFavoriteProducts(rawFavorites ? JSON.parse(rawFavorites) : []);
-    } catch {
-      setFavoriteProducts([]);
-    }
+    const loadWishlist = () => {
+      const user = readCurrentUser();
+      if (!user?.email) { setFavoriteProducts([]); return; }
+      void fetchWishlist(user.email).then(setFavoriteProducts).catch(() => setFavoriteProducts([]));
+    };
+    loadWishlist();
+    window.addEventListener("moco-wishlist-updated", loadWishlist);
+    window.addEventListener("moco-auth-updated", loadWishlist);
+    return () => { window.removeEventListener("moco-wishlist-updated", loadWishlist); window.removeEventListener("moco-auth-updated", loadWishlist); };
   }, []);
 
-  const toggleFavoriteProduct = (slug: string) => {
-    setFavoriteProducts((current) => {
-      const nextFavorites = current.includes(slug)
-        ? current.filter((item) => item !== slug)
-        : [...current, slug];
-
-      window.localStorage.setItem("moco-favorites", JSON.stringify(nextFavorites));
-      return nextFavorites;
-    });
+  const toggleFavoriteProduct = async (slug: string) => {
+    const user = readCurrentUser();
+    if (!user?.email) { router.push(`/login?returnTo=${encodeURIComponent(window.location.pathname)}`); return; }
+    const existingItem = favoriteProducts.find((item) => item.productSlug === slug);
+    try {
+      const isAdded = await toggleWishlistItem(user.email, slug, existingItem);
+      setFavoriteProducts(await fetchWishlist(user.email));
+      showToast(isAdded ? (language === "vi" ? "Đã thêm vào yêu thích." : "Added to wishlist.") : (language === "vi" ? "Đã xóa khỏi yêu thích." : "Removed from wishlist."), "success");
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : "Unable to update wishlist.", "error");
+    }
   };
 
   return (
@@ -213,12 +223,12 @@ export default function ProductPage() {
                   />
                 </button>
                 <button
-                  className={`product-favorite-button${favoriteProducts.includes(product.slug) ? " active" : ""}`}
+                  className={`product-favorite-button${favoriteProducts.some((item) => item.productSlug === product.slug) ? " active" : ""}`}
                   type="button"
                   aria-label={language === "vi" ? "Th\u00eam v\u00e0o y\u00eau th\u00edch" : "Add to favorites"}
-                  onClick={() => toggleFavoriteProduct(product.slug)}
+                  onClick={() => void toggleFavoriteProduct(product.slug)}
                 >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill={favoriteProducts.includes(product.slug) ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill={favoriteProducts.some((item) => item.productSlug === product.slug) ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"></path>
                   </svg>
                 </button>

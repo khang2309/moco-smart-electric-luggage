@@ -9133,4 +9133,129 @@ html[lang="vi"] .home-featured-title {
   }
 }
 
+/* Responsive audit: protect fluid layouts from narrow viewport overflow. */
+html,
+body {
+  max-width: 100%;
+}
+
+body {
+  overflow-x: clip;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+img,
+video,
+canvas {
+  max-inline-size: 100%;
+}
+
+input,
+select,
+textarea,
+button {
+  max-inline-size: 100%;
+}
+
+.cart-item-main,
+.checkout-summary-items article > div,
+.registered-product > div,
+.order-items > div > div,
+.admin-shell,
+.admin-shell table {
+  min-inline-size: 0;
+}
+
+.cart-item-main strong,
+.checkout-summary-items strong,
+.registered-product strong,
+.order-items strong,
+.admin-shell td,
+.admin-shell dd {
+  overflow-wrap: anywhere;
+}
+
+/* Keep fixed panels usable above iPhone home indicators and in short viewports. */
+.password-modal-backdrop,
+.order-modal-backdrop {
+  padding:
+    max(16px, env(safe-area-inset-top))
+    max(16px, env(safe-area-inset-right))
+    max(16px, env(safe-area-inset-bottom))
+    max(16px, env(safe-area-inset-left));
+}
+
+.password-modal,
+.order-modal {
+  max-block-size: calc(100dvh - 32px);
+  overflow-y: auto;
+}
+
+.cart-drawer-header button,
+.cart-item-side button,
+.account-card-title button,
+.account-edit-actions button,
+.password-modal-close {
+  min-inline-size: 44px;
+  min-block-size: 44px;
+}
+
+@media (max-width: 480px) {
+  .checkout-page {
+    padding-inline: 12px;
+  }
+
+  .checkout-form-panel fieldset {
+    padding: 16px;
+    padding-top: 52px;
+  }
+
+  .checkout-form-panel fieldset::before,
+  .checkout-form-panel fieldset::after {
+    top: 16px;
+  }
+
+  .checkout-voucher,
+  .payment-gateway div,
+  .order-action-row,
+  .order-modal-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .payment-gateway div,
+  .order-modal-actions {
+    display: grid;
+  }
+
+  .checkout-voucher button,
+  .payment-gateway button,
+  .order-action-row button,
+  .order-modal-actions button {
+    width: 100%;
+  }
+
+  .cart-drawer {
+    top: max(96px, env(safe-area-inset-top));
+    right: max(12px, env(safe-area-inset-right));
+    bottom: max(12px, env(safe-area-inset-bottom));
+    left: max(12px, env(safe-area-inset-left));
+    width: auto;
+    min-height: 0;
+    max-height: none;
+    padding: 16px;
+  }
+
+  .cart-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .cart-quantity {
+    min-height: 44px;
+  }
+
+  .password-modal {
+    padding: 24px 18px;
+  }
+}
+
 

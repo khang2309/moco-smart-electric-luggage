@@ -11,6 +11,8 @@ export default function RegisterProductPage() {
   const [hasSerial, setHasSerial] = useState("yes");
   
   const [formData, setFormData] = useState({
+    orderCode: "",
+    orderItemIndex: "",
     serial: "",
     model: "",
     purchaseDate: "",
@@ -21,12 +23,17 @@ export default function RegisterProductPage() {
   const [fileName, setFileName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [userEmail, setUserEmail] = useState("");
+  const [eligibleOrders, setEligibleOrders] = useState<Array<{ orderCode: string; orderItemIndex: number; model: string; invoiceDate: string }>>([]);
 
   useEffect(() => {
     const user = readCurrentUser();
     if (user?.email) {
       setUserEmail(user.email);
       setFormData(prev => ({ ...prev, contact: user.email }));
+      fetch(`/api/warranties?email=${encodeURIComponent(user.email)}&eligible=true`)
+        .then((response) => response.json())
+        .then((data) => setEligibleOrders(data.orders || []))
+        .catch(() => setEligibleOrders([]));
     }
   }, []);
 
@@ -121,6 +128,7 @@ export default function RegisterProductPage() {
                   <input
                     type="radio"
                     name="serial"
+                    disabled
                     className="w-4 h-4 text-black border-gray-300 focus:ring-black accent-black cursor-pointer"
                     checked={hasSerial === "no"}
                     onChange={() => {
@@ -139,11 +147,41 @@ export default function RegisterProductPage() {
 
           <div className="space-y-4">
             <div>
+              <select
+                required
+                value={formData.orderCode ? `${formData.orderCode}:${formData.orderItemIndex}` : ""}
+                onChange={(event) => {
+                  const selected = eligibleOrders.find((item) => `${item.orderCode}:${item.orderItemIndex}` === event.target.value);
+                  if (!selected) return;
+                  setFormData((prev) => ({
+                    ...prev,
+                    orderCode: selected.orderCode,
+                    orderItemIndex: String(selected.orderItemIndex),
+                    model: selected.model,
+                    purchaseDate: selected.invoiceDate,
+                  }));
+                }}
+                className="block w-full rounded-xl border border-gray-200 px-4 py-3.5 text-[15px] focus:border-gray-400 focus:ring-1 focus:ring-gray-400 outline-none transition-shadow bg-white appearance-none"
+              >
+                <option value="" disabled>{language === "vi" ? "Chọn sản phẩm từ đơn hàng đã giao *" : "Select a delivered order item *"}</option>
+                {eligibleOrders.map((item) => (
+                  <option key={`${item.orderCode}:${item.orderItemIndex}`} value={`${item.orderCode}:${item.orderItemIndex}`}>
+                    {item.model} · {item.orderCode} · {item.invoiceDate}
+                  </option>
+                ))}
+              </select>
+              {userEmail && eligibleOrders.length === 0 && (
+                <p className="mt-2 text-xs font-medium text-amber-700">
+                  {language === "vi" ? "Chỉ đơn hàng đã giao mới có thể đăng ký bảo hành." : "Only delivered orders are eligible for warranty registration."}
+                </p>
+              )}
+            </div>
+            <div>
               <input
                 type="text"
                 placeholder={language === "vi" ? "Số serial sản phẩm *" : "Product serial number *"}
-                required={hasSerial === "yes"}
-                disabled={hasSerial === "no"}
+                required
+                disabled={false}
                 value={formData.serial}
                 onChange={(e) => setFormData(prev => ({ ...prev, serial: e.target.value }))}
                 className="block w-full rounded-xl border border-gray-200 px-4 py-3.5 text-[15px] placeholder:text-gray-400 focus:border-gray-400 focus:ring-1 focus:ring-gray-400 outline-none transition-shadow disabled:bg-gray-50 disabled:text-gray-400"
@@ -154,6 +192,7 @@ export default function RegisterProductPage() {
               <select
                 required
                 value={formData.model}
+                disabled
                 onChange={(e) => setFormData(prev => ({ ...prev, model: e.target.value }))}
                 className="block w-full rounded-xl border border-gray-200 px-4 py-3.5 text-[15px] focus:border-gray-400 focus:ring-1 focus:ring-gray-400 outline-none transition-shadow bg-white appearance-none"
               >
@@ -171,6 +210,7 @@ export default function RegisterProductPage() {
                 placeholder={language === "vi" ? "Ngày mua *" : "Purchase date *"}
                 required
                 value={formData.purchaseDate}
+                readOnly
                 onChange={(e) => setFormData(prev => ({ ...prev, purchaseDate: e.target.value }))}
                 className="block w-full rounded-xl border border-gray-200 pl-4 pr-10 py-3.5 text-[15px] placeholder:text-gray-400 focus:border-gray-400 focus:ring-1 focus:ring-gray-400 outline-none transition-shadow uppercase"
               />

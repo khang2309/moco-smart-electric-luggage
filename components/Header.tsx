@@ -631,8 +631,8 @@ export default function Header() {
                       <span>{currentCopy.orders}</span>
                     </Link>
                     <Link
-                      href="/product"
-                      onClick={() => handleNavClick("/product")}
+                      href="/wishlist"
+                      onClick={() => setIsAccountOpen(false)}
                     >
                       <span>{currentCopy.favorites}</span>
                     </Link>

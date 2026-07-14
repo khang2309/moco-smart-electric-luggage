@@ -57,7 +57,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="admin-shell flex min-h-screen bg-gray-100">
       {/* Mobile sidebar backdrop */}
       {isSidebarOpen && (
         <div 
@@ -74,26 +74,26 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       >
         <div className="flex items-center justify-between p-6">
           <h1 className="text-2xl font-bold">MOCO Admin</h1>
-          <button className="md:hidden p-2 -mr-2 text-gray-300 hover:text-white" onClick={() => setIsSidebarOpen(false)}>
+          <button aria-label="Close navigation" className="md:hidden -mr-2 flex h-11 w-11 items-center justify-center text-gray-300 hover:text-white" onClick={() => setIsSidebarOpen(false)}>
             <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
         <nav className="space-y-2 px-4">
-          <Link href="/admin" className="block rounded px-4 py-2 transition hover:bg-gray-700">
+          <Link href="/admin" className="flex min-h-11 items-center rounded px-4 py-2 transition hover:bg-gray-700">
             {t.dashboard}
           </Link>
-          <Link href="/admin/products" className="block rounded px-4 py-2 transition hover:bg-gray-700">
+          <Link href="/admin/products" className="flex min-h-11 items-center rounded px-4 py-2 transition hover:bg-gray-700">
             {t.products}
           </Link>
-          <Link href="/admin/orders" className="block rounded px-4 py-2 transition hover:bg-gray-700">
+          <Link href="/admin/orders" className="flex min-h-11 items-center rounded px-4 py-2 transition hover:bg-gray-700">
             {t.orders}
           </Link>
-          <Link href="/admin/warranties" className="block rounded px-4 py-2 transition hover:bg-gray-700">
+          <Link href="/admin/warranties" className="flex min-h-11 items-center rounded px-4 py-2 transition hover:bg-gray-700">
             {t.warranties}
           </Link>
-          <Link href="/admin/users" className="block rounded px-4 py-2 transition hover:bg-gray-700">
+          <Link href="/admin/users" className="flex min-h-11 items-center rounded px-4 py-2 transition hover:bg-gray-700">
             {t.users}
           </Link>
         </nav>
@@ -105,7 +105,8 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         <div className="sticky top-0 z-30 flex items-center bg-white px-4 py-3 shadow-sm md:hidden">
           <button 
             onClick={() => setIsSidebarOpen(true)} 
-            className="mr-4 p-1 text-gray-600 hover:text-gray-900 focus:outline-none"
+            aria-label="Open navigation"
+            className="mr-4 flex h-11 w-11 items-center justify-center text-gray-600 hover:text-gray-900 focus:outline-none"
           >
             <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />

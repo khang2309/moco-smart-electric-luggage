@@ -27,6 +27,21 @@
   border-left: 4px solid transparent;
 }
 
+/* Keep notifications inside narrow and safe-area viewports. */
+@media (max-width: 480px) {
+  .toast-container {
+    top: max(12px, env(safe-area-inset-top));
+    right: 12px;
+    left: 12px;
+  }
+
+  .toast-item {
+    width: 100%;
+    min-width: 0;
+    padding: 14px 16px;
+  }
+}
+
 .toast-success {
   border-left-color: #10b981;
 }

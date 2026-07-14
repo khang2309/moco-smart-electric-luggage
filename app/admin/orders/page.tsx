@@ -1,125 +1,53 @@
 "use client";
+
 import { showToast } from "@/app/toast";
-
-
 import { useLanguage } from "@/app/providers";
 import { useEffect, useMemo, useState } from "react";
 
-type OrderItem = {
-  name?: string;
-  quantity?: number;
-  price?: number;
+type OrderItem = { name?: string; quantity?: number; price?: number };
+type Order = {
+  _id: string; code: string; email?: string; phone?: string; fullName?: string; address?: string;
+  total: number; status?: string; fulfillmentStatus?: string; paymentStatus?: string; payment?: string;
+  shipping?: string; items: OrderItem[]; createdAt: string; adminNotes?: string;
 };
 
-type Order = {
-  _id: string;
-  code: string;
-  email?: string;
-  phone?: string;
-  fullName?: string;
-  address?: string;
-  total: number;
-  status?: string;
-  fulfillmentStatus?: string;
-  paymentStatus?: string;
-  payment?: string;
-  shipping?: string;
-  items: OrderItem[];
-  createdAt: string;
-};
+const PAGE_SIZE = 8;
+const ORDER_STATES = ["pending", "processing", "shipped", "delivered", "cancelled"] as const;
 
 const labels = {
   vi: {
-    title: "Quản lý đơn hàng",
-    subtitle: "Theo dõi đơn hàng, trạng thái giao hàng và thông tin khách hàng.",
-    totalOrders: "Tổng đơn",
-    pendingOrders: "Chờ xử lý",
-    completedOrders: "Hoàn tất",
-    revenue: "Doanh thu",
-    loading: "Đang tải đơn hàng...",
-    empty: "Không có đơn hàng nào.",
-    loadError: "Lỗi khi tải đơn hàng.",
-    orderCode: "Mã đơn",
-    customer: "Khách hàng",
-    total: "Tổng tiền",
-    status: "Trạng thái",
-    detailTitle: "Chi tiết đơn hàng",
-    email: "Email",
-    phone: "Điện thoại",
-    address: "Địa chỉ",
-    products: "Sản phẩm",
-    payment: "Thanh toán",
-    shipping: "Giao hàng",
-    createdAt: "Ngày tạo",
-    retailCustomer: "Khách lẻ",
-    selectHint: "Chọn một đơn hàng để xem chi tiết.",
-    pending: "Chờ xử lý",
-    processing: "Đang xử lý",
-    shipped: "Đã gửi",
-    delivered: "Đã giao",
-    cancelled: "Đã hủy",
-    paid: "Đã thanh toán",
-    unpaid: "Chưa thanh toán",
+    title: "Quản lý đơn hàng", subtitle: "Theo dõi đơn hàng, trạng thái giao hàng và thông tin khách hàng.", totalOrders: "Tổng đơn", pendingOrders: "Chờ xử lý", completedOrders: "Hoàn tất", revenue: "Doanh thu", loading: "Đang tải đơn hàng...", empty: "Không có đơn hàng nào.", loadError: "Lỗi khi tải đơn hàng.", orderCode: "Mã đơn", customer: "Khách hàng", total: "Tổng tiền", status: "Trạng thái", detailTitle: "Chi tiết đơn hàng", email: "Email", phone: "Điện thoại", address: "Địa chỉ", products: "Sản phẩm", payment: "Thanh toán", shipping: "Giao hàng", createdAt: "Ngày tạo", notes: "Ghi chú quản trị", retailCustomer: "Khách lẻ", selectHint: "Chọn một đơn hàng để xem chi tiết.", pending: "Chờ xử lý", processing: "Đang xử lý", shipped: "Đã gửi", delivered: "Đã giao", cancelled: "Đã hủy", paid: "Đã thanh toán", unpaid: "Chưa thanh toán", search: "Tìm mã đơn hoặc khách hàng", allStatuses: "Tất cả trạng thái", previous: "Trước", next: "Sau", page: "Trang", save: "Lưu thay đổi", close: "Đóng", unsaved: "Bạn có thay đổi chưa lưu. Bạn có muốn đóng không?", timeline: "Tiến trình đơn hàng",
   },
   en: {
-    title: "Order Management",
-    subtitle: "Track orders, delivery status, and customer information.",
-    totalOrders: "Total orders",
-    pendingOrders: "Pending",
-    completedOrders: "Completed",
-    revenue: "Revenue",
-    loading: "Loading orders...",
-    empty: "No orders found.",
-    loadError: "Could not load orders.",
-    orderCode: "Order code",
-    customer: "Customer",
-    total: "Total",
-    status: "Status",
-    detailTitle: "Order detail",
-    email: "Email",
-    phone: "Phone",
-    address: "Address",
-    products: "Products",
-    payment: "Payment",
-    shipping: "Shipping",
-    createdAt: "Created at",
-    retailCustomer: "Retail customer",
-    selectHint: "Select an order to view details.",
-    pending: "Pending",
-    processing: "Processing",
-    shipped: "Shipped",
-    delivered: "Delivered",
-    cancelled: "Cancelled",
-    paid: "Paid",
-    unpaid: "Unpaid",
+    title: "Order Management", subtitle: "Track orders, delivery status, and customer information.", totalOrders: "Total orders", pendingOrders: "Pending", completedOrders: "Completed", revenue: "Revenue", loading: "Loading orders...", empty: "No orders found.", loadError: "Could not load orders.", orderCode: "Order code", customer: "Customer", total: "Total", status: "Status", detailTitle: "Order detail", email: "Email", phone: "Phone", address: "Address", products: "Products", payment: "Payment", shipping: "Shipping", createdAt: "Created at", notes: "Admin notes", retailCustomer: "Retail customer", selectHint: "Select an order to view details.", pending: "Pending", processing: "Processing", shipped: "Shipped", delivered: "Delivered", cancelled: "Cancelled", paid: "Paid", unpaid: "Unpaid", search: "Search order code or customer", allStatuses: "All statuses", previous: "Previous", next: "Next", page: "Page", save: "Save changes", close: "Close", unsaved: "You have unsaved changes. Close anyway?", timeline: "Order timeline",
   },
 } as const;
 
-const currency = new Intl.NumberFormat("vi-VN", {
-  style: "currency",
-  currency: "VND",
-  maximumFractionDigits: 0,
-});
+const currency = new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND", maximumFractionDigits: 0 });
 
 function getOrderStatus(order: Order) {
-  return order.fulfillmentStatus || order.status || "pending";
+  const status = String(order.status || "").toLowerCase();
+  if (ORDER_STATES.includes(status as typeof ORDER_STATES[number])) return status;
+  const fulfillmentStatus = String(order.fulfillmentStatus || "pending").toLowerCase();
+  return ORDER_STATES.includes(fulfillmentStatus as typeof ORDER_STATES[number]) ? fulfillmentStatus : "pending";
 }
 
 function getStatusColor(status: string) {
-  switch (status) {
-    case "pending":
-      return "bg-amber-50 text-amber-700 ring-amber-100";
-    case "processing":
-      return "bg-blue-50 text-blue-700 ring-blue-100";
-    case "shipped":
-      return "bg-violet-50 text-violet-700 ring-violet-100";
-    case "delivered":
-      return "bg-emerald-50 text-emerald-700 ring-emerald-100";
-    case "cancelled":
-      return "bg-red-50 text-red-700 ring-red-100";
-    default:
-      return "bg-gray-50 text-gray-700 ring-gray-100";
-  }
+  return status === "pending" ? "bg-amber-50 text-amber-700 ring-amber-100" : status === "processing" ? "bg-blue-50 text-blue-700 ring-blue-100" : status === "shipped" ? "bg-violet-50 text-violet-700 ring-violet-100" : status === "delivered" ? "bg-emerald-50 text-emerald-700 ring-emerald-100" : status === "cancelled" ? "bg-red-50 text-red-700 ring-red-100" : "bg-gray-50 text-gray-700 ring-gray-100";
+}
+
+function OrderDetail({ order, draftStatus, isSaving, t, locale, onStatusChange, onSave, onClose }: {
+  order: Order | null; draftStatus: string; isSaving: boolean; t: typeof labels.vi | typeof labels.en; locale: string;
+  onStatusChange: (status: string) => void; onSave: () => void; onClose: () => void;
+}) {
+  const hasChanges = Boolean(order && draftStatus !== getOrderStatus(order));
+  const statusLabels: Record<string, string> = { pending: t.pending, processing: t.processing, shipped: t.shipped, delivered: t.delivered, cancelled: t.cancelled };
+  const timeline = ORDER_STATES.filter((state) => state !== "cancelled");
+  const activeStep = timeline.indexOf(draftStatus as typeof timeline[number]);
+
+  if (!order) return <div className="grid min-h-56 place-items-center p-6 text-center text-sm font-semibold text-gray-500">{t.selectHint}</div>;
+
+  return <div className="flex h-full min-h-0 flex-col"><div className="flex items-center justify-between border-b border-gray-100 px-5 py-4 lg:px-6"><div><p className="text-xs font-black uppercase tracking-[0.14em] text-blue-600">{t.orderCode}</p><h2 className="mt-1 text-xl font-black text-gray-950">{order.code}</h2></div><button type="button" onClick={onClose} className="flex h-11 w-11 items-center justify-center rounded-lg text-xl text-gray-500 hover:bg-gray-100 lg:hidden" aria-label={t.close}>×</button></div><div className="min-h-0 flex-1 space-y-5 overflow-y-auto p-5 text-sm lg:p-6"><section><p className="mb-3 text-xs font-black uppercase tracking-[0.14em] text-gray-500">{t.timeline}</p><ol className="grid grid-cols-4 gap-2"><li className={`rounded-lg px-2 py-2 text-center text-[11px] font-black ${draftStatus === "cancelled" ? "bg-red-50 text-red-700" : "bg-gray-50 text-gray-400"}`}>{draftStatus === "cancelled" ? t.cancelled : t.pending}</li>{timeline.slice(1).map((state, index) => <li key={state} className={`rounded-lg px-2 py-2 text-center text-[11px] font-black ${activeStep > index ? "bg-blue-50 text-blue-700" : "bg-gray-50 text-gray-400"}`}>{statusLabels[state]}</li>)}</ol></section><dl className="grid gap-4"><div><dt className="font-bold text-gray-500">{t.customer}</dt><dd className="mt-1 font-semibold text-gray-900">{order.fullName || t.retailCustomer}</dd></div><div className="grid gap-4 sm:grid-cols-2"><div><dt className="font-bold text-gray-500">{t.email}</dt><dd className="mt-1 break-words font-semibold text-gray-900">{order.email || "-"}</dd></div><div><dt className="font-bold text-gray-500">{t.phone}</dt><dd className="mt-1 font-semibold text-gray-900">{order.phone || "-"}</dd></div></div><div><dt className="font-bold text-gray-500">{t.address}</dt><dd className="mt-1 font-semibold text-gray-900">{order.address || "-"}</dd></div><div className="grid gap-4 sm:grid-cols-2"><div><dt className="font-bold text-gray-500">{t.payment}</dt><dd className="mt-1 font-semibold text-gray-900">{order.payment || "-"} · {order.paymentStatus === "paid" ? t.paid : t.unpaid}</dd></div><div><dt className="font-bold text-gray-500">{t.shipping}</dt><dd className="mt-1 font-semibold text-gray-900">{order.shipping || "-"}</dd></div></div><div><dt className="font-bold text-gray-500">{t.createdAt}</dt><dd className="mt-1 font-semibold text-gray-900">{order.createdAt ? new Date(order.createdAt).toLocaleDateString(locale) : "-"}</dd></div></dl><section className="border-t border-gray-100 pt-5"><p className="mb-3 font-bold text-gray-500">{t.products}</p><div className="space-y-2">{order.items.map((item, index) => <div key={`${item.name}-${index}`} className="flex items-center justify-between gap-3 rounded-lg bg-gray-50 px-3 py-2"><span className="font-semibold text-gray-800">{item.name || "-"} x{item.quantity || 1}</span><span className="font-black text-gray-950">{currency.format((Number(item.price) || 0) * (Number(item.quantity) || 1))}</span></div>)}</div><p className="mt-4 text-lg font-black text-gray-950">{t.total}: {currency.format(Number(order.total) || 0)}</p></section><section className="border-t border-gray-100 pt-5"><label className="block text-xs font-black uppercase tracking-[0.14em] text-gray-500" htmlFor="order-status">{t.status}</label><select id="order-status" value={draftStatus} onChange={(event) => onStatusChange(event.target.value)} disabled={isSaving} className={`mt-2 min-h-11 w-full rounded-lg border px-3 text-sm font-semibold outline-none focus:ring-2 disabled:opacity-50 ${getStatusColor(draftStatus)}`}><option value="pending">{t.pending}</option><option value="processing">{t.processing}</option><option value="shipped">{t.shipped}</option><option value="delivered">{t.delivered}</option><option value="cancelled">{t.cancelled}</option></select></section><section className="border-t border-gray-100 pt-5"><p className="text-xs font-black uppercase tracking-[0.14em] text-gray-500">{t.notes}</p><p className="mt-2 rounded-lg bg-gray-50 p-3 font-semibold text-gray-700">{order.adminNotes || "—"}</p></section></div><div className="flex shrink-0 justify-end gap-3 border-t border-gray-100 bg-white p-4 lg:px-6"><button type="button" onClick={onClose} className="min-h-11 rounded-lg px-4 text-sm font-semibold text-gray-700 hover:bg-gray-100">{t.close}</button><button type="button" onClick={onSave} disabled={!hasChanges || isSaving} className="min-h-11 rounded-lg bg-gray-950 px-4 text-sm font-black text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50">{isSaving ? "..." : t.save}</button></div></div>;
 }
 
 export default function AdminOrders() {
@@ -129,250 +57,31 @@ export default function AdminOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+  const [draftStatus, setDraftStatus] = useState("pending");
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [page, setPage] = useState(1);
 
-  const handleStatusChange = async (newStatus: string) => {
-    if (!selectedOrder) return;
-    setIsUpdatingStatus(true);
-    try {
-      const res = await fetch(`/api/admin/orders/${selectedOrder._id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setOrders(orders.map(o => o._id === selectedOrder._id ? { ...o, status: newStatus, fulfillmentStatus: newStatus } : o));
-        setSelectedOrder({ ...selectedOrder, status: newStatus, fulfillmentStatus: newStatus });
-      } else {
-        showToast(language === "vi" ? "Lỗi cập nhật trạng thái." : "Error updating status.");
-      }
-    } catch (error) {
-      console.error(error);
-      showToast(language === "vi" ? "Đã có lỗi xảy ra." : "An error occurred.");
-    } finally {
-      setIsUpdatingStatus(false);
-    }
-  };
+  const fetchOrders = async () => { try { setIsLoading(true); const response = await fetch("/api/admin/orders"); const data = await response.json(); if (data.success) setOrders(data.orders || []); else showToast(t.loadError); } catch (error) { console.error("Failed to fetch orders:", error); showToast(t.loadError); } finally { setIsLoading(false); } };
+  useEffect(() => { fetchOrders(); }, []);
 
-  const fetchOrders = async () => {
-    try {
-      setIsLoading(true);
-      const res = await fetch("/api/admin/orders");
-      const data = await res.json();
-      if (data.success) {
-        setOrders(data.orders || []);
-      }
-    } catch (error) {
-      console.error("Failed to fetch orders:", error);
-      showToast(t.loadError);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const stats = useMemo(() => ({ total: orders.length, pending: orders.filter((order) => getOrderStatus(order) === "pending").length, completed: orders.filter((order) => getOrderStatus(order) === "delivered").length, revenue: orders.reduce((sum, order) => sum + (Number(order.total) || 0), 0) }), [orders]);
+  const filteredOrders = useMemo(() => orders.filter((order) => { const query = search.trim().toLowerCase(); const matchesSearch = !query || [order.code, order.fullName, order.email, order.phone].some((value) => String(value || "").toLowerCase().includes(query)); return matchesSearch && (!statusFilter || getOrderStatus(order) === statusFilter); }), [orders, search, statusFilter]);
+  const pageCount = Math.max(1, Math.ceil(filteredOrders.length / PAGE_SIZE));
+  const visibleOrders = filteredOrders.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  useEffect(() => {
-    fetchOrders();
-  }, []);
+  useEffect(() => { setPage(1); }, [search, statusFilter]);
+  useEffect(() => { if (page > pageCount) setPage(pageCount); }, [page, pageCount]);
+  useEffect(() => { if (!isDetailOpen || typeof window === "undefined" || window.innerWidth >= 1024) return; const previousOverflow = document.body.style.overflow; document.body.style.overflow = "hidden"; return () => { document.body.style.overflow = previousOverflow; }; }, [isDetailOpen]);
+  const hasUnsavedChanges = Boolean(selectedOrder && draftStatus !== getOrderStatus(selectedOrder));
+  const closeDetail = () => { if (hasUnsavedChanges && !window.confirm(t.unsaved)) return; setDraftStatus(selectedOrder ? getOrderStatus(selectedOrder) : "pending"); setIsDetailOpen(false); };
+  useEffect(() => { const onKeyDown = (event: KeyboardEvent) => { if (event.key === "Escape" && isDetailOpen) closeDetail(); }; window.addEventListener("keydown", onKeyDown); return () => window.removeEventListener("keydown", onKeyDown); }, [isDetailOpen, hasUnsavedChanges, draftStatus, selectedOrder, t.unsaved]);
 
-  const stats = useMemo(() => {
-    const completed = orders.filter((order) => getOrderStatus(order) === "delivered").length;
-    const pending = orders.filter((order) => getOrderStatus(order) === "pending").length;
-    const revenue = orders.reduce((sum, order) => sum + (Number(order.total) || 0), 0);
+  const selectOrder = (order: Order) => { if (selectedOrder && selectedOrder._id !== order._id && hasUnsavedChanges && !window.confirm(t.unsaved)) return; setSelectedOrder(order); setDraftStatus(getOrderStatus(order)); setIsDetailOpen(true); };
+  const saveStatus = async () => { if (!selectedOrder || !hasUnsavedChanges) return; setIsSaving(true); try { const response = await fetch(`/api/admin/orders/${selectedOrder._id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: draftStatus }) }); const data = await response.json(); if (!data.success) throw new Error(data.error); const updatedOrder = { ...selectedOrder, status: draftStatus, fulfillmentStatus: draftStatus }; setOrders((current) => current.map((order) => order._id === updatedOrder._id ? updatedOrder : order)); setSelectedOrder(updatedOrder); showToast(language === "vi" ? "Đã cập nhật trạng thái đơn hàng." : "Order status updated."); } catch (error) { console.error(error); showToast(language === "vi" ? "Lỗi cập nhật trạng thái." : "Error updating status."); } finally { setIsSaving(false); } };
+  const statusLabels: Record<string, string> = { pending: t.pending, processing: t.processing, shipped: t.shipped, delivered: t.delivered, cancelled: t.cancelled };
 
-    return {
-      total: orders.length,
-      pending,
-      completed,
-      revenue,
-    };
-  }, [orders]);
-
-  const getStatusLabel = (status: string) => {
-    const statusLabels: Record<string, string> = {
-      pending: t.pending,
-      processing: t.processing,
-      shipped: t.shipped,
-      delivered: t.delivered,
-      cancelled: t.cancelled,
-    };
-    return statusLabels[status] || status;
-  };
-
-  return (
-    <div className="space-y-6">
-        <div>
-          <p className="text-sm font-black uppercase tracking-[0.16em] text-blue-600">
-            MOCO Orders
-          </p>
-          <h1 className="mt-2 text-3xl font-black text-gray-950">{t.title}</h1>
-          <p className="mt-2 max-w-2xl text-sm font-medium leading-6 text-gray-600">
-            {t.subtitle}
-          </p>
-        </div>
-
-        <section className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
-          {[
-            { label: t.totalOrders, value: stats.total, tone: "border-blue-100 bg-blue-50 text-blue-700" },
-            { label: t.pendingOrders, value: stats.pending, tone: "border-amber-100 bg-amber-50 text-amber-700" },
-            { label: t.completedOrders, value: stats.completed, tone: "border-emerald-100 bg-emerald-50 text-emerald-700" },
-            { label: t.revenue, value: currency.format(stats.revenue), tone: "border-gray-200 bg-white text-gray-950" },
-          ].map((item) => (
-            <article key={item.label} className={`rounded-lg border p-5 shadow-sm ${item.tone}`}>
-              <p className="text-xs font-black uppercase tracking-[0.14em] opacity-80">{item.label}</p>
-              <strong className="mt-3 block text-2xl font-black">{item.value}</strong>
-            </article>
-          ))}
-        </section>
-
-        {isLoading ? (
-          <div className="rounded-lg bg-white p-10 text-center font-semibold text-gray-500 shadow-sm">
-            {t.loading}
-          </div>
-        ) : orders.length === 0 ? (
-          <div className="rounded-lg bg-white p-10 text-center font-semibold text-gray-500 shadow-sm">
-            {t.empty}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.35fr_0.65fr]">
-            <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
-              <table className="w-full block md:table">
-                <thead className="bg-gray-50 text-left text-xs font-black uppercase tracking-wide text-gray-500 hidden md:table-header-group">
-                  <tr>
-                    <th className="px-4 py-3">{t.orderCode}</th>
-                    <th className="px-4 py-3">{t.customer}</th>
-                    <th className="px-4 py-3">{t.total}</th>
-                    <th className="px-4 py-3">{t.status}</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100 text-sm block md:table-row-group">
-                  {orders.map((order) => {
-                    const status = getOrderStatus(order);
-                    return (
-                      <tr
-                        key={order._id}
-                        className="cursor-pointer hover:bg-gray-50 flex flex-col p-4 gap-2 md:table-row md:p-0 md:gap-0"
-                        onClick={() => setSelectedOrder(order)}
-                      >
-                        <td className="md:px-4 md:py-4 flex justify-between items-center md:table-cell">
-                          <span className="md:hidden text-xs font-bold text-gray-500 uppercase">{t.orderCode}</span>
-                          <span className="font-black text-blue-700">{order.code}</span>
-                        </td>
-                        <td className="md:px-4 md:py-4 flex justify-between items-center md:table-cell">
-                          <span className="md:hidden text-xs font-bold text-gray-500 uppercase">{t.customer}</span>
-                          <span className="font-semibold text-gray-700">
-                            {order.fullName || order.email || t.retailCustomer}
-                          </span>
-                        </td>
-                        <td className="md:px-4 md:py-4 flex justify-between items-center md:table-cell">
-                          <span className="md:hidden text-xs font-bold text-gray-500 uppercase">{t.total}</span>
-                          <span className="font-black text-gray-950">
-                            {currency.format(Number(order.total) || 0)}
-                          </span>
-                        </td>
-                        <td className="md:px-4 md:py-4 flex justify-between items-center md:table-cell">
-                          <span className="md:hidden text-xs font-bold text-gray-500 uppercase">{t.status}</span>
-                          <span className={`inline-flex rounded-full px-3 py-1 text-xs font-black ring-1 ${getStatusColor(status)}`}>
-                            {getStatusLabel(status)}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-
-            <aside className="h-fit rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-              {selectedOrder ? (
-                <div className="space-y-4 text-sm">
-                  <h2 className="text-xl font-black text-gray-950">{t.detailTitle}</h2>
-                  <dl className="grid gap-3">
-                    <div>
-                      <dt className="font-bold text-gray-500">{t.orderCode}</dt>
-                      <dd className="mt-1 font-black text-blue-700">{selectedOrder.code}</dd>
-                    </div>
-                    <div>
-                      <dt className="font-bold text-gray-500">{t.customer}</dt>
-                      <dd className="mt-1 font-semibold text-gray-900">
-                        {selectedOrder.fullName || t.retailCustomer}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="font-bold text-gray-500">{t.status}</dt>
-                      <dd className="mt-1">
-                        <select
-                          value={getOrderStatus(selectedOrder)}
-                          onChange={(e) => handleStatusChange(e.target.value)}
-                          disabled={isUpdatingStatus}
-                          className={`w-full rounded-lg border px-3 py-2 text-sm font-semibold outline-none focus:ring-2 disabled:opacity-50 appearance-none cursor-pointer ${getStatusColor(getOrderStatus(selectedOrder))}`}
-                        >
-                          <option value="pending" className="bg-white text-gray-900">{t.pending}</option>
-                          <option value="processing" className="bg-white text-gray-900">{t.processing}</option>
-                          <option value="shipped" className="bg-white text-gray-900">{t.shipped}</option>
-                          <option value="delivered" className="bg-white text-gray-900">{t.delivered}</option>
-                          <option value="cancelled" className="bg-white text-gray-900">{t.cancelled}</option>
-                        </select>
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="font-bold text-gray-500">{t.email}</dt>
-                      <dd className="mt-1 font-semibold text-gray-900">{selectedOrder.email || "-"}</dd>
-                    </div>
-                    <div>
-                      <dt className="font-bold text-gray-500">{t.phone}</dt>
-                      <dd className="mt-1 font-semibold text-gray-900">{selectedOrder.phone || "-"}</dd>
-                    </div>
-                    <div>
-                      <dt className="font-bold text-gray-500">{t.address}</dt>
-                      <dd className="mt-1 font-semibold text-gray-900">{selectedOrder.address || "-"}</dd>
-                    </div>
-                    <div>
-                      <dt className="font-bold text-gray-500">{t.payment}</dt>
-                      <dd className="mt-1 font-semibold text-gray-900">
-                        {selectedOrder.payment || "-"} · {selectedOrder.paymentStatus === "paid" ? t.paid : t.unpaid}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="font-bold text-gray-500">{t.shipping}</dt>
-                      <dd className="mt-1 font-semibold text-gray-900">{selectedOrder.shipping || "-"}</dd>
-                    </div>
-                    <div>
-                      <dt className="font-bold text-gray-500">{t.createdAt}</dt>
-                      <dd className="mt-1 font-semibold text-gray-900">
-                        {selectedOrder.createdAt ? new Date(selectedOrder.createdAt).toLocaleDateString(locale) : "-"}
-                      </dd>
-                    </div>
-                  </dl>
-
-                  <div className="border-t border-gray-100 pt-4">
-                    <p className="mb-2 font-bold text-gray-500">{t.products}</p>
-                    <div className="space-y-2">
-                      {selectedOrder.items.map((item, index) => (
-                        <div key={`${item.name}-${index}`} className="flex items-center justify-between gap-3 rounded-lg bg-gray-50 px-3 py-2">
-                          <span className="font-semibold text-gray-800">
-                            {item.name || "-"} x{item.quantity || 1}
-                          </span>
-                          <span className="font-black text-gray-950">
-                            {currency.format((Number(item.price) || 0) * (Number(item.quantity) || 1))}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="border-t border-gray-100 pt-4">
-                    <p className="text-lg font-black text-gray-950">
-                      {t.total}: {currency.format(Number(selectedOrder.total) || 0)}
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div className="p-6 text-center font-semibold text-gray-500">{t.selectHint}</div>
-              )}
-            </aside>
-          </div>
-        )}
-      </div>
-  );
+  return <div className="space-y-6"><div><p className="text-sm font-black uppercase tracking-[0.16em] text-blue-600">MOCO Orders</p><h1 className="mt-2 text-3xl font-black text-gray-950">{t.title}</h1><p className="mt-2 max-w-2xl text-sm font-medium leading-6 text-gray-600">{t.subtitle}</p></div><section className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">{[{ label: t.totalOrders, value: stats.total, tone: "border-blue-100 bg-blue-50 text-blue-700" }, { label: t.pendingOrders, value: stats.pending, tone: "border-amber-100 bg-amber-50 text-amber-700" }, { label: t.completedOrders, value: stats.completed, tone: "border-emerald-100 bg-emerald-50 text-emerald-700" }, { label: t.revenue, value: currency.format(stats.revenue), tone: "border-gray-200 bg-white text-gray-950" }].map((item) => <article key={item.label} className={`rounded-lg border p-5 shadow-sm ${item.tone}`}><p className="text-xs font-black uppercase tracking-[0.14em] opacity-80">{item.label}</p><strong className="mt-3 block text-2xl font-black">{item.value}</strong></article>)}</section>{isLoading ? <div className="rounded-lg bg-white p-10 text-center font-semibold text-gray-500 shadow-sm">{t.loading}</div> : orders.length === 0 ? <div className="rounded-lg bg-white p-10 text-center font-semibold text-gray-500 shadow-sm">{t.empty}</div> : <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(340px,0.65fr)]"><section className="min-w-0 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm"><div className="flex flex-col gap-3 border-b border-gray-100 p-4 sm:flex-row"><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder={t.search} className="min-h-11 min-w-0 flex-1 rounded-lg border border-gray-200 px-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" /><select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)} className="min-h-11 rounded-lg border border-gray-200 px-3 text-sm font-semibold"><option value="">{t.allStatuses}</option>{ORDER_STATES.map((status) => <option key={status} value={status}>{statusLabels[status]}</option>)}</select></div>{filteredOrders.length === 0 ? <div className="p-10 text-center text-sm font-semibold text-gray-500">{t.empty}</div> : <><table className="hidden w-full lg:table"><thead className="bg-gray-50 text-left text-xs font-black uppercase tracking-wide text-gray-500"><tr><th className="px-4 py-3">{t.orderCode}</th><th className="px-4 py-3">{t.customer}</th><th className="px-4 py-3">{t.total}</th><th className="px-4 py-3">{t.status}</th></tr></thead><tbody className="divide-y divide-gray-100 text-sm">{visibleOrders.map((order) => { const status = getOrderStatus(order); const selected = selectedOrder?._id === order._id; return <tr key={order._id} tabIndex={0} role="button" aria-pressed={selected} onClick={() => selectOrder(order)} onKeyDown={(event) => event.key === "Enter" && selectOrder(order)} className={`cursor-pointer transition hover:bg-gray-50 focus:bg-gray-50 focus:outline-none ${selected ? "bg-blue-50/60" : ""}`}><td className="px-4 py-4 font-black text-blue-700">{order.code}</td><td className="px-4 py-4 font-semibold text-gray-700">{order.fullName || order.email || t.retailCustomer}</td><td className="px-4 py-4 font-black text-gray-950">{currency.format(Number(order.total) || 0)}</td><td className="px-4 py-4"><span className={`inline-flex rounded-full px-3 py-1 text-xs font-black ring-1 ${getStatusColor(status)}`}>{statusLabels[status]}</span></td></tr>; })}</tbody></table><div className="divide-y divide-gray-100 lg:hidden">{visibleOrders.map((order) => { const status = getOrderStatus(order); return <button key={order._id} type="button" onClick={() => selectOrder(order)} className="grid w-full gap-2 p-4 text-left hover:bg-gray-50"><span className="flex items-center justify-between gap-3"><strong className="font-black text-blue-700">{order.code}</strong><span className={`inline-flex rounded-full px-3 py-1 text-xs font-black ring-1 ${getStatusColor(status)}`}>{statusLabels[status]}</span></span><span className="font-semibold text-gray-700">{order.fullName || order.email || t.retailCustomer}</span><span className="font-black text-gray-950">{currency.format(Number(order.total) || 0)}</span></button>; })}</div><div className="flex items-center justify-between border-t border-gray-100 p-4 text-sm"><button type="button" disabled={page === 1} onClick={() => setPage((current) => current - 1)} className="min-h-11 rounded-lg px-3 font-bold text-gray-700 hover:bg-gray-100 disabled:opacity-40">{t.previous}</button><span className="font-semibold text-gray-500">{t.page} {page}/{pageCount}</span><button type="button" disabled={page === pageCount} onClick={() => setPage((current) => current + 1)} className="min-h-11 rounded-lg px-3 font-bold text-gray-700 hover:bg-gray-100 disabled:opacity-40">{t.next}</button></div></>}</section><>{isDetailOpen && <button type="button" aria-label={t.close} onClick={closeDetail} className="fixed inset-0 z-40 bg-black/40 lg:hidden" />}<aside role="dialog" aria-modal="true" aria-label={t.detailTitle} className={`fixed inset-y-0 right-0 z-50 flex w-full flex-col bg-white shadow-2xl transition-transform duration-200 ease-out sm:w-[70vw] lg:sticky lg:top-6 lg:z-auto lg:h-[calc(100vh-3rem)] lg:w-auto lg:translate-x-0 lg:rounded-lg lg:border lg:border-gray-200 lg:shadow-sm ${isDetailOpen ? "translate-x-0" : "translate-x-full"}`}><OrderDetail order={selectedOrder} draftStatus={draftStatus} isSaving={isSaving} t={t} locale={locale} onStatusChange={setDraftStatus} onSave={saveStatus} onClose={closeDetail} /></aside></></div>}</div>;
 }

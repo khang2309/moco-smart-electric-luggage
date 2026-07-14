@@ -1,288 +1,44 @@
 "use client";
+
+import { useEffect, useRef, useState } from "react";
+import { useLanguage } from "@/app/providers";
 import { showToast } from "@/app/toast";
 
-import { useEffect, useState } from "react";
-import { useLanguage } from "@/app/providers";
+type Warranty = Record<string, any> & { _id: string; status: string; model?: string; serialNumber?: string; customerEmail?: string; invoiceDate?: string; warrantyEnd?: string; remainingDays?: number | null };
+type HistoryEntry = { _id?: string; action?: string; oldStatus?: string | null; newStatus?: string; performedBy?: string; details?: { rejectionReason?: string; months?: number; price?: number }; createdAt?: string };
 
 const labels = {
-  vi: {
-    title: "Quản lý Đăng ký Bảo hành",
-    loading: "Đang tải dữ liệu...",
-    noData: "Chưa có đăng ký bảo hành nào.",
-    model: "Model",
-    serial: "Số Serial",
-    customer: "Khách hàng",
-    purchaseDate: "Ngày mua",
-    expiryDate: "Hạn bảo hành",
-    status: "Trạng thái",
-    actions: "Thao tác",
-    active: "Đang bảo hành",
-    pending: "Chờ duyệt",
-    expired: "Hết hạn",
-    rejected: "Từ chối",
-    viewInvoice: "Xem Hóa đơn",
-    editStatus: "Cập nhật",
-    delete: "Xóa",
-    confirmDelete: "Bạn có chắc chắn muốn xóa bản ghi này?",
-    close: "Đóng",
-    save: "Lưu",
-    noInvoice: "Không có hóa đơn",
-    success: "Cập nhật thành công!",
-    error: "Đã có lỗi xảy ra.",
-  },
-  en: {
-    title: "Warranty Registrations Management",
-    loading: "Loading data...",
-    noData: "No warranty registrations found.",
-    model: "Model",
-    serial: "Serial Number",
-    customer: "Customer",
-    purchaseDate: "Purchase Date",
-    expiryDate: "Expiry Date",
-    status: "Status",
-    actions: "Actions",
-    active: "Active",
-    pending: "Pending",
-    expired: "Expired",
-    rejected: "Rejected",
-    viewInvoice: "View Invoice",
-    editStatus: "Update",
-    delete: "Delete",
-    confirmDelete: "Are you sure you want to delete this record?",
-    close: "Close",
-    save: "Save",
-    noInvoice: "No invoice",
-    success: "Updated successfully!",
-    error: "An error occurred.",
-  },
+  vi: { title: "Quản lý đăng ký bảo hành", loading: "Đang tải dữ liệu...", noData: "Chưa có đăng ký bảo hành nào.", model: "Model", serial: "Số serial", customer: "Khách hàng", invoiceDate: "Ngày hóa đơn", endDate: "Hạn bảo hành", status: "Trạng thái", actions: "Thao tác", pending: "Chờ duyệt", active: "Đang bảo hành", extended: "Đã gia hạn", rejected: "Từ chối", expired: "Hết hạn", export: "Xuất Excel", search: "Tìm theo số serial", filter: "Lọc", details: "Chi tiết đăng ký bảo hành", registered: "Ngày đăng ký", close: "Đóng", customerInfo: "Thông tin khách hàng", productInfo: "Thông tin sản phẩm", registrationInfo: "Thông tin đăng ký", timeline: "Lịch sử xử lý", fullName: "Họ và tên", phone: "Số điện thoại", email: "Email", address: "Địa chỉ", product: "Sản phẩm", variant: "Phiên bản", purchaseDate: "Ngày mua", expiryDate: "Hạn bảo hành", staff: "Nhân viên phụ trách", notes: "Ghi chú xử lý", invoice: "Hóa đơn đính kèm", noInvoice: "Không có hóa đơn đính kèm", noHistory: "Chưa có lịch sử xử lý", approve: "Duyệt đăng ký", reject: "Từ chối đăng ký", extend: "Gia hạn bảo hành", rejectionReason: "Lý do từ chối", rejectionPlaceholder: "Nhập lý do từ chối để thông báo cho khách hàng", months: "Số tháng gia hạn", price: "Chi phí", cancel: "Hủy", confirm: "Xác nhận", saving: "Đang lưu...", success: "Cập nhật thành công.", error: "Đã có lỗi xảy ra.", confirmApprove: "Duyệt đăng ký bảo hành này?", confirmExtend: "Xác nhận gia hạn bảo hành?", dateUnknown: "Chưa cập nhật", days: "ngày", view: "Xem chi tiết", historyAction: "Đã thực hiện", loadDetail: "Đang tải chi tiết...", currentStatus: "Trạng thái hiện tại", orderCode: "Mã đơn hàng", registrationId: "Mã đăng ký", attachment: "Tệp đính kèm", approvedBy: "Người duyệt", requiredReason: "Vui lòng nhập lý do từ chối.", noAction: "Không có thao tác khả dụng cho trạng thái này.", },
+  en: { title: "Warranty registrations", loading: "Loading data...", noData: "No warranty registrations found.", model: "Model", serial: "Serial number", customer: "Customer", invoiceDate: "Invoice date", endDate: "Warranty end", status: "Status", actions: "Actions", pending: "Pending", active: "Active warranty", extended: "Extended", rejected: "Rejected", expired: "Expired", export: "Export Excel", search: "Search serial number", filter: "Filter", details: "Warranty registration details", registered: "Registration date", close: "Close", customerInfo: "Customer information", productInfo: "Product information", registrationInfo: "Registration details", timeline: "Processing timeline", fullName: "Full name", phone: "Phone number", email: "Email", address: "Address", product: "Product", variant: "Variant", purchaseDate: "Purchase date", expiryDate: "Warranty expiration", staff: "Assigned staff", notes: "Processing notes", invoice: "Attached invoice", noInvoice: "No attached invoice", noHistory: "No processing history yet", approve: "Approve registration", reject: "Reject registration", extend: "Extend warranty", rejectionReason: "Rejection reason", rejectionPlaceholder: "Enter a reason the customer can understand", months: "Extension months", price: "Price", cancel: "Cancel", confirm: "Confirm", saving: "Saving...", success: "Updated successfully.", error: "Something went wrong.", confirmApprove: "Approve this warranty registration?", confirmExtend: "Confirm this warranty extension?", dateUnknown: "Not available", days: "days", view: "View details", historyAction: "Action performed", loadDetail: "Loading details...", currentStatus: "Current status", orderCode: "Order code", registrationId: "Registration ID", attachment: "Attachment", approvedBy: "Approved by", requiredReason: "Please enter a rejection reason.", noAction: "No actions are available for this status.", },
 } as const;
 
+const statusClass = (status: string) => status === "PENDING" ? "bg-amber-100 text-amber-800" : status === "REJECTED" ? "bg-rose-100 text-rose-800" : status === "EXPIRED" ? "bg-slate-100 text-slate-700" : "bg-emerald-100 text-emerald-800";
+const statusLabel = (status: string, t: typeof labels.vi | typeof labels.en) => ({ PENDING: t.pending, ACTIVE: t.active, EXTENDED: t.extended, REJECTED: t.rejected, EXPIRED: t.expired }[status] || status);
+const formatDate = (value: unknown, language: "vi" | "en", fallback: string) => { const date = value ? new Date(String(value)) : null; return date && !Number.isNaN(date.getTime()) ? new Intl.DateTimeFormat(language === "vi" ? "vi-VN" : "en-US", { dateStyle: "medium", timeStyle: typeof value === "string" && value.length > 10 ? "short" : undefined }).format(date) : fallback; };
+
 export default function WarrantiesAdminPage() {
-  const { language } = useLanguage();
-  const t = labels[language];
+  const { language } = useLanguage(); const t = labels[language];
+  const [warranties, setWarranties] = useState<Warranty[]>([]); const [loading, setLoading] = useState(true); const [status, setStatus] = useState(""); const [serial, setSerial] = useState("");
+  const [selected, setSelected] = useState<Warranty | null>(null); const [detail, setDetail] = useState<Warranty | null>(null); const [history, setHistory] = useState<HistoryEntry[]>([]); const [detailLoading, setDetailLoading] = useState(false);
+  const [action, setAction] = useState<"approve" | "reject" | "extend" | null>(null); const [reason, setReason] = useState(""); const [months, setMonths] = useState("6"); const [price, setPrice] = useState("0"); const [submitting, setSubmitting] = useState(false); const closeRef = useRef<HTMLButtonElement>(null);
 
-  const [warranties, setWarranties] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [selectedInvoice, setSelectedInvoice] = useState<string | null>(null);
-  
-  const [editingItem, setEditingItem] = useState<any | null>(null);
-  const [editStatus, setEditStatus] = useState("");
-  const [editExpiry, setEditExpiry] = useState("");
+  const fetchWarranties = async () => { setLoading(true); try { const query = new URLSearchParams(); if (status) query.set("status", status); if (serial) query.set("serial", serial); const response = await fetch(`/api/admin/warranties${query.size ? `?${query}` : ""}`); const data = await response.json(); if (!data.success) throw new Error(data.error); setWarranties(data.warranties || []); } catch { showToast(t.error, "error"); } finally { setLoading(false); } };
+  useEffect(() => { void fetchWarranties(); }, [status]);
+  useEffect(() => { if (!selected) return; const onKeyDown = (event: KeyboardEvent) => event.key === "Escape" && !submitting && setSelected(null); window.addEventListener("keydown", onKeyDown); window.setTimeout(() => closeRef.current?.focus(), 0); return () => window.removeEventListener("keydown", onKeyDown); }, [selected, submitting]);
 
-  const fetchWarranties = async () => {
-    setIsLoading(true);
-    try {
-      const res = await fetch("/api/admin/warranties");
-      const data = await res.json();
-      if (data.success) {
-        setWarranties(data.warranties || []);
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const openDetails = async (warranty: Warranty) => { setSelected(warranty); setDetail(null); setHistory([]); setAction(null); setReason(""); setDetailLoading(true); try { const response = await fetch(`/api/admin/warranties/${warranty._id}`, { cache: "no-store" }); const data = await response.json(); if (!data.success) throw new Error(data.error); setDetail(data.warranty); setHistory(data.history || []); } catch { showToast(t.error, "error"); } finally { setDetailLoading(false); } };
+  const saveAction = async () => { if (!detail || !action) return; if (action === "reject" && !reason.trim()) { showToast(t.requiredReason, "error"); return; } if (action === "approve" && !window.confirm(t.confirmApprove)) return; if (action === "extend" && !window.confirm(t.confirmExtend)) return; setSubmitting(true); try { const response = await fetch(`/api/admin/warranties/${detail._id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action, rejectionReason: reason, months, price }) }); const data = await response.json(); if (!data.success) throw new Error(data.error); setWarranties((current) => current.map((item) => item._id === detail._id ? data.warranty : item)); setDetail(data.warranty); setHistory((current) => [{ action: action.toUpperCase(), newStatus: data.warranty.status, performedBy: "admin", details: action === "reject" ? { rejectionReason: reason } : action === "extend" ? { months: Number(months), price: Number(price) } : {}, createdAt: new Date().toISOString() }, ...current]); setAction(null); showToast(t.success, "success"); } catch (error) { showToast(error instanceof Error ? error.message : t.error, "error"); } finally { setSubmitting(false); } };
+  const availableActions = detail?.status === "PENDING" ? ["approve", "reject"] as const : detail && ["ACTIVE", "EXTENDED"].includes(detail.status) ? ["extend"] as const : [];
 
-  useEffect(() => {
-    fetchWarranties();
-  }, []);
-
-  const handleDelete = async (id: string) => {
-    if (!window.confirm(t.confirmDelete)) return;
-    try {
-      const res = await fetch(`/api/admin/warranties/${id}`, { method: "DELETE" });
-      const data = await res.json();
-      if (data.success) {
-        setWarranties(warranties.filter(w => w._id !== id));
-      } else {
-        showToast(t.error);
-      }
-    } catch (err) {
-      console.error(err);
-      showToast(t.error);
-    }
-  };
-
-  const handleSaveEdit = async () => {
-    if (!editingItem) return;
-    try {
-      const res = await fetch(`/api/admin/warranties/${editingItem._id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          status: editStatus,
-          warrantyExpiry: editExpiry,
-        }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setWarranties(warranties.map(w => w._id === editingItem._id ? { ...w, status: editStatus, warrantyExpiry: editExpiry } : w));
-        setEditingItem(null);
-      } else {
-        showToast(t.error);
-      }
-    } catch (err) {
-      console.error(err);
-      showToast(t.error);
-    }
-  };
-
-  return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">{t.title}</h2>
-
-      {isLoading ? (
-        <div className="text-center py-10 text-gray-500">{t.loading}</div>
-      ) : warranties.length === 0 ? (
-        <div className="text-center py-10 text-gray-500 bg-gray-50 rounded-lg border border-dashed border-gray-200">
-          {t.noData}
-        </div>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm whitespace-nowrap">
-            <thead className="bg-gray-50 text-gray-600">
-              <tr>
-                <th className="px-4 py-3 rounded-tl-lg font-semibold">{t.model} & {t.serial}</th>
-                <th className="px-4 py-3 font-semibold">{t.customer}</th>
-                <th className="px-4 py-3 font-semibold">{t.purchaseDate}</th>
-                <th className="px-4 py-3 font-semibold">{t.status}</th>
-                <th className="px-4 py-3 font-semibold rounded-tr-lg text-right">{t.actions}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {warranties.map((item) => (
-                <tr key={item._id} className="hover:bg-gray-50/50 transition">
-                  <td className="px-4 py-4">
-                    <div className="font-bold text-gray-900">{item.model}</div>
-                    <div className="text-gray-500 text-xs mt-0.5">{item.serial || "-"}</div>
-                  </td>
-                  <td className="px-4 py-4">
-                    <div className="font-medium text-gray-800">{item.contact}</div>
-                    {item.userEmail && item.userEmail !== item.contact && (
-                      <div className="text-gray-500 text-xs mt-0.5">{item.userEmail}</div>
-                    )}
-                  </td>
-                  <td className="px-4 py-4">
-                    <div className="font-medium text-gray-800">{item.purchaseDate}</div>
-                    <div className="text-gray-500 text-xs mt-0.5">{t.expiryDate}: {item.warrantyExpiry}</div>
-                  </td>
-                  <td className="px-4 py-4">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                      item.status === 'active' ? 'bg-green-100 text-green-800' :
-                      item.status === 'pending' ? 'bg-amber-100 text-amber-800' :
-                      item.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {t[item.status as keyof typeof t] || item.status}
-                    </span>
-                  </td>
-                  <td className="px-4 py-4 text-right">
-                    <div className="flex justify-end gap-2">
-                      <button 
-                        onClick={() => setSelectedInvoice(item.invoiceImage || "none")}
-                        className="p-1.5 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition"
-                        title={t.viewInvoice}
-                      >
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10.4 12.6a2 2 0 1 1 3 3L8 21l-4 1 1-4Z"/><path d="M18 22h2a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v3"/></svg>
-                      </button>
-                      <button 
-                        onClick={() => {
-                          setEditingItem(item);
-                          setEditStatus(item.status);
-                          setEditExpiry(item.warrantyExpiry || "");
-                        }}
-                        className="p-1.5 text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-lg transition"
-                        title={t.editStatus}
-                      >
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-                      </button>
-                      <button 
-                        onClick={() => handleDelete(item._id)}
-                        className="p-1.5 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition"
-                        title={t.delete}
-                      >
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {/* Invoice Modal */}
-      {selectedInvoice !== null && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden">
-            <div className="flex justify-between items-center p-4 border-b border-gray-100">
-              <h3 className="font-bold text-lg">{t.viewInvoice}</h3>
-              <button onClick={() => setSelectedInvoice(null)} className="text-gray-400 hover:text-black">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-              </button>
-            </div>
-            <div className="p-4 overflow-y-auto flex-1 flex justify-center items-center bg-gray-50">
-              {selectedInvoice === "none" ? (
-                <p className="text-gray-500 py-20">{t.noInvoice}</p>
-              ) : selectedInvoice.startsWith("data:image") ? (
-                <img src={selectedInvoice} alt="Invoice" className="max-w-full rounded-lg shadow-sm" />
-              ) : selectedInvoice.startsWith("data:application/pdf") ? (
-                <iframe src={selectedInvoice} className="w-full h-[60vh] rounded-lg" />
-              ) : (
-                <p className="text-gray-500 py-20">Định dạng file không hỗ trợ hiển thị trực tiếp.</p>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Modal */}
-      {editingItem && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-sm w-full overflow-hidden">
-            <div className="flex justify-between items-center p-4 border-b border-gray-100">
-              <h3 className="font-bold text-lg">{t.editStatus}</h3>
-              <button onClick={() => setEditingItem(null)} className="text-gray-400 hover:text-black">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-              </button>
-            </div>
-            <div className="p-5 space-y-4">
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">{t.status}</label>
-                <select
-                  value={editStatus}
-                  onChange={(e) => setEditStatus(e.target.value)}
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-black focus:ring-1 focus:ring-black bg-white"
-                >
-                  <option value="pending">{t.pending}</option>
-                  <option value="active">{t.active}</option>
-                  <option value="expired">{t.expired}</option>
-                  <option value="rejected">{t.rejected}</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">{t.expiryDate}</label>
-                <input
-                  type="text"
-                  value={editExpiry}
-                  onChange={(e) => setEditExpiry(e.target.value)}
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-black focus:ring-1 focus:ring-black"
-                />
-              </div>
-            </div>
-            <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
-              <button onClick={() => setEditingItem(null)} className="px-4 py-2 text-sm font-semibold text-gray-600 hover:text-black">
-                {t.close}
-              </button>
-              <button onClick={handleSaveEdit} className="px-4 py-2 text-sm font-bold bg-black text-white rounded-lg hover:bg-gray-900 transition shadow-sm">
-                {t.save}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      </div>
-  );
+  return <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6"><div className="mb-6 flex flex-wrap items-center justify-between gap-3"><div><p className="text-xs font-black uppercase tracking-[0.16em] text-blue-600">MOCO Admin</p><h1 className="mt-1 text-2xl font-black text-gray-950 sm:text-3xl">{t.title}</h1></div><a href="/api/admin/warranties/export" className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-black px-4 text-sm font-bold !text-white shadow-sm transition hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" aria-label={t.export}><span aria-hidden="true">⇩</span><span>{t.export}</span></a></div><div className="mb-5 flex flex-wrap gap-3"><input value={serial} onChange={(event) => setSerial(event.target.value)} onKeyDown={(event) => event.key === "Enter" && void fetchWarranties()} placeholder={t.search} className="min-h-11 min-w-0 flex-1 rounded-xl border border-gray-200 px-3 text-sm outline-none focus:ring-2 focus:ring-blue-100"/><select value={status} onChange={(event) => setStatus(event.target.value)} className="min-h-11 rounded-xl border border-gray-200 px-3 text-sm"><option value="">{t.status}</option><option value="PENDING">{t.pending}</option><option value="ACTIVE">{t.active}</option><option value="EXTENDED">{t.extended}</option><option value="REJECTED">{t.rejected}</option><option value="EXPIRED">{t.expired}</option></select><button type="button" onClick={() => void fetchWarranties()} className="min-h-11 rounded-xl border border-gray-200 px-4 text-sm font-bold hover:bg-gray-50">{t.filter}</button></div>{loading ? <ListSkeleton /> : warranties.length === 0 ? <div className="rounded-xl border border-dashed border-gray-200 bg-gray-50 py-12 text-center text-sm text-gray-500">{t.noData}</div> : <div className="overflow-x-auto"><table className="min-w-[880px] w-full text-left text-sm"><thead className="bg-gray-50 text-gray-600"><tr><th className="px-4 py-3">{t.model} / {t.serial}</th><th className="px-4 py-3">{t.customer}</th><th className="px-4 py-3">{t.invoiceDate}</th><th className="px-4 py-3">{t.endDate}</th><th className="px-4 py-3">{t.status}</th><th className="px-4 py-3 text-right">{t.actions}</th></tr></thead><tbody className="divide-y divide-gray-100">{warranties.map((item) => <tr key={item._id} className="hover:bg-gray-50"><td className="px-4 py-4"><strong className="block text-gray-900">{item.model}</strong><span className="text-xs text-gray-500">{item.serialNumber}</span></td><td className="px-4 py-4"><span className="block text-gray-800">{item.customerEmail || item.contact}</span><span className="text-xs text-gray-500">{item.orderCode || "—"}</span></td><td className="px-4 py-4">{formatDate(item.invoiceDate, language, "—")}</td><td className="px-4 py-4"><strong>{formatDate(item.warrantyEnd, language, "—")}</strong><span className="ml-2 text-xs text-gray-500">{item.remainingDays === null ? "" : `${item.remainingDays} ${t.days}`}</span></td><td className="px-4 py-4"><StatusBadge status={item.status} t={t}/></td><td className="px-4 py-4 text-right"><button type="button" onClick={() => void openDetails(item)} aria-label={t.view} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-blue-50 px-3 text-sm font-bold text-blue-700 hover:bg-blue-100">⌕ <span>{t.view}</span></button></td></tr>)}</tbody></table></div>}{selected && <WarrantyDrawer warranty={detail || selected} history={history} loading={detailLoading} action={action} reason={reason} months={months} price={price} submitting={submitting} t={t} language={language} availableActions={availableActions} onClose={() => !submitting && setSelected(null)} onAction={setAction} onReason={setReason} onMonths={setMonths} onPrice={setPrice} onSave={() => void saveAction()} closeRef={closeRef}/>}</div>;
 }
+
+function WarrantyDrawer({ warranty, history, loading, action, reason, months, price, submitting, t, language, availableActions, onClose, onAction, onReason, onMonths, onPrice, onSave, closeRef }: { warranty: Warranty; history: HistoryEntry[]; loading: boolean; action: "approve" | "reject" | "extend" | null; reason: string; months: string; price: string; submitting: boolean; t: typeof labels.vi | typeof labels.en; language: "vi" | "en"; availableActions: readonly ("approve" | "reject" | "extend")[]; onClose: () => void; onAction: (action: "approve" | "reject" | "extend" | null) => void; onReason: (value: string) => void; onMonths: (value: string) => void; onPrice: (value: string) => void; onSave: () => void; closeRef: React.RefObject<HTMLButtonElement | null> }) {
+  return <div className="fixed inset-0 z-[100] bg-slate-950/50 backdrop-blur-sm" role="presentation"><div className="absolute inset-y-0 right-0 flex w-full flex-col bg-white shadow-2xl transition-transform duration-300 lg:inset-6 lg:left-1/2 lg:h-[calc(100dvh-3rem)] lg:max-w-[1080px] lg:-translate-x-1/2 lg:rounded-2xl" role="dialog" aria-modal="true" aria-label={t.details}><header className="flex shrink-0 flex-wrap items-start justify-between gap-4 border-b border-gray-200 p-5 sm:p-6"><div className="min-w-0"><p className="text-xs font-black uppercase tracking-[0.15em] text-blue-600">{t.registrationId} · {warranty._id}</p><h2 className="mt-1 truncate text-xl font-black text-gray-950 sm:text-2xl">{warranty.model || t.product}</h2><div className="mt-3 flex flex-wrap items-center gap-2"><StatusBadge status={warranty.status} t={t}/><span className="text-sm text-gray-500">{t.registered}: {formatDate(warranty.registrationDate || warranty.createdAt, language, t.dateUnknown)}</span><span className="text-sm text-gray-500">{warranty.customerEmail || warranty.contact || t.dateUnknown}</span></div></div><button ref={closeRef} type="button" onClick={onClose} aria-label={t.close} className="grid h-11 w-11 place-items-center rounded-xl text-xl text-gray-600 hover:bg-gray-100">×</button></header><div className="flex-1 overflow-y-auto p-4 sm:p-6">{loading ? <DetailSkeleton /> : <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,.72fr)]"><div className="space-y-5"><Section title={t.customerInfo}><Field label={t.fullName} value={warranty.fullName || warranty.customerName || t.dateUnknown}/><Field label={t.phone} value={warranty.phone || t.dateUnknown}/><Field label={t.email} value={warranty.customerEmail || warranty.contact || t.dateUnknown}/><Field label={t.address} value={warranty.address || t.dateUnknown}/></Section><Section title={t.productInfo}><div className="flex gap-4"><div className="grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-xl bg-gray-50 text-2xl">{warranty.productImage ? <img src={warranty.productImage} loading="lazy" alt={warranty.productName || warranty.model || t.product} className="h-full w-full object-contain"/> : "▣"}</div><div className="min-w-0"><Field label={t.product} value={warranty.productName || warranty.model || t.dateUnknown}/><Field label={t.variant} value={warranty.variantId || t.dateUnknown}/><Field label={t.serial} value={warranty.serialNumber || warranty.serial || t.dateUnknown}/></div></div><div className="mt-4 grid gap-3 sm:grid-cols-2"><Field label={t.purchaseDate} value={formatDate(warranty.purchaseDate || warranty.invoiceDate, language, t.dateUnknown)}/><Field label={t.expiryDate} value={formatDate(warranty.warrantyEnd, language, t.dateUnknown)}/></div></Section><Section title={t.registrationInfo}><div className="grid gap-3 sm:grid-cols-2"><Field label={t.registered} value={formatDate(warranty.registrationDate || warranty.createdAt, language, t.dateUnknown)}/><Field label={t.currentStatus} value={statusLabel(warranty.status, t)}/><Field label={t.staff} value={warranty.approvedBy || t.dateUnknown}/><Field label={t.orderCode} value={warranty.orderCode || t.dateUnknown}/></div>{warranty.rejectedReason && <Field label={t.notes} value={warranty.rejectedReason}/>}<div className="mt-4"><p className="mb-2 text-xs font-black uppercase tracking-wide text-gray-500">{t.attachment}</p>{warranty.invoiceImage ? warranty.invoiceImage.startsWith("data:image") ? <img src={warranty.invoiceImage} loading="lazy" alt={t.invoice} className="max-h-52 rounded-xl border border-gray-200 object-contain"/> : <a href={warranty.invoiceImage} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center rounded-xl border border-gray-200 px-4 text-sm font-bold text-blue-700">{t.invoice}</a> : <p className="text-sm text-gray-500">{t.noInvoice}</p>}</div></Section></div><aside className="space-y-5"><Section title={t.timeline}>{history.length ? <ol className="space-y-4 border-l-2 border-blue-100 pl-4">{history.map((entry, index) => <li key={entry._id || index} className="relative"><span className="absolute -left-[22px] top-1 h-3 w-3 rounded-full bg-blue-600 ring-4 ring-white"/><div className="rounded-xl bg-gray-50 p-3"><div className="flex flex-wrap items-center justify-between gap-2"><strong className="text-sm">{statusLabel(entry.newStatus || warranty.status, t)}</strong><span className="text-xs text-gray-500">{formatDate(entry.createdAt, language, t.dateUnknown)}</span></div><p className="mt-1 text-xs text-gray-500">{entry.performedBy || "admin"} · {entry.action || t.historyAction}</p>{entry.details?.rejectionReason && <p className="mt-2 text-sm text-gray-700">{entry.details.rejectionReason}</p>}</div></li>)}</ol> : <p className="text-sm text-gray-500">{t.noHistory}</p>}</Section></aside></div>}</div><footer className="sticky bottom-0 shrink-0 border-t border-gray-200 bg-white p-4 sm:p-5"><div className="mx-auto flex max-w-[1030px] flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">{action === "reject" ? <textarea value={reason} onChange={(event) => onReason(event.target.value)} placeholder={t.rejectionPlaceholder} className="min-h-20 w-full rounded-xl border border-gray-200 p-3 text-sm outline-none focus:ring-2 focus:ring-rose-100 sm:max-w-md"/> : action === "extend" ? <div className="grid w-full grid-cols-2 gap-3 sm:max-w-md"><input type="number" min="1" value={months} onChange={(event) => onMonths(event.target.value)} aria-label={t.months} className="min-h-11 rounded-xl border border-gray-200 px-3"/><input type="number" min="0" value={price} onChange={(event) => onPrice(event.target.value)} aria-label={t.price} className="min-h-11 rounded-xl border border-gray-200 px-3"/></div> : <p className="text-sm text-gray-500">{availableActions.length ? t.currentStatus : t.noAction}</p>}<div className="flex flex-wrap gap-2">{action ? <><button type="button" disabled={submitting} onClick={() => onAction(null)} className="min-h-11 rounded-xl px-4 text-sm font-bold">{t.cancel}</button><button type="button" disabled={submitting} onClick={onSave} className={`min-h-11 rounded-xl px-4 text-sm font-bold text-white ${action === "reject" ? "bg-rose-600" : "bg-slate-950"}`}>{submitting ? t.saving : t.confirm}</button></> : availableActions.map((item) => <button key={item} type="button" onClick={() => onAction(item)} className={`min-h-11 rounded-xl px-4 text-sm font-bold ${item === "reject" ? "bg-rose-50 text-rose-700" : item === "extend" ? "bg-amber-50 text-amber-800" : "bg-slate-950 text-white"}`}>{item === "approve" ? t.approve : item === "reject" ? t.reject : t.extend}</button>)}</div></div></footer></div></div>;
+}
+
+function StatusBadge({ status, t }: { status: string; t: typeof labels.vi | typeof labels.en }) { return <span className={`inline-flex rounded-full px-3 py-1 text-xs font-black ${statusClass(status)}`}>{statusLabel(status, t)}</span>; }
+function Section({ title, children }: { title: string; children: React.ReactNode }) { return <section className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm"><h3 className="text-sm font-black uppercase tracking-[0.12em] text-gray-700">{title}</h3><div className="mt-4">{children}</div></section>; }
+function Field({ label, value }: { label: string; value: string }) { return <div className="mb-3 last:mb-0"><p className="text-xs font-bold uppercase tracking-wide text-gray-500">{label}</p><p className="mt-1 break-words text-sm font-semibold text-gray-900">{value}</p></div>; }
+function ListSkeleton() { return <div className="space-y-3">{Array.from({ length: 5 }, (_, index) => <div key={index} className="h-20 animate-pulse rounded-xl bg-gray-100"/>)}</div>; }
+function DetailSkeleton() { return <div className="grid gap-5 lg:grid-cols-2">{Array.from({ length: 4 }, (_, index) => <div key={index} className="h-48 animate-pulse rounded-2xl bg-gray-100"/>)}</div>; }

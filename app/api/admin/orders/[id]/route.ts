@@ -15,20 +15,25 @@ export async function PUT(
     }
 
     const db = await getDb();
-    
-    const result = await db.collection("orders").updateOne(
-      { _id: new ObjectId(id) },
-      { 
-        $set: { 
-          status,
-          updatedAt: new Date().toISOString()
-        } 
-      }
-    );
-
-    if (result.matchedCount === 0) {
+    const orders = db.collection("orders");
+    const orderId = new ObjectId(id);
+    const existingOrder = await orders.findOne({ _id: orderId });
+    if (!existingOrder) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
+
+    const now = new Date();
+    const updateData: Record<string, unknown> = { status, updatedAt: now };
+    if (String(status).toLowerCase() === "delivered") {
+      // The first delivered timestamp is the immutable invoice/warranty start date.
+      updateData.deliveredAt = existingOrder.deliveredAt || now;
+      updateData.invoiceDate = existingOrder.invoiceDate || existingOrder.deliveredAt || now;
+    }
+
+    const result = await db.collection("orders").updateOne(
+      { _id: orderId },
+      { $set: updateData }
+    );
 
     return NextResponse.json({ success: true, message: "Order updated successfully" });
   } catch (error) {

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/mongodb";
+import { listWarranties } from "@/lib/warranty";
 
 export async function GET(request: Request) {
   try {
@@ -15,19 +16,10 @@ export async function GET(request: Request) {
 
     const db = await getDb();
 
-    // Find registrations by email. 
-    // If the user registered without being logged in, they might have put their email in 'contact'.
-    // So we check both userEmail and contact.
-    const registrations = await db
-      .collection("registrations")
-      .find({
-        $or: [
-          { userEmail: email },
-          { contact: email }
-        ]
-      })
-      .sort({ createdAt: -1 })
-      .toArray();
+    // Legacy callers still receive `products`, now enriched with live warranty status.
+    const registrations = await listWarranties(db, {
+      $or: [{ customerEmail: email }, { userEmail: email }, { contact: email }],
+    });
 
     return NextResponse.json({
       success: true,
