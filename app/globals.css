@@ -9258,4 +9258,125 @@ button {
   }
 }
 
+/* Product Description (Read More / Collapse) */
+.product-desc-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+}
 
+.product-desc-content {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.product-desc-gradient {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: linear-gradient(to top, #ffffff, transparent);
+  pointer-events: none;
+}
+
+.product-desc-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 12px;
+  padding: 6px 12px;
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--blue-dark);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.product-desc-toggle:hover {
+  background: rgba(13, 91, 255, 0.05);
+  border-color: rgba(13, 91, 255, 0.2);
+}
+
+.product-desc-toggle svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.3s ease;
+}
+
+/* Prose for formatted description content */
+.prose-description {
+  color: #374151;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.prose-description p {
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+.prose-description p:last-child {
+  margin-bottom: 0;
+}
+
+.prose-description img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 16px 0;
+}
+
+.prose-description h1,
+.prose-description h2,
+.prose-description h3,
+.prose-description h4,
+.prose-description h5,
+.prose-description h6 {
+  color: #111827;
+  font-weight: 700;
+  margin-top: 24px;
+  margin-bottom: 12px;
+  line-height: 1.3;
+}
+
+.prose-description h1 { font-size: 24px; }
+.prose-description h2 { font-size: 20px; }
+.prose-description h3 { font-size: 18px; }
+
+.prose-description ul,
+.prose-description ol {
+  margin-top: 0;
+  margin-bottom: 16px;
+  padding-left: 24px;
+}
+
+.prose-description ul { list-style-type: disc; }
+.prose-description ol { list-style-type: decimal; }
+
+.prose-description li {
+  margin-bottom: 6px;
+}
+
+.prose-description strong,
+.prose-description b {
+  font-weight: 700;
+  color: #111827;
+}
+
+.prose-description a {
+  color: var(--blue);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.prose-description a:hover {
+  color: var(--blue-dark);
+}

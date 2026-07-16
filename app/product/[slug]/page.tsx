@@ -8,6 +8,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useLanguage } from '../../LanguageProvider';
 import { readCurrentUser } from "../../auth-storage";
 import { fetchWishlist, toggleWishlistItem, type WishlistItem } from "@/lib/wishlist-client";
+import ProductDescription from "@/components/ProductDescription";
 import { showToast } from "../../toast";
 
 type ProductFeature = {
@@ -657,8 +658,11 @@ function ProductFeatureShowcase({
               const angle = (index / product.features.length) * Math.PI * 2 - Math.PI / 2;
               const radiusX = 42;
               const radiusY = 36;
-              const x = 50 + Math.cos(angle) * radiusX;
-              const y = 50 + Math.sin(angle) * radiusY;
+              // Browser and Node can round trigonometric values at a different
+              // final decimal. Serialize a stable value so SSR and hydration
+              // receive identical CSS custom properties.
+              const x = (50 + Math.cos(angle) * radiusX).toFixed(3);
+              const y = (50 + Math.sin(angle) * radiusY).toFixed(3);
 
               return (
                 <button
@@ -902,7 +906,7 @@ export default function ProductDetailPage() {
         <div className="product-detail-info">
           <h1>{displayName}</h1>
           <span className="product-title-line" aria-hidden="true" />
-          <p>{displayDescription}</p>
+          <ProductDescription description={displayDescription} language={language as "vi" | "en"} />
 
           {isFetchingStatus ? (
              <div className="rounded-lg bg-gray-50 p-4 text-center text-sm font-semibold text-gray-500">

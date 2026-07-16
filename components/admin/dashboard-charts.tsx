@@ -31,22 +31,21 @@ export default function DashboardCharts({ trend, statuses }: { trend: Trend[]; s
     revenueByDay: "Revenue Analytics", revenueDescription: "Track revenue and order trends over time.", completedOnly: "Completed only", noRevenue: "No completed orders in this period.", orderStatus: "Order Status", statusDescription: "Order distribution by current status.", orders: "Orders", pending: "Pending", processing: "Processing", shipping: "Shipping", completed: "Completed", cancelled: "Cancelled", refunded: "Refunded", salesAnalytics: "Sales Analytics", salesDescription: "Compare main order statuses.", revenue: "Revenue"
   };
   const statusLabels: Record<string, string> = { pending: t.pending, processing: t.processing, shipping: t.shipping, completed: t.completed, cancelled: t.cancelled, refunded: t.refunded };
-  const totalStatuses = Math.max(Object.values(statuses).reduce((sum, value) => sum + value, 0), 1);
+  const totalStatuses = Object.values(statuses).reduce((sum, value) => sum + (Number.isFinite(value) ? value : 0), 0);
 
   const pieData = Object.entries(statuses)
-    .filter(([_, count]) => count > 0)
+    .filter(([_, count]) => Number.isFinite(count) && count > 0)
     .map(([status, count]) => ({
       name: statusLabels[status] || status,
       value: count,
       color: statusColors[status] || "#cbd5e1"
     }));
 
-  const barData = [
-    { name: t.completed, value: statuses.completed || 0, fill: statusColors.completed },
-    { name: t.pending, value: statuses.pending || 0, fill: statusColors.pending },
-    { name: t.cancelled, value: statuses.cancelled || 0, fill: statusColors.cancelled },
-    { name: t.refunded, value: statuses.refunded || 0, fill: statusColors.refunded },
-  ];
+  const barData = Object.entries(statuses).map(([status, count]) => ({
+    name: statusLabels[status] || status,
+    value: Number.isFinite(count) ? count : 0,
+    fill: statusColors[status] || "#cbd5e1",
+  }));
 
   return (
     <div className="grid gap-6 xl:grid-cols-3">
@@ -88,7 +87,7 @@ export default function DashboardCharts({ trend, statuses }: { trend: Trend[]; s
           <p className="mt-1 text-sm text-slate-500">{t.statusDescription}</p>
         </div>
         <div className="flex-1 flex flex-col justify-center mt-6">
-          <div className="h-48 w-full relative">
+          {pieData.length ? <><div className="h-48 w-full relative">
              <ResponsiveContainer width="100%" height="100%">
                <PieChart>
                  <Pie
@@ -112,7 +111,7 @@ export default function DashboardCharts({ trend, statuses }: { trend: Trend[]; s
                </PieChart>
              </ResponsiveContainer>
              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span className="text-2xl font-bold text-slate-900">{Object.values(statuses).reduce((a, b) => a + b, 0)}</span>
+                <span className="text-2xl font-bold text-slate-900">{totalStatuses}</span>
                 <span className="text-xs text-slate-500">{t.orders}</span>
              </div>
           </div>
@@ -123,7 +122,7 @@ export default function DashboardCharts({ trend, statuses }: { trend: Trend[]; s
                 <strong className="text-slate-900 shrink-0">{count}</strong>
               </div>
             ))}
-          </div>
+          </div></> : <EmptyChart label={language === "vi" ? "Chưa có đơn hàng trong khoảng thời gian này." : "No orders in this period."} />}
         </div>
       </section>
 
@@ -133,7 +132,7 @@ export default function DashboardCharts({ trend, statuses }: { trend: Trend[]; s
           <h2 className="text-lg font-semibold text-slate-900">{t.salesAnalytics}</h2>
           <p className="mt-1 text-sm text-slate-500">{t.salesDescription}</p>
         </div>
-        <div className="h-64 w-full mt-6">
+        {totalStatuses ? <div className="h-64 w-full mt-6">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={barData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
@@ -150,7 +149,7 @@ export default function DashboardCharts({ trend, statuses }: { trend: Trend[]; s
               </Bar>
             </BarChart>
           </ResponsiveContainer>
-        </div>
+        </div> : <EmptyChart label={language === "vi" ? "Chưa có đơn hàng trong khoảng thời gian này." : "No orders in this period."} />}
       </section>
     </div>
   );

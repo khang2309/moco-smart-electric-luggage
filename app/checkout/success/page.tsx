@@ -1,5 +1,5 @@
 "use client";
-
+import React from "react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useLanguage } from '../../LanguageProvider';
@@ -12,7 +12,7 @@ type LastOrder = {
   payment: string;
 };
 
-export default function CheckoutSuccessPage() {
+function CheckoutSuccessPage() {
   const [order, setOrder] = useState<LastOrder | null>(null);
   const { language } = useLanguage();
   const currency = new Intl.NumberFormat("vi-VN").format;
@@ -55,4 +55,11 @@ export default function CheckoutSuccessPage() {
       </section>
     </main>
   );
+}
+
+export default function Page() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+  return <CheckoutSuccessPage />;
 }

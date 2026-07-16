@@ -57,18 +57,18 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="admin-shell flex min-h-screen bg-gray-100">
+    <div className="admin-shell flex min-h-screen overflow-x-hidden bg-gray-100">
       {/* Mobile sidebar backdrop */}
       {isSidebarOpen && (
         <div 
-          className="fixed inset-0 z-40 bg-black/50 md:hidden transition-opacity" 
-          onClick={() => setIsSidebarOpen(false)} 
+          className="fixed inset-0 z-50 bg-black/50 md:hidden transition-opacity"
+          onClick={() => setIsSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
-      <aside 
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-800 text-white transition-transform duration-300 ease-in-out md:static md:translate-x-0 ${
+      <aside
+        className={`fixed inset-y-0 left-0 z-[60] w-64 bg-gray-800 text-white transition-transform duration-300 ease-in-out md:static md:translate-x-0 ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -102,7 +102,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       {/* Main Content */}
       <main className="flex-1 flex flex-col min-w-0">
         {/* Mobile Header */}
-        <div className="sticky top-0 z-30 flex items-center bg-white px-4 py-3 shadow-sm md:hidden">
+        <div className="sticky top-0 z-40 flex items-center bg-white px-4 py-3 shadow-sm md:hidden">
           <button 
             onClick={() => setIsSidebarOpen(true)} 
             aria-label="Open navigation"
@@ -116,7 +116,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         </div>
 
         {/* Page Content */}
-        <div className="flex-1 p-4 md:p-6">
+        <div className="flex-1 min-w-0 p-4 md:p-6">
           <div className="mx-auto max-w-7xl">
             {children}
           </div>

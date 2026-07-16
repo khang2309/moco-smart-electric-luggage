@@ -1,5 +1,5 @@
 "use client";
-
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -38,7 +38,7 @@ const paymentOptions = {
   card: { vi: "Th\u1ebb ATM / Visa / Mastercard", en: "ATM / Visa / Mastercard" },
 } as const;
 
-export default function CheckoutPage() {
+function CheckoutPage() {
   const [items, setItems] = useState<CartItem[]>([]);
   const [shipping, setShipping] = useState<keyof typeof shippingOptions>("standard");
   const [payment, setPayment] = useState<keyof typeof paymentOptions>("cod");
@@ -70,7 +70,7 @@ export default function CheckoutPage() {
     } catch {
       setItems([]);
     }
-  }, []);
+  }, [router]);
 
   const subtotal = useMemo(
     () => items.reduce((sum, item) => sum + item.price * item.quantity, 0),
@@ -320,4 +320,11 @@ export default function CheckoutPage() {
       </form>
     </main>
   );
+}
+
+export default function Page() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+  return <CheckoutPage />;
 }

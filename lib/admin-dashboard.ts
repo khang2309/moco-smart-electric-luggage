@@ -1,8 +1,5 @@
 import type { Db, Document } from "mongodb";
 
-const CACHE_TTL_MS = 45_000;
-const cache = new Map<string, { expiresAt: number; value: DashboardData }>();
-
 export type DashboardFilters = {
   range?: string;
   start?: string;
@@ -37,7 +34,8 @@ function resolveRange(filters: DashboardFilters) {
   const today = startOfDay(now);
   const start = new Date(today);
   const end = new Date(now);
-  const range = filters.range || "month";
+  const range = filters.range || "all";
+  if (range === "all") return { start: null, end: null };
   if (range === "today") return { start: today, end };
   if (range === "yesterday") { start.setDate(start.getDate() - 1); end.setTime(today.getTime() - 1); return { start, end }; }
   if (range === "week") { start.setDate(start.getDate() - ((start.getDay() + 6) % 7)); return { start, end }; }
@@ -51,7 +49,8 @@ function resolveRange(filters: DashboardFilters) {
 }
 
 function statusOf(order: Document) {
-  const candidates = [String(order.fulfillmentStatus || "").toLowerCase(), String(order.status || "").toLowerCase()];
+  // `status` is canonical. Legacy orders can still fall back to fulfillmentStatus.
+  const candidates = [String(order.status || "").toLowerCase(), String(order.fulfillmentStatus || "").toLowerCase()];
   const raw = candidates.find((value) => ["pending", "processing", "confirmed", "shipping", "shipped", "delivered", "completed", "cancelled", "canceled", "refunded", "refund"].includes(value)) || "pending";
   if (["delivered", "completed"].includes(raw)) return "completed";
   if (["shipping", "shipped"].includes(raw)) return "shipping";
@@ -65,17 +64,16 @@ function toDate(value: unknown) {
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
-function cacheKey(filters: DashboardFilters) { return JSON.stringify(filters); }
+function finiteNumber(value: unknown) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : 0;
+}
 
 export async function getDashboardData(db: Db, filters: DashboardFilters): Promise<DashboardData> {
-  const key = cacheKey(filters);
-  const cached = cache.get(key);
-  if (cached && cached.expiresAt > Date.now()) return cached.value;
-
   const { start, end } = resolveRange(filters);
   const orders = await db.collection("orders").aggregate<Document>([
     { $addFields: { dashboardCreatedAt: { $convert: { input: "$createdAt", to: "date", onError: null, onNull: null } } } },
-    { $match: { dashboardCreatedAt: { $gte: start, $lte: end } } },
+    ...(start && end ? [{ $match: { dashboardCreatedAt: { $gte: start, $lte: end } } }] : []),
     { $sort: { dashboardCreatedAt: -1 } },
   ]).toArray();
 
@@ -103,20 +101,20 @@ export async function getDashboardData(db: Db, filters: DashboardFilters): Promi
   for (const order of filteredOrders) {
     const status = statusOf(order);
     if (status in statuses) statuses[status as keyof typeof statuses] += 1;
-    const total = Number(order.total) || 0;
-    if (status === "refunded") { refunds += Number(order.refundAmount ?? total) || 0; continue; }
+    const total = finiteNumber(order.total);
+    if (status === "refunded") { refunds += finiteNumber(order.refundAmount ?? total); continue; }
     if (status !== "completed") continue;
     completedRevenue += total;
-    shippingCost += Number(order.shippingCost || 0);
-    voucherDiscount += Number(order.discount || order.voucherDiscount || 0);
-    paymentFee += Number(order.paymentFee || order.transactionFee || 0);
-    operatingExpenses += Number(order.operatingExpenses || 0) + Number(order.marketingExpenses || 0) + Number(order.otherExpenses || 0);
+    shippingCost += finiteNumber(order.shippingCost);
+    voucherDiscount += finiteNumber(order.discount ?? order.voucherDiscount);
+    paymentFee += finiteNumber(order.paymentFee ?? order.transactionFee);
+    operatingExpenses += finiteNumber(order.operatingExpenses) + finiteNumber(order.marketingExpenses) + finiteNumber(order.otherExpenses);
     const items = Array.isArray(order.items) ? order.items : [];
     if (items.length === 0) financialDataComplete = false;
     for (const item of items) {
-      const quantity = Math.max(1, Number(item.quantity) || 1);
+      const quantity = Math.max(1, finiteNumber(item.quantity) || 1);
       const name = String(item.name || item.slug || "Product");
-      const itemRevenue = (Number(item.price) || 0) * quantity;
+      const itemRevenue = finiteNumber(item.price) * quantity;
       const product = products.get(name) || { quantity: 0, revenue: 0 };
       product.quantity += quantity;
       product.revenue += itemRevenue;
@@ -141,10 +139,10 @@ export async function getDashboardData(db: Db, filters: DashboardFilters): Promi
     const keyLabel = date.toLocaleDateString("en-CA");
     const row = revenueTrendMap.get(keyLabel) || { revenue: 0, orders: 0 };
     if (status === "completed") {
-      row.revenue += Number(order.total) || 0;
+      row.revenue += finiteNumber(order.total);
       row.orders += 1;
     } else {
-      row.revenue -= Number(order.refundAmount ?? order.total) || 0;
+      row.revenue -= finiteNumber(order.refundAmount ?? order.total);
     }
     revenueTrendMap.set(keyLabel, row);
   }
@@ -166,7 +164,7 @@ export async function getDashboardData(db: Db, filters: DashboardFilters): Promi
   const data: DashboardData = {
     generatedAt: new Date().toISOString(),
     financialDataComplete,
-    kpis: { totalRevenue: recognizedRevenue, grossProfit, netProfit, completedOrders: statuses.completed, processingOrders: statuses.processing + statuses.shipping, pendingOrders: statuses.pending, cancelledOrders: statuses.cancelled, refundedOrders: statuses.refunded, totalCustomers: customers.length, newCustomersToday: customers.filter((user) => { const date = toDate(user.createdAt); return Boolean(date && date >= today); }).length, totalProducts: productsList.length, lowStockProducts: productsList.filter((product) => Number(product.stock) > 0 && Number(product.stock) <= 5).length, averageOrderValue: statuses.completed ? completedRevenue / statuses.completed : 0, refunds, totalWishlistItems: wishlistInsights.reduce((sum, item) => sum + Number(item.count || 0), 0) },
+    kpis: { totalOrders: filteredOrders.length, totalRevenue: recognizedRevenue, grossProfit, netProfit, completedOrders: statuses.completed, processingOrders: statuses.processing + statuses.shipping, pendingOrders: statuses.pending, cancelledOrders: statuses.cancelled, refundedOrders: statuses.refunded, totalCustomers: customers.length, newCustomersToday: customers.filter((user) => { const date = toDate(user.createdAt); return Boolean(date && date >= today); }).length, totalProducts: productsList.length, lowStockProducts: productsList.filter((product) => Number(product.stock) > 0 && Number(product.stock) <= 5).length, averageOrderValue: statuses.completed ? completedRevenue / statuses.completed : 0, refunds, totalWishlistItems: wishlistInsights.reduce((sum, item) => sum + finiteNumber(item.count), 0) },
     statuses,
     revenueTrend: Array.from(revenueTrendMap, ([label, value]) => ({ label, ...value })).sort((a, b) => a.label.localeCompare(b.label)),
     topProducts: Array.from(products, ([name, value]) => ({ name, ...value })).sort((a, b) => b.revenue - a.revenue).slice(0, 5),
@@ -174,6 +172,5 @@ export async function getDashboardData(db: Db, filters: DashboardFilters): Promi
     wishlistInsights: wishlistInsights.map((item) => ({ name: String(item.name), slug: String(item.slug), count: Number(item.count || 0), stock: Number(item.stock || 0), category: String(item.category || "Uncategorized"), brand: String(item.brand || "Unknown") })),
     recentOrders: filteredOrders.slice(0, 8),
   };
-  cache.set(key, { value: data, expiresAt: Date.now() + CACHE_TTL_MS });
   return data;
 }

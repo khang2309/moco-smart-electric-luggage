@@ -1,6 +1,7 @@
 "use client";
-
+import React from "react";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import { useLanguage } from '../LanguageProvider';
 
 const aboutCopy = {
@@ -41,7 +42,7 @@ const aboutCopy = {
   },
 } as const;
 
-export default function AboutPage() {
+function AboutPage() {
   const { language } = useLanguage();
   const copy = aboutCopy[language];
 
@@ -82,4 +83,11 @@ export default function AboutPage() {
       </section>
     </main>
   );
+}
+
+export default function Page() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+  return <AboutPage />;
 }
